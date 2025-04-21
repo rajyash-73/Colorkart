@@ -8,7 +8,8 @@ import OnboardingTour from "@/components/modals/OnboardingTour";
 import ExportModal from "@/components/modals/ExportModal";
 import AdjustColorModal from "@/components/modals/AdjustColorModal";
 import { usePalette } from "@/contexts/PaletteContext";
-import { type Color } from "@shared/schema";
+import { type Color } from "../types/Color";
+import { Helmet } from "react-helmet-async";
 
 export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -17,7 +18,7 @@ export default function Home() {
   const [activeColorIndex, setActiveColorIndex] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  const { palette, generatePalette, addColor, clearPalette, updateColor } = usePalette();
+  const { palette, generatePalette, addColor, resetPalette, updateColor } = usePalette();
   const { toast } = useToast();
   
   console.log('Home component rendered with palette:', palette);
@@ -95,7 +96,26 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+      <Helmet>
+        <title>Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes</title>
+        <meta name="description" content="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools." />
+        <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="canonical" href="https://coolors.in/" />
+        {/* Dynamic structured data for the home page */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Coolors.in Color Palette Generator",
+            "url": "https://coolors.in/",
+            "description": "Create beautiful color combinations with our intuitive color generator",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Any"
+          })}
+        </script>
+      </Helmet>
       <Header 
         onHelp={handleHelp} 
         onExport={handleExport} 
@@ -106,7 +126,20 @@ export default function Home() {
       
       <KeyboardShortcutsBar />
       
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden" id="paletteContainer">
+      {/* Mobile View: Stack colors vertically */}
+      <div className="flex-1 flex flex-col overflow-auto md:hidden" id="mobilePaletteContainer">
+        {palette.map((color, index) => (
+          <ColorCard 
+            key={index}
+            color={color}
+            index={index}
+            onAdjustColor={() => handleAdjustColor(index)}
+          />
+        ))}
+      </div>
+      
+      {/* Desktop View: Colors side by side */}
+      <div className="hidden md:flex flex-1 flex-row overflow-hidden" id="desktopPaletteContainer">
         {palette.map((color, index) => (
           <ColorCard 
             key={index}
@@ -116,7 +149,7 @@ export default function Home() {
           />
         ))}
         
-        <div className="hidden md:flex items-center justify-center w-16 bg-gray-100 border-l border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors"
+        <div className="flex items-center justify-center w-16 bg-gray-100 border-l border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors"
             onClick={() => addColor()}>
           <div className="flex flex-col items-center justify-center text-gray-500 space-y-2">
             <i className="fas fa-plus text-xl"></i>
@@ -128,7 +161,7 @@ export default function Home() {
       <ActionButtons 
         onGenerate={handleGeneratePalette}
         onAddColor={addColor}
-        onClearAll={clearPalette}
+        onClearAll={resetPalette}
       />
       
       {showOnboarding && <OnboardingTour onClose={() => setShowOnboarding(false)} />}

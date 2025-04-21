@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Color } from "@shared/schema";
+import { Color } from "../../types/Color";
 import { useToast } from "@/hooks/use-toast";
 import html2canvas from "html2canvas";
 
@@ -88,10 +88,10 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
   };
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Export Palette</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6">
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Export Palette</h2>
           <button 
             className="text-gray-500 hover:text-gray-700"
             onClick={onClose}
@@ -101,10 +101,10 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
           </button>
         </div>
         
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div 
             ref={paletteRef}
-            className="flex space-x-1 h-16 mb-4 rounded overflow-hidden"
+            className="flex space-x-1 h-14 sm:h-16 mb-3 sm:mb-4 rounded overflow-hidden"
           >
             {palette.map((color, index) => (
               <div 
@@ -113,12 +113,12 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
                 style={{ backgroundColor: color.hex }}
               >
                 {showHex && (
-                  <div className="absolute bottom-1 left-0 right-0 text-center text-xs" style={{ color: isLightColor(color.hex) ? '#000' : '#fff' }}>
+                  <div className="absolute bottom-1 left-0 right-0 text-center text-[10px] sm:text-xs" style={{ color: isLightColor(color.hex) ? '#000' : '#fff' }}>
                     {color.hex}
                   </div>
                 )}
                 {showRGB && (
-                  <div className="absolute top-1 left-0 right-0 text-center text-xs" style={{ color: isLightColor(color.hex) ? '#000' : '#fff' }}>
+                  <div className="absolute top-1 left-0 right-0 text-center text-[10px] sm:text-xs" style={{ color: isLightColor(color.hex) ? '#000' : '#fff' }}>
                     {color.rgb.r},{color.rgb.g},{color.rgb.b}
                   </div>
                 )}
@@ -126,10 +126,48 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
             ))}
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">Export Format</label>
-              <div className="flex space-x-3">
+              <label className="block text-gray-700 text-sm font-medium mb-1 sm:mb-2">Export Format</label>
+              {/* Mobile view */}
+              <div className="flex flex-wrap sm:hidden gap-3">
+                <div className="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="formatPNGMobile" 
+                    name="exportFormat" 
+                    checked={exportFormat === "png"}
+                    onChange={() => setExportFormat("png")}
+                    className="h-4 w-4 text-primary"
+                  />
+                  <label htmlFor="formatPNGMobile" className="ml-2 text-xs text-gray-700">PNG Image</label>
+                </div>
+                <div className="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="formatJSONMobile" 
+                    name="exportFormat" 
+                    checked={exportFormat === "json"}
+                    onChange={() => setExportFormat("json")}
+                    className="h-4 w-4 text-primary"
+                  />
+                  <label htmlFor="formatJSONMobile" className="ml-2 text-xs text-gray-700">JSON</label>
+                </div>
+                <div className="flex items-center">
+                  <input 
+                    type="radio" 
+                    id="formatTXTMobile" 
+                    name="exportFormat" 
+                    checked={exportFormat === "txt"}
+                    onChange={() => setExportFormat("txt")}
+                    className="h-4 w-4 text-primary"
+                  />
+                  <label htmlFor="formatTXTMobile" className="ml-2 text-xs text-gray-700">Text</label>
+                </div>
+              </div>
+              
+              {/* Desktop view */}
+              <div className="hidden sm:flex space-x-3">
                 <div className="flex items-center">
                   <input 
                     type="radio" 
@@ -168,8 +206,8 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
             
             {exportFormat === "png" && (
               <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2">Image Options</label>
-                <div className="flex space-x-3">
+                <label className="block text-gray-700 text-sm font-medium mb-1 sm:mb-2">Image Options</label>
+                <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:space-x-3">
                   <div className="flex items-center">
                     <input 
                       type="checkbox" 
@@ -178,7 +216,7 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
                       onChange={() => setShowHex(!showHex)}
                       className="h-4 w-4 text-primary"
                     />
-                    <label htmlFor="showHex" className="ml-2 text-sm text-gray-700">Show Hex Codes</label>
+                    <label htmlFor="showHex" className="ml-2 text-xs sm:text-sm text-gray-700">Show Hex Codes</label>
                   </div>
                   <div className="flex items-center">
                     <input 
@@ -188,7 +226,7 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
                       onChange={() => setShowRGB(!showRGB)}
                       className="h-4 w-4 text-primary"
                     />
-                    <label htmlFor="showRGB" className="ml-2 text-sm text-gray-700">Show RGB Values</label>
+                    <label htmlFor="showRGB" className="ml-2 text-xs sm:text-sm text-gray-700">Show RGB Values</label>
                   </div>
                 </div>
               </div>
@@ -198,7 +236,7 @@ export default function ExportModal({ palette, onClose }: ExportModalProps) {
         
         <div className="flex justify-end">
           <button 
-            className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-md flex items-center space-x-2"
+            className="bg-primary hover:bg-blue-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-md flex items-center space-x-1.5 sm:space-x-2 text-sm sm:text-base"
             onClick={handleDownload}
           >
             <i className="fas fa-download"></i>

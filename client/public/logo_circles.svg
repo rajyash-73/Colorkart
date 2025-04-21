@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100" height="40" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Color Circles -->
+  <circle cx="14" cy="20" r="12" fill="#FF5E5B"/>
+  <circle cx="32" cy="20" r="12" fill="#FFB703"/>
+  <circle cx="50" cy="20" r="12" fill="#8AC926"/>
+  <circle cx="68" cy="20" r="12" fill="#1982C4"/>
+  <circle cx="86" cy="20" r="12" fill="#6A4C93"/>
+</svg>

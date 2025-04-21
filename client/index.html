@@ -2,45 +2,92 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1"
-    />
-
-    <!-- ✅ Site Title -->
-    <title>Coolors – Beautiful Color Palettes for Creatives & Designers</title>
-
-    <!-- ✅ Meta Description for SEO -->
-    <meta
-      name="description"
-      content="Coolors lets you create and explore beautiful color palettes for your projects. Perfect for designers, artists, and creators!"
-    />
-    <meta name="keywords" content="color palettes, design, UI, UX, hex, color scheme, generate, creative, coolors" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Coolors.in - Free Color Palette Generator | Color Schemes & Combinations</title>
+    <meta name="description" content="Generate perfect color combinations for your designs. Create, save, and export beautiful color palettes with Coolors.in's free color palette generator." />
+    <meta name="keywords" content="color palette generator, color scheme, color combinations, color picker, web design tools, UI design, color theory, graphic design, color wheel, color inspiration" />
     <meta name="author" content="Coolors.in" />
-
-    <!-- ✅ Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png" />
-
-    <!-- ✅ Google Analytics -->
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB40PTGVD4"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-      gtag("config", "G-XB40PTGVD4");
-    </script>
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    <!-- ✅ Google AdSense -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5617109574785382"
-      crossorigin="anonymous"
-    ></script>
+      gtag('config', 'G-XB40PTGVD4');
+    </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5617109574785382"
+     crossorigin="anonymous"></script>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://coolors.in" />
+    
+    <!-- Favicon & App Icons -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/logo_compact.svg" />
+    <link rel="mask-icon" href="/logo_circles.svg" color="#5bbad5" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="msapplication-TileColor" content="#6A4C93" />
+    
+    <!-- Google Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Coolors.in",
+      "url": "https://coolors.in",
+      "description": "Free online color palette generator for designers and artists. Create and export beautiful color schemes instantly.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Coolors.in - Free Color Palette Generator | Color Schemes & Combinations" />
+    <meta property="og:description" content="Generate perfect color combinations for your designs. Create, save, and export beautiful color palettes with Coolors.in's free online tool." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://coolors.in" />
+    <meta property="og:image" content="/logo.svg" />
+    <meta property="og:site_name" content="Coolors.in" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Coolors.in - Free Color Palette Generator" />
+    <meta name="twitter:description" content="Generate perfect color combinations for your designs. Create, save, and export beautiful color palettes with Coolors.in." />
+    <meta name="twitter:image" content="/logo.svg" />
+    
+    <!-- Mobile App Capable -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" role="application" aria-label="Coolors.in Color Palette Generator"></div>
+    <!-- Preload common resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Noscript notice for users with JavaScript disabled -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>Coolors.in requires JavaScript to generate color palettes. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
   </body>
 </html>

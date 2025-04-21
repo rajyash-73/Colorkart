@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom utilities */
+.ring-color {
+  --tw-ring-color: var(--ring-color);
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
