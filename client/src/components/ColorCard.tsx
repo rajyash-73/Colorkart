@@ -78,55 +78,78 @@ export default function ColorCard({ color, index, onAdjustColor }: ColorCardProp
   
   return (
     <div 
-      className="flex-1 relative flex flex-col justify-between transition-all cursor-pointer group min-h-[100px] xs:min-h-[120px] sm:min-h-[150px] md:min-h-0"
+      className="flex-1 relative flex flex-col justify-between transition-all cursor-pointer group min-h-[150px] xs:min-h-[170px] sm:min-h-[190px] md:min-h-0 w-full h-full border-2 border-white/20 rounded-md shadow-md"
       style={{ backgroundColor: color.hex }}
       data-color-index={index}
     >
       {/* Color Controls - Top */}
       <div className="absolute top-0 left-0 right-0 p-2 md:p-4 flex justify-between items-center">
-        <button 
-          className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-70 md:group-hover:opacity-100 md:opacity-0`}
-          onClick={handleToggleLock}
-          aria-label={color.locked ? "Unlock color" : "Lock color"}
-          title={color.locked ? "Unlock color" : "Lock color"}
-        >
-          <i className={`fas ${color.locked ? 'fa-lock' : 'fa-unlock'}`}></i>
-        </button>
+        <div className="flex space-x-1">
+          <button 
+            className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-90`}
+            onClick={handleToggleLock}
+            aria-label={color.locked ? "Unlock color" : "Lock color"}
+            title={color.locked ? "Unlock color" : "Lock color"}
+          >
+            <i className={`fas ${color.locked ? 'fa-lock' : 'fa-unlock'} text-xs md:text-base`}></i>
+          </button>
+          
+          <button 
+            className={`${textColor} bg-black/30 dark:bg-white/30 rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-90 ml-1 md:opacity-90`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopyColorCode();
+            }}
+            aria-label="Copy color code"
+            title="Copy color code"
+          >
+            <i className="fas fa-copy text-xs md:text-base"></i>
+          </button>
+        </div>
         
         <div className="flex space-x-1 md:space-x-2">
           <button 
-            className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-70 md:group-hover:opacity-100 md:opacity-0`}
+            className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-90`}
             onClick={handleAdjustColor}
             aria-label="Adjust color"
             title="Adjust color"
           >
-            <i className="fas fa-sliders-h"></i>
+            <i className="fas fa-sliders-h text-xs md:text-base"></i>
           </button>
           <button 
-            className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-70 md:group-hover:opacity-100 md:opacity-0`}
+            className={`${textColor} ${buttonBg} rounded-full p-1.5 md:p-2 transition-all transform hover:scale-110 opacity-90`}
             onClick={handleRemoveColor}
             aria-label="Remove color"
             title="Remove color"
           >
-            <i className="fas fa-times"></i>
+            <i className="fas fa-times text-xs md:text-base"></i>
           </button>
         </div>
       </div>
       
       {/* Color Code Display - Center */}
       <div 
-        className={`flex-1 flex flex-col items-center justify-center ${textColor} py-3 xs:py-4 sm:py-4 px-1 xs:px-2 md:p-4 group-hover:scale-105 md:group-hover:scale-110 transition-transform`}
+        className={`flex-1 flex flex-col items-center justify-center ${textColor} py-10 xs:py-12 sm:py-14 px-1 xs:px-2 md:p-4 group-hover:scale-105 md:group-hover:scale-110 transition-transform`}
         onClick={handleCopyColorCode}
       >
-        {/* Mobile Display */}
+        {/* Mobile Display - Simplified with no copy buttons */}
         <div className="block md:hidden w-full">
-          <div className="flex flex-row justify-center items-center">
-            <span className="text-[10px] xs:text-xs sm:text-sm font-bold whitespace-nowrap mr-1">
-              {color.hex}
-            </span>
-            <span className="text-[8px] xs:text-[10px] sm:text-xs opacity-80 whitespace-nowrap">
-              {color.name ? color.name : `(${color.rgb.r},${color.rgb.g},${color.rgb.b})`}
-            </span>
+          <div className="text-center">
+            <div className="bg-black/20 dark:bg-white/20 py-2 px-3 mx-auto inline-block rounded-md">
+              <div className="flex items-center justify-center">
+                <span className="text-xs xs:text-sm sm:text-base font-bold mr-1">
+                  {color.hex}
+                </span>
+                {color.name && (
+                  <>
+                    <span className="opacity-80 text-[9px] xs:text-[10px] mx-0.5">•</span>
+                    <span className="text-[10px] xs:text-xs sm:text-sm opacity-90 truncate max-w-[80px]">
+                      {color.name}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
         
@@ -135,25 +158,24 @@ export default function ColorCard({ color, index, onAdjustColor }: ColorCardProp
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold tracking-wider mb-2 text-center">
             {color.hex}
           </h2>
-          {color.name ? (
-            <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 items-center">
+            {color.name && (
               <p className="text-base opacity-90 font-medium">{color.name}</p>
-              <p className="text-sm opacity-70">
-                RGB: {color.rgb.r}, {color.rgb.g}, {color.rgb.b}
-              </p>
-            </div>
-          ) : (
-            <p className="text-base opacity-80">
+            )}
+            <p className="text-sm opacity-70">
               RGB: {color.rgb.r}, {color.rgb.g}, {color.rgb.b}
             </p>
-          )}
+          </div>
         </div>
         
-        <div className="mt-2 md:mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className={`${isLightColor(color.hex) ? 'bg-black bg-opacity-10' : 'bg-white bg-opacity-20'} rounded-full px-2 py-0.5 md:px-3 md:py-1 text-[10px] xs:text-xs md:text-sm`}>
+        {/* Desktop "Click to copy" tooltip */}
+        <div className="hidden md:block mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className={`${isLightColor(color.hex) ? 'bg-black bg-opacity-10' : 'bg-white bg-opacity-20'} rounded-full px-3 py-1 text-sm`}>
             Click to copy
           </div>
         </div>
+        
+        {/* We don't need the mobile hover indicator anymore since we have a dedicated Copy button */}
       </div>
     </div>
   );

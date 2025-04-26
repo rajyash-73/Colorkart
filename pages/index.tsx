@@ -1,35 +1,47 @@
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
-import KeyboardShortcutsBar from "@/components/KeyboardShortcutsBar";
-import ActionButtons from "@/components/ActionButtons";
-import ColorCard from "@/components/ColorCard";
-import OnboardingTour from "@/components/modals/OnboardingTour";
-import ExportModal from "@/components/modals/ExportModal";
-import AdjustColorModal from "@/components/modals/AdjustColorModal";
-import { usePalette } from "@/contexts/PaletteContext";
-import { type Color } from "../types/Color";
-import { Helmet } from "react-helmet-async";
+import React, { useEffect, useState } from 'react';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { useToast } from '../client/src/hooks/use-toast';
+import Header from '../client/src/components/Header';
+import KeyboardShortcutsBar from '../client/src/components/KeyboardShortcutsBar';
+import ActionButtons from '../client/src/components/ActionButtons';
+import ColorCard from '../client/src/components/ColorCard';
+import OnboardingTour from '../client/src/components/modals/OnboardingTour';
+import ExportModal from '../client/src/components/modals/ExportModal';
+import AdjustColorModal from '../client/src/components/modals/AdjustColorModal';
+import { usePalette } from '../client/src/contexts/PaletteContext';
+import { type Color } from '../client/src/types/Color';
+import dynamic from 'next/dynamic';
 
-export default function Home() {
+// Define any components that must be client-side only
+const ClientSideShortcutsBar = dynamic(
+  () => import('../client/src/components/KeyboardShortcutsBar'),
+  { ssr: false }
+);
+
+const HomePage: NextPage = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isClient, setIsClient] = useState(false);
   
   const { palette, generatePalette, addColor, resetPalette, updateColor, reorderColors } = usePalette();
   const { toast } = useToast();
-  
-  console.log('Home component rendered with palette:', palette);
 
+  // Set isClient to true after component mounts
   useEffect(() => {
+    setIsClient(true);
+    
     // Check if first visit
-    const hasVisited = localStorage.getItem("hasVisitedPalettePro");
-    if (!hasVisited) {
-      setShowOnboarding(true);
-      localStorage.setItem("hasVisitedPalettePro", "true");
+    if (typeof window !== 'undefined') {
+      const hasVisited = localStorage.getItem("hasVisitedPalettePro");
+      if (!hasVisited) {
+        setShowOnboarding(true);
+        localStorage.setItem("hasVisitedPalettePro", "true");
+      }
     }
     
     // Setup space key handler
@@ -47,7 +59,7 @@ export default function Home() {
     
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [showOnboarding, showExportModal, showAdjustModal, generatePalette]);
+  }, [showOnboarding, showExportModal, showAdjustModal]);
 
   const handleGeneratePalette = () => {
     // Call the generate palette function from context
@@ -62,21 +74,23 @@ export default function Home() {
 
   const handleSavePalette = () => {
     // Save to localStorage
-    const savedPalettes = JSON.parse(localStorage.getItem("savedPalettes") || "[]");
-    const newPalette = {
-      id: Date.now(),
-      colors: palette,
-      createdAt: new Date().toISOString(),
-    };
-    
-    savedPalettes.push(newPalette);
-    localStorage.setItem("savedPalettes", JSON.stringify(savedPalettes));
-    
-    toast({
-      title: "Palette saved!",
-      description: "Your palette has been saved to local storage.",
-      duration: 2000,
-    });
+    if (typeof window !== 'undefined') {
+      const savedPalettes = JSON.parse(localStorage.getItem("savedPalettes") || "[]");
+      const newPalette = {
+        id: Date.now(),
+        colors: palette,
+        createdAt: new Date().toISOString(),
+      };
+      
+      savedPalettes.push(newPalette);
+      localStorage.setItem("savedPalettes", JSON.stringify(savedPalettes));
+      
+      toast({
+        title: "Palette saved!",
+        description: "Your palette has been saved to local storage.",
+        duration: 2000,
+      });
+    }
   };
 
   const handleHelp = () => {
@@ -145,27 +159,57 @@ export default function Home() {
     setDraggedIndex(null);
   };
 
+  // Server-side rendering fallback content
+  if (!isClient) {
+    return (
+      <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+        <Head>
+          <title>Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes</title>
+          <meta name="description" content="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools." />
+          <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
+          <link rel="canonical" href="https://coolors.in/" />
+        </Head>
+        
+        <Header 
+          onHelp={() => {}} 
+          onExport={() => {}} 
+          onSave={() => {}}
+          mobileMenuOpen={false}
+          toggleMobileMenu={() => {}}
+        />
+        
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="text-2xl font-bold mb-4">Loading Color Palette Generator...</div>
+          <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
-      <Helmet>
+      <Head>
         <title>Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes</title>
         <meta name="description" content="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools." />
         <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="canonical" href="https://coolors.in/" />
         {/* Dynamic structured data for the home page */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Coolors.in Color Palette Generator",
-            "url": "https://coolors.in/",
-            "description": "Create beautiful color combinations with our intuitive color generator",
-            "applicationCategory": "DesignApplication",
-            "operatingSystem": "Any"
-          })}
-        </script>
-      </Helmet>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              'name': 'Coolors.in Color Palette Generator',
+              'url': 'https://coolors.in/',
+              'description': 'Create beautiful color combinations with our intuitive color generator',
+              'applicationCategory': 'DesignApplication',
+              'operatingSystem': 'Any'
+            })
+          }}
+        />
+      </Head>
+      
       <Header 
         onHelp={handleHelp} 
         onExport={handleExport} 
@@ -174,7 +218,7 @@ export default function Home() {
         toggleMobileMenu={toggleMobileMenu}
       />
       
-      <KeyboardShortcutsBar />
+      <ClientSideShortcutsBar />
       
       {/* Mobile View: Stack colors vertically with drag support */}
       <div className="flex-1 flex flex-col overflow-auto md:hidden" id="mobilePaletteContainer">
@@ -275,4 +319,6 @@ export default function Home() {
       }
     </div>
   );
-}
+};
+
+export default HomePage;

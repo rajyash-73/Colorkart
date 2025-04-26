@@ -1,0 +1,76 @@
+/* Import existing styles from client/src/index.css */
+@import '../client/src/index.css';
+
+/* Additional global styles for Next.js */
+:root {
+  /* Define CSS variables for reuse across the app */
+  --toastify-color-light: #fff;
+  --toastify-color-dark: #121212;
+  --toastify-color-info: #3498db;
+  --toastify-color-success: #07bc0c;
+  --toastify-color-warning: #f1c40f;
+  --toastify-color-error: #e74c3c;
+}
+
+/* Optimize for Core Web Vitals */
+/* Prevent Cumulative Layout Shift (CLS) */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent ad-related layout shifts */
+.ad-container {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ad-container::before {
+  content: "Advertisement";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  color: #888;
+}
+
+/* Performance improvements */
+/* Enable smooth scrolling but only if user doesn't prefer reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Improved focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid #4c8bf5;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none;
+  }
+  
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+}
+
+/* Loading indicator for SSR hydration */
+#__next-prerender-indicator {
+  display: none;
+}
+
+/* Hide lazyload placeholders once loaded */
+.lazyloaded {
+  opacity: 1 !important;
+  transition: opacity 0.3s ease-in;
+}
