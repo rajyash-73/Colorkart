@@ -32,6 +32,14 @@ class MyDocument extends Document {
           {/* Add webmanifest for PWA support */}
           <link rel="manifest" href="/manifest.json" />
           
+          {/* Grow.me / Mediavine Initializer */}
+          <script
+            data-grow-initializer=""
+            dangerouslySetInnerHTML={{
+              __html: `!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTowZjljZWEwNi05MjVjLTRhOWMtYjE2NC0yZmYyYzdlMTQyMmY=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();`
+            }}
+          />
+
           {/* Structured data for organization */}
           <script
             type="application/ld+json"
