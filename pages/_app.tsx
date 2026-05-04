@@ -65,7 +65,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         `}
       </Script>
 
-      {/* Google AdSense setup component - loaded with afterInteractive strategy */}
+      {/* Mediavine ad setup component - loaded with lazyOnload strategy */}
       <AdSenseSetup />
 
       <QueryClientProvider client={queryClient}>

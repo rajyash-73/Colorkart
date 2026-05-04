@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Script from 'next/script';
 
 export const AdSenseSetup = () => {
   return (
     <Script
-      id="adsense-setup"
+      id="mediavine-setup"
       strategy="lazyOnload"
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890"
-      crossOrigin="anonymous"
+      src="//scripts.scriptwrapper.com/tags/0f9cea06-925c-4a9c-b164-2ff2c7e1422f.js"
+      data-noptimize="1"
+      data-cfasync="false"
     />
   );
 };
@@ -20,31 +21,17 @@ interface AdSenseProps {
 }
 
 export const AdSense = ({ adSlot, style, format = 'auto', responsive = true }: AdSenseProps) => {
-  useEffect(() => {
-    try {
-      // Only push to adsbygoogle if it exists
-      if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
-        (window as any).adsbygoogle.push({});
-      }
-    } catch (err) {
-      console.error('AdSense error:', err);
-    }
-  }, []);
 
   return (
     <div className="ad-container" style={{ overflow: 'hidden', ...style }}>
-      <ins
-        className="adsbygoogle"
+      <div
+        data-ad-slot={adSlot}
+        data-ad-format={format}
         style={{
           display: 'block',
           overflow: 'hidden',
           width: responsive ? '100%' : undefined,
-          height: format === 'fluid' ? 'fluid' : undefined,
         }}
-        data-ad-client="ca-pub-1234567890"
-        data-ad-slot={adSlot}
-        data-ad-format={format}
-        data-full-width-responsive={responsive ? 'true' : 'false'}
       />
     </div>
   );
