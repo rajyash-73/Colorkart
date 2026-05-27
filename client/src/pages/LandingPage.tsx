@@ -255,8 +255,7 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TRENDING.map(p => (
-              <div key={p.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 transition-shadow cursor-pointer group"
-                onClick={() => { window.location.href = '/explore'; }}>
+              <div key={p.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 transition-shadow group">
                 <div className="flex h-20">
                   {p.colors.map((c, i) => (
                     <div key={i} className="flex-1 relative" style={{ backgroundColor: c }}>
@@ -267,10 +266,17 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <div className="px-4 py-2.5 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{p.name}</span>
-                  <span className="flex items-center gap-1 text-xs text-gray-400 ml-2 flex-shrink-0">
-                    <Heart size={11} /> {p.likes}
-                  </span>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate block">{p.name}</span>
+                    <span className="text-xs text-gray-400">{p.colors.length} colors</span>
+                  </div>
+                  <button
+                    onClick={() => { window.location.href = '/explore'; }}
+                    className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:text-violet-600 hover:border-violet-400 transition-colors flex-shrink-0"
+                    aria-label="Explore palettes"
+                  >
+                    <ArrowRight size={14} />
+                  </button>
                 </div>
               </div>
             ))}

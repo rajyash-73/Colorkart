@@ -101,9 +101,13 @@ export default function TrendingPalettes({ onSelectPalette }: TrendingPalettesPr
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Trending Palettes</h2>
           <p className="text-sm text-gray-600 mt-1">Try these popular color combinations</p>
         </div>
-        <div className="bg-white p-1.5 rounded-full shadow-sm border border-gray-200">
+        <button
+          onClick={() => { window.location.href = '/explore'; }}
+          className="bg-white p-1.5 rounded-full shadow-sm border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+          aria-label="Explore all palettes"
+        >
           <ArrowRight size={20} className="text-blue-500" />
-        </div>
+        </button>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
