@@ -15,7 +15,7 @@ const APP_LINKS = [
   { label: 'Image to Palette',             href: '/image-palette' },
   { label: 'Palette Visualizer',           href: '/visualize' },
   { label: 'Font Generator',               href: '/font-generator' },
-  { label: 'Korean Color Analysis',        href: '/clothing-palette' },
+  { label: 'Korean Color Analysis',        href: '/korean-color-analysis' },
 ];
 
 const RESOURCE_LINKS = [

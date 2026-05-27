@@ -307,7 +307,7 @@ export default function LandingPage() {
                 Discover your personal color season — Spring, Summer, Autumn or Winter — and find the colors that make you glow.
               </p>
               <button
-                onClick={() => window.location.href = '/clothing-palette'}
+                onClick={() => window.location.href = '/korean-color-analysis'}
                 className="text-purple-600 font-medium text-sm hover:text-purple-700 transition-colors"
               >
                 Try now →

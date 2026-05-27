@@ -58,7 +58,7 @@ export default function ClothingColorGuide() {
           </p>
           
           <button
-            onClick={() => window.location.href = '/clothing-palette'}
+            onClick={() => window.location.href = '/korean-color-analysis'}
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center mx-auto"
           >
             Try the Tool Now
@@ -233,7 +233,7 @@ export default function ClothingColorGuide() {
             Transform your wardrobe with personalized color recommendations.
           </p>
           <button
-            onClick={() => window.location.href = '/clothing-palette'}
+            onClick={() => window.location.href = '/korean-color-analysis'}
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-pink-700 transition-colors duration-300 shadow-lg"
           >
             Start Your Color Analysis

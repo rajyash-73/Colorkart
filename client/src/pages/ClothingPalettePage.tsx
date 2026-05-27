@@ -295,7 +295,7 @@ export default function KoreanColorAnalysis() {
         title="Korean Personal Color Analysis — Find Your Color Season"
         description="Discover your Korean personal color season (퍼스널 컬러). Take a selfie or upload a photo to find whether you're Spring, Summer, Autumn or Winter and get personalised color recommendations."
         keywords="Korean color analysis, personal color, 퍼스널 컬러, color season analysis, skin tone color, spring summer autumn winter color, personal color test online"
-        canonicalPath="/clothing-palette"
+        canonicalPath="/korean-color-analysis"
       />
       <Header mobileMenuOpen={false} toggleMobileMenu={() => {}} />
 

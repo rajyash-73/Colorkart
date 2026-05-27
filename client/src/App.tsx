@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -54,7 +54,8 @@ const PaletteRoutes = () => (
     <Route path="/font-generator"><LazyRoute component={FontGenerator} /></Route>
     <Route path="/auth"><LazyRoute component={AuthPage} /></Route>
     <Route path="/saved-palettes"><LazyRoute component={SavedPalettes} /></Route>
-    <Route path="/clothing-palette"><LazyRoute component={ClothingPalettePage} /></Route>
+    <Route path="/korean-color-analysis"><LazyRoute component={ClothingPalettePage} /></Route>
+    <Route path="/clothing-palette"><Redirect to="/korean-color-analysis" /></Route>
     <Route path="/image-palette"><LazyRoute component={ImagePalette} /></Route>
     <Route path="/visualize"><LazyRoute component={PaletteVisualizerNew} /></Route>
     <Route path="/visualize-old"><LazyRoute component={PaletteVisualizer} /></Route>
