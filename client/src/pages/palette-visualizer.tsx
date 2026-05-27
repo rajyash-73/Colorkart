@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Layout, Monitor, PieChart, MessageSquare, Calendar } from 'lucide-react';
 import { usePalette } from '@/contexts/PaletteContext';
@@ -31,21 +31,21 @@ export default function PaletteVisualizer() {
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex flex-col">
       <Helmet>
-        <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors.in</title>
+        <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors</title>
         <meta name="description" content="Visualize your color palette in real UI templates. See how your colors work together in dashboards, landing pages, and app interfaces." />
         <meta name="keywords" content="palette visualizer, color combinations, UI templates, color schemes in action" />
-        <link rel="canonical" href="https://coolors.in/visualize" />
+        <link rel="canonical" href="https://Coolors/visualize" />
         {/* Dynamic structured data for the visualizer page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Palette Visualizer | Coolors.in",
-            "url": "https://coolors.in/visualize",
-            "description": "Visualize your color palette in real UI templates with Coolors.in's Palette Visualizer",
+            "name": "Palette Visualizer | Coolors",
+            "url": "https://Coolors/visualize",
+            "description": "Visualize your color palette in real UI templates with Coolors's Palette Visualizer",
             "isPartOf": {
               "@type": "WebApplication",
-              "name": "Coolors.in"
+              "name": "Coolors"
             }
           })}
         </script>

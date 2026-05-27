@@ -1,202 +1,186 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { Palette } from "../types/Palette";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Loader2, ChevronLeft } from "lucide-react";
-import { Link } from "wouter";
-import { getPalettes, getUserPalettes, deletePalette } from "../lib/localStorageService";
-import { Helmet } from "react-helmet-async";
+import { Trash2, Loader2, ChevronLeft, Plus, Share2, Copy, Check } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { getColorName } from "@/lib/colorUtils";
+import SEOHead from '@/components/SEOHead';
 import Footer from "@/components/Footer";
+
+type SavedPalette = {
+  id: string;
+  name: string;
+  colors: string[];
+  created_at: string;
+  is_public: boolean;
+};
+
+function CopyBtn({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button onClick={() => { navigator.clipboard.writeText(text).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+      className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
+      {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+    </button>
+  );
+}
 
 export default function SavedPalettes() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [palettes, setPalettes] = useState<Palette[]>([]);
+  const [palettes, setPalettes] = useState<SavedPalette[]>([]);
+  const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Load palettes from local storage
   useEffect(() => {
-    try {
-      if (user) {
-        const userPalettes = getUserPalettes(user.id);
-        setPalettes(userPalettes);
+    const loadPalettes = async () => {
+      if (!user) { setLoading(false); return; }
+      const { data, error } = await supabase
+        .from('public_palettes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('Supabase fetch error:', error);
+        toast({ title: 'Could not load palettes', description: error.message, variant: 'destructive' });
       } else {
-        setPalettes([]);
+        setPalettes(data ?? []);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to load palettes'));
-    } finally {
-      setIsLoading(false);
-    }
+      setLoading(false);
+    };
+    loadPalettes();
   }, [user]);
 
-  // Handle delete palette
-  const handleDelete = (palette: Palette) => {
-    if (confirm("Are you sure you want to delete this palette?")) {
-      try {
-        setDeletingId(palette.id);
-        deletePalette(palette.id);
-        
-        // Update the state
-        setPalettes(prev => prev.filter(p => p.id !== palette.id));
-        
-        // Show success message
-        toast({
-          title: "Palette deleted",
-          description: "The palette has been deleted successfully.",
-        });
-      } catch (err) {
-        toast({
-          title: "Delete failed",
-          description: err instanceof Error ? err.message : "An error occurred",
-          variant: "destructive",
-        });
-      } finally {
-        setDeletingId(null);
-      }
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this palette?')) return;
+    setDeletingId(id);
+    try {
+      await supabase.from('public_palettes').delete().eq('id', id);
+      setPalettes(prev => prev.filter(p => p.id !== id));
+      toast({ title: 'Palette deleted' });
+    } catch {
+      toast({ title: 'Failed to delete', variant: 'destructive' });
+    } finally {
+      setDeletingId(null);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const handleApply = (palette: SavedPalette) => {
+    const colors = palette.colors.map(hex => ({
+      hex,
+      rgb: { r: parseInt(hex.slice(1,3),16), g: parseInt(hex.slice(3,5),16), b: parseInt(hex.slice(5,7),16) },
+      locked: false,
+      name: getColorName(hex),
+    }));
+    localStorage.setItem('pendingPalette', JSON.stringify(colors));
+    window.location.href = '/generator';
+  };
 
-  if (error) {
+  const togglePublic = async (palette: SavedPalette) => {
+    const newPublic = !palette.is_public;
+    await supabase.from('public_palettes').update({ is_public: newPublic }).eq('id', palette.id);
+    setPalettes(prev => prev.map(p => p.id === palette.id ? { ...p, is_public: newPublic } : p));
+    toast({ title: newPublic ? 'Shared publicly on Explore!' : 'Set to private' });
+  };
+
+  if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="text-2xl font-bold mb-4">Error Loading Palettes</h1>
-        <p className="text-muted-foreground mb-6">{error.message}</p>
-        <Link href="/">
-          <Button>Go Home</Button>
-        </Link>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">Sign in to view your palettes</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Create an account to save and manage your color palettes</p>
+          <a href="/auth" className="px-6 py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition-colors">
+            Sign In
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Helmet>
-        <title>My Saved Palettes | Coolors.in</title>
-        <meta name="description" content="Access your saved color palettes. View, manage, and load previously created color schemes for your design projects." />
-        <link rel="canonical" href="https://coolors.in/saved-palettes" />
-        {/* Structured data for collection page */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "CollectionPage",
-            "name": "My Saved Palettes | Coolors.in",
-            "description": "Access your saved color palettes and previously created color schemes.",
-            "numberOfItems": palettes.length,
-            "itemListElement": palettes.map((palette, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "CreativeWork",
-                "name": palette.name,
-                "dateCreated": palette.createdAt instanceof Date 
-                  ? palette.createdAt.toISOString() 
-                  : new Date(palette.createdAt as any).toISOString()
-              }
-            }))
-          })}
-        </script>
-      </Helmet>
-      <header className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <div 
-            className="cursor-pointer"
-            onClick={() => window.location.href = '/'}
-          >
-            <Button variant="outline" size="icon">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </div>
-          <h1 className="text-3xl font-bold">Saved Palettes</h1>
-        </div>
-        <p className="text-muted-foreground">
-          {palettes.length
-            ? `You have ${palettes.length} saved palette${palettes.length !== 1 ? "s" : ""}.`
-            : "You don't have any saved palettes yet."}
-        </p>
-      </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <SEOHead
+        title="My Saved Palettes — Manage Your Color Collections"
+        description="View and manage your saved color palettes. Share palettes publicly, use them in the generator, or keep them private. Sign in to access your palette library."
+        keywords="saved color palettes, my palettes, color palette library, saved color schemes, palette management"
+        canonicalPath="/saved-palettes"
+        noIndex={true}
+      />
 
-      {palettes.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg bg-muted/30">
-          <h2 className="text-xl font-medium mb-2">No saved palettes</h2>
-          <p className="text-muted-foreground mb-6">
-            Create and save palettes from the home page to see them here.
-          </p>
-          <div
-            className="cursor-pointer" 
-            onClick={() => window.location.href = '/'}
-          >
-            <Button>Create New Palette</Button>
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
+        <a href="/" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1 text-sm">
+          <ChevronLeft size={16} />Coolors
+        </a>
+        <span className="text-gray-300 dark:text-gray-600">|</span>
+        <h1 className="font-bold text-gray-800 dark:text-white">My Palettes</h1>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Saved Palettes</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Signed in as {user.email}</p>
           </div>
+          <a href="/generator" className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition-colors text-sm">
+            <Plus size={16} />New Palette
+          </a>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {palettes.map((palette) => (
-            <Card key={palette.id} className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <CardTitle>{palette.name}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(palette)}
-                    disabled={deletingId === palette.id}
-                  >
-                    {deletingId === palette.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                <CardDescription>
-                  {palette.createdAt instanceof Date 
-                    ? palette.createdAt.toLocaleDateString() 
-                    : new Date(palette.createdAt as any).toLocaleDateString()}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <div className="flex h-20 rounded overflow-hidden">
-                  {palette.colors.map((color, i) => (
-                    <div
-                      key={i}
-                      className="flex-1"
-                      style={{ backgroundColor: color.hex }}
-                    ></div>
+
+        {loading ? (
+          <div className="flex justify-center py-16"><Loader2 className="animate-spin text-violet-500" size={32} /></div>
+        ) : palettes.length === 0 ? (
+          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <p className="text-gray-400 dark:text-gray-500 mb-4">No saved palettes yet</p>
+            <a href="/generator" className="text-violet-600 hover:underline text-sm font-medium">Create your first palette →</a>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {palettes.map(palette => (
+              <div key={palette.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="flex h-20">
+                  {palette.colors.map((c, i) => (
+                    <div key={i} className="flex-1 cursor-pointer group relative" style={{ backgroundColor: c }}
+                      onClick={() => { navigator.clipboard.writeText(c).catch(() => {}); toast({ title: `Copied ${c}` }); }}
+                    >
+                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-mono text-white/80 opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
+                        {c.slice(1)}
+                      </span>
+                    </div>
                   ))}
                 </div>
-              </CardContent>
-              <CardFooter>
-                <div
-                  className="cursor-pointer"
-                  onClick={() => window.location.href = `/?palette=${palette.id}`}
-                >
-                  <Button variant="outline" className="w-full">
-                    Load Palette
-                  </Button>
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold text-gray-800 dark:text-white">{palette.name}</h3>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{new Date(palette.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${palette.is_public ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                      {palette.is_public ? 'Public' : 'Private'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button onClick={() => handleApply(palette)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-violet-500 text-white rounded-lg hover:bg-violet-600 font-medium transition-colors">
+                      Use in Generator
+                    </button>
+                    <button onClick={() => togglePublic(palette)} className="flex items-center gap-1 px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-green-400 transition-colors">
+                      <Share2 size={11} />{palette.is_public ? 'Make Private' : 'Share'}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(palette.id)}
+                      disabled={deletingId === palette.id}
+                      className="ml-auto p-1.5 text-gray-300 dark:text-gray-600 hover:text-red-500 transition-colors"
+                    >
+                      {deletingId === palette.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                    </button>
+                  </div>
                 </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
-      <div className="mt-12">
-        <Footer />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      <Footer />
     </div>
   );
 }

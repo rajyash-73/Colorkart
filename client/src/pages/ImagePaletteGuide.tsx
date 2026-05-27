@@ -1,5 +1,5 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
+﻿import React from "react";
+import SEOHead from '@/components/SEOHead';
 import { Camera, Upload, Palette, ArrowRight, ChevronLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,48 +7,30 @@ import Footer from "@/components/Footer";
 export default function ImagePaletteGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-      <Helmet>
-        <title>Image to Color Palette Guide - Extract Colors from Photos | Coolors.in</title>
-        <meta name="description" content="Learn how to extract beautiful color palettes from any image using our AI-powered color extraction tool. Perfect for design inspiration and color matching." />
-        <meta name="keywords" content="image color extractor, photo color palette, color picker from image, extract colors from photo, image color analysis, design inspiration colors, dominant colors from image" />
-        <link rel="canonical" href="https://coolors.in/image-palette-guide" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content="Image to Color Palette Guide - Extract Colors from Photos" />
-        <meta property="og:description" content="Extract beautiful color palettes from any image with our comprehensive guide to image color analysis." />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://coolors.in/image-palette-guide" />
-        
-        {/* Schema.org JSON-LD */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": "Image to Color Palette Guide - Extract Colors from Photos",
-            "description": "Complete guide to extracting color palettes from images for design inspiration",
-            "author": {
-              "@type": "Person",
-              "name": "Yash"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "Coolors.in"
-            },
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": "https://coolors.in/image-palette-guide"
-            }
-          })}
-        </script>
-      </Helmet>
+      <SEOHead
+        title="Image Color Palette Guide — Extract Colors from Any Photo"
+        description="Learn how to extract and use color palettes from images. Step-by-step guide for designers, photographers and digital artists. Turn any photo into your design inspiration."
+        keywords="image color palette guide, extract colors from photos, photo color palette tutorial, image to color scheme, colour picking from images, photo color extraction guide, image palette tutorial"
+        canonicalPath="/image-palette-guide"
+        ogType="article"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "Image Color Palette Guide",
+          "description": "Learn how to extract and use color palettes from images for design projects.",
+          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "url": "https://coolors.in/image-palette-guide"
+        }}
+      />
 
-      <Header 
+      <Header
         mobileMenuOpen={false}
         toggleMobileMenu={() => {}}
       />
 
       {/* Back to Home Navigation */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 py-3">
           <div 
             className="flex items-center text-orange-600 hover:text-orange-800 transition-colors cursor-pointer"
@@ -63,7 +45,7 @@ export default function ImagePaletteGuide() {
       <main className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             Image to Color Palette
             <br />
             <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -71,7 +53,7 @@ export default function ImagePaletteGuide() {
             </span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             Transform any image into a beautiful color palette with our AI-powered color extraction tool. Perfect for finding design inspiration and color matching.
           </p>
           
@@ -86,15 +68,15 @@ export default function ImagePaletteGuide() {
 
         {/* What is Image Color Extraction */}
         <section className="mb-16">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">What is Image Color Extraction?</h2>
-            <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">What is Image Color Extraction?</h2>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6 leading-relaxed">
               Image color extraction is the process of analyzing an image to identify its dominant colors and creating a cohesive color palette. Our AI-powered tool examines millions of pixels to find the most significant colors and creates harmonious palettes that capture the essence of your image.
             </p>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Perfect for:</h3>
-                <ul className="space-y-3 text-gray-600">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Perfect for:</h3>
+                <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <Camera className="w-5 h-5 text-orange-600 mt-1 flex-shrink-0" />
                     Design inspiration from photography
@@ -114,8 +96,8 @@ export default function ImagePaletteGuide() {
                 </ul>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Benefits:</h3>
-                <ul className="space-y-3 text-gray-600">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Benefits:</h3>
+                <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <span className="w-2 h-2 bg-orange-600 rounded-full mt-2 flex-shrink-0"></span>
                     Save time on color research and selection
@@ -140,14 +122,14 @@ export default function ImagePaletteGuide() {
 
         {/* How to Use the Tool */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How to Extract Colors from Images</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How to Extract Colors from Images</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Upload className="w-8 h-8 text-orange-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Upload Your Image</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Upload Your Image</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Upload any image - photographs, artwork, logos, or design references. Our tool supports all common image formats.
               </p>
             </div>
@@ -156,8 +138,8 @@ export default function ImagePaletteGuide() {
               <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Camera className="w-8 h-8 text-orange-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">AI Analysis</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">AI Analysis</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Our advanced AI analyzes the image to identify dominant colors, color relationships, and optimal palette combinations.
               </p>
             </div>
@@ -166,8 +148,8 @@ export default function ImagePaletteGuide() {
               <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Palette className="w-8 h-8 text-orange-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Get Your Palette</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Get Your Palette</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Receive a curated color palette with hex codes, ready to use in your design projects and creative work.
               </p>
             </div>
@@ -176,44 +158,44 @@ export default function ImagePaletteGuide() {
 
         {/* Use Cases */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Creative Applications</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Creative Applications</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-white text-xl">🎨</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Web Design</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Web Design</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Extract colors from inspiration images to create cohesive website color schemes.
               </p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-white text-xl">🏠</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Interior Design</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Interior Design</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Match paint colors to furniture, artwork, or fabric patterns in your photos.
               </p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-white text-xl">📱</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">App Design</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">App Design</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Create app themes and UI color schemes from brand imagery or concept art.
               </p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-white text-xl">🎭</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Art & Fashion</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Art & Fashion</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Analyze artwork or fashion photos to understand color relationships and trends.
               </p>
             </div>
@@ -273,15 +255,15 @@ export default function ImagePaletteGuide() {
 
         {/* Technical Features */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Advanced Features</h2>
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Advanced Features</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">🎯</span>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Smart Color Detection</h3>
-                <p className="text-gray-600 text-sm">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Smart Color Detection</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Advanced algorithms identify the most visually significant colors while filtering out noise and artifacts.
                 </p>
               </div>
@@ -290,8 +272,8 @@ export default function ImagePaletteGuide() {
                 <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">⚖️</span>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Color Harmony</h3>
-                <p className="text-gray-600 text-sm">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Color Harmony</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Our tool ensures extracted colors work well together by analyzing color relationships and balance.
                 </p>
               </div>
@@ -300,8 +282,8 @@ export default function ImagePaletteGuide() {
                 <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">📊</span>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">Multiple Formats</h3>
-                <p className="text-gray-600 text-sm">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2">Multiple Formats</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Export your extracted palettes in HEX, RGB, HSL, and other formats for any design workflow.
                 </p>
               </div>
@@ -311,10 +293,10 @@ export default function ImagePaletteGuide() {
 
         {/* CTA Section */}
         <section className="text-center bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Ready to Extract Colors from Your Images?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Turn any image into a beautiful, professional color palette in seconds.
           </p>
           <button

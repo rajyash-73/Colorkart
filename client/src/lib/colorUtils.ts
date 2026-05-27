@@ -218,20 +218,20 @@ function colorDistance(hex1: string, hex2: string): number {
 export function getColorName(hexColor: string): string {
   // Normalize the hex color
   hexColor = hexColor.toUpperCase();
-  
+
   // Add # if missing
   if (!hexColor.startsWith('#')) {
     hexColor = '#' + hexColor;
   }
-  
+
   // If exact match exists
   const exactMatch = namedColors.find(c => c.hex.toUpperCase() === hexColor);
   if (exactMatch) return exactMatch.name;
-  
+
   // Find closest match
   let closestMatch = namedColors[0];
   let closestDistance = colorDistance(hexColor, closestMatch.hex);
-  
+
   for (let i = 1; i < namedColors.length; i++) {
     const distance = colorDistance(hexColor, namedColors[i].hex);
     if (distance < closestDistance) {
@@ -239,6 +239,208 @@ export function getColorName(hexColor: string): string {
       closestMatch = namedColors[i];
     }
   }
-  
+
   return closestMatch.name;
+}
+
+// ─── HSL Conversions ────────────────────────────────────────────────────────
+
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rn: h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6; break;
+      case gn: h = ((bn - rn) / d + 2) / 6; break;
+      case bn: h = ((rn - gn) / d + 4) / 6; break;
+    }
+  }
+
+  return {
+    h: Math.round(h * 360),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100),
+  };
+}
+
+export function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  const hn = h / 360, sn = s / 100, ln = l / 100;
+
+  function hue2rgb(p: number, q: number, t: number): number {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+
+  if (sn === 0) {
+    const v = Math.round(ln * 255);
+    return { r: v, g: v, b: v };
+  }
+
+  const q = ln < 0.5 ? ln * (1 + sn) : ln + sn - ln * sn;
+  const p = 2 * ln - q;
+  return {
+    r: Math.round(hue2rgb(p, q, hn + 1 / 3) * 255),
+    g: Math.round(hue2rgb(p, q, hn) * 255),
+    b: Math.round(hue2rgb(p, q, hn - 1 / 3) * 255),
+  };
+}
+
+export function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return null;
+  return rgbToHsl(rgb.r, rgb.g, rgb.b);
+}
+
+export function hslToHex(h: number, s: number, l: number): string {
+  const { r, g, b } = hslToRgb(h, s, l);
+  return rgbToHex(r, g, b);
+}
+
+// ─── WCAG Contrast ──────────────────────────────────────────────────────────
+
+export const WCAG_AA_NORMAL = 4.5;
+export const WCAG_AA_LARGE = 3.0;
+export const WCAG_AAA_NORMAL = 7.0;
+export const WCAG_AAA_LARGE = 4.5;
+
+export function getLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+  const linearise = (c: number) => {
+    const v = c / 255;
+    return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * linearise(rgb.r) + 0.7152 * linearise(rgb.g) + 0.0722 * linearise(rgb.b);
+}
+
+export function getContrastRatio(hex1: string, hex2: string): number {
+  const l1 = getLuminance(hex1);
+  const l2 = getLuminance(hex2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// ─── Color Blindness Simulation ─────────────────────────────────────────────
+
+export type ColorBlindnessType = 'normal' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia';
+
+const CB_MATRICES: Record<Exclude<ColorBlindnessType, 'normal' | 'achromatopsia'>, number[][]> = {
+  protanopia:   [[0.56667, 0.43333, 0], [0.55833, 0.44167, 0], [0, 0.24167, 0.75833]],
+  deuteranopia: [[0.625,   0.375,   0], [0.70,    0.30,    0], [0, 0.30,    0.70]],
+  tritanopia:   [[0.95,    0.05,    0], [0,       0.43333, 0.56667], [0, 0.475, 0.525]],
+};
+
+export function simulateColorBlindness(hex: string, type: ColorBlindnessType): string {
+  if (type === 'normal') return hex;
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  const { r, g, b } = rgb;
+
+  if (type === 'achromatopsia') {
+    const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    return rgbToHex(gray, gray, gray);
+  }
+
+  const m = CB_MATRICES[type];
+  return rgbToHex(
+    Math.round(Math.min(255, Math.max(0, m[0][0] * r + m[0][1] * g + m[0][2] * b))),
+    Math.round(Math.min(255, Math.max(0, m[1][0] * r + m[1][1] * g + m[1][2] * b))),
+    Math.round(Math.min(255, Math.max(0, m[2][0] * r + m[2][1] * g + m[2][2] * b))),
+  );
+}
+
+// ─── Shades / Tints / Tones ──────────────────────────────────────────────────
+
+export function generateShades(hex: string, count: number): string[] {
+  const hsl = hexToHsl(hex);
+  if (!hsl) return [];
+  const { h, s, l } = hsl;
+  return Array.from({ length: count }, (_, i) => {
+    const lightness = Math.round(10 + (i / (count - 1)) * (l - 10));
+    return hslToHex(h, s, lightness);
+  });
+}
+
+export function generateTints(hex: string, count: number): string[] {
+  const hsl = hexToHsl(hex);
+  if (!hsl) return [];
+  const { h, s, l } = hsl;
+  return Array.from({ length: count }, (_, i) => {
+    const lightness = Math.round(l + (i / (count - 1)) * (95 - l));
+    return hslToHex(h, s, lightness);
+  });
+}
+
+export function generateTones(hex: string, count: number): string[] {
+  const hsl = hexToHsl(hex);
+  if (!hsl) return [];
+  const { h, s, l } = hsl;
+  return Array.from({ length: count }, (_, i) => {
+    const saturation = Math.round(s - (i / (count - 1)) * s);
+    return hslToHex(h, saturation, l);
+  });
+}
+
+// ─── Palette Tag Detection ───────────────────────────────────────────────────
+
+function getHueColorTag(h: number): string {
+  if (h < 20 || h >= 345) return 'Red';
+  if (h < 45) return 'Orange';
+  if (h < 70) return 'Yellow';
+  if (h < 170) return 'Green';
+  if (h < 195) return 'Turquoise';
+  if (h < 260) return 'Blue';
+  if (h < 290) return 'Violet';
+  if (h < 345) return 'Pink';
+  return 'Red';
+}
+
+export function getPaletteTags(colors: string[]): string[] {
+  const tags = new Set<string>();
+
+  const hsls = colors.map(c => hexToHsl(c)).filter(Boolean) as { h: number; s: number; l: number }[];
+  if (hsls.length === 0) return [];
+
+  const avgS = hsls.reduce((a, c) => a + c.s, 0) / hsls.length;
+  const avgL = hsls.reduce((a, c) => a + c.l, 0) / hsls.length;
+
+  // Color tags from dominant hues
+  hsls.forEach(hsl => {
+    if (hsl.s > 15) tags.add(getHueColorTag(hsl.h));
+  });
+
+  // Grayscale check
+  if (hsls.every(h => h.s < 15)) { tags.add('Gray'); tags.add('Black'); }
+  if (hsls.some(h => h.l > 90 && h.s < 20)) tags.add('White');
+  if (hsls.some(h => h.l < 15)) tags.add('Black');
+
+  // Style tags
+  const warmHues = hsls.filter(h => (h.h < 70 || h.h > 330) && h.s > 20).length;
+  const coolHues = hsls.filter(h => h.h >= 170 && h.h <= 290 && h.s > 20).length;
+  if (warmHues >= Math.ceil(hsls.length / 2)) tags.add('Warm');
+  if (coolHues >= Math.ceil(hsls.length / 2)) tags.add('Cold');
+  if (avgS > 65 && avgL > 40 && avgL < 70) tags.add('Bright');
+  if (avgL < 30) tags.add('Dark');
+  if (avgL > 65 && avgS > 10 && avgS < 60) tags.add('Pastel');
+  if (avgS < 30 && avgS > 5) tags.add('Vintage');
+
+  // Check if monochromatic (all hues within 30°)
+  if (hsls.length > 1) {
+    const minH = Math.min(...hsls.map(h => h.h));
+    const maxH = Math.max(...hsls.map(h => h.h));
+    if (maxH - minH < 30 || (360 - maxH + minH) < 30) tags.add('Monochromatic');
+  }
+
+  return Array.from(tags);
 }

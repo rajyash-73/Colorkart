@@ -1,5 +1,5 @@
-import React from "react";
-import { Helmet } from "react-helmet-async";
+﻿import React from "react";
+import SEOHead from '@/components/SEOHead';
 import { Monitor, Eye, Layers, ArrowRight, ChevronLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,48 +7,30 @@ import Footer from "@/components/Footer";
 export default function VisualizerGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
-      <Helmet>
-        <title>Color Palette Visualizer Guide - See Your Colors in Action | Coolors.in</title>
-        <meta name="description" content="Learn how to use our color palette visualizer to preview your color schemes in real-world applications, websites, and design mockups before implementation." />
-        <meta name="keywords" content="color palette visualizer, color scheme preview, design mockups, website color preview, UI color testing, color combination visualizer, design visualization tool" />
-        <link rel="canonical" href="https://coolors.in/visualizer-guide" />
-        
-        {/* Open Graph */}
-        <meta property="og:title" content="Color Palette Visualizer Guide - See Your Colors in Action" />
-        <meta property="og:description" content="Preview your color palettes in real-world applications with our comprehensive visualization tool guide." />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://coolors.in/visualizer-guide" />
-        
-        {/* Schema.org JSON-LD */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": "Color Palette Visualizer Guide - See Your Colors in Action",
-            "description": "Complete guide to using our color palette visualizer for design preview and testing",
-            "author": {
-              "@type": "Person",
-              "name": "Yash"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "Coolors.in"
-            },
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": "https://coolors.in/visualizer-guide"
-            }
-          })}
-        </script>
-      </Helmet>
+      <SEOHead
+        title="Palette Visualizer Guide — Preview Colors in Real UI Designs"
+        description="Learn how to use the Palette Visualizer to preview color schemes in real UI templates. Complete guide for designers and developers. See colors in dashboards, landing pages and more."
+        keywords="palette visualizer guide, color scheme preview guide, UI color palette tutorial, visualizer tutorial, design color preview guide, color UI template guide"
+        canonicalPath="/visualizer-guide"
+        ogType="article"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "Palette Visualizer Guide",
+          "description": "Learn how to preview color palettes in real UI templates using the Coolors Palette Visualizer.",
+          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "url": "https://coolors.in/visualizer-guide"
+        }}
+      />
 
-      <Header 
+      <Header
         mobileMenuOpen={false}
         toggleMobileMenu={() => {}}
       />
 
       {/* Back to Home Navigation */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 py-3">
           <div 
             className="flex items-center text-green-600 hover:text-green-800 transition-colors cursor-pointer"
@@ -63,7 +45,7 @@ export default function VisualizerGuide() {
       <main className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             Color Palette Visualizer
             <br />
             <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
@@ -71,7 +53,7 @@ export default function VisualizerGuide() {
             </span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             Preview your color palettes in real-world applications and design mockups before committing to your final color scheme.
           </p>
           
@@ -86,26 +68,26 @@ export default function VisualizerGuide() {
 
         {/* Why Use Color Visualization */}
         <section className="mb-16">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Visualize Your Color Palettes?</h2>
-            <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Why Visualize Your Color Palettes?</h2>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6 leading-relaxed">
               Color visualization is crucial for making informed design decisions. Our visualizer helps you understand how your color choices will look in real applications, preventing costly mistakes and ensuring your designs achieve the desired impact.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
                 <Eye className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Test Before Implementation</h3>
-                <p className="text-gray-600 text-sm">See how colors work together before applying them to your actual project</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Test Before Implementation</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">See how colors work together before applying them to your actual project</p>
               </div>
               <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
                 <Monitor className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Multiple Contexts</h3>
-                <p className="text-gray-600 text-sm">Preview your palette in websites, apps, and various design layouts</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Multiple Contexts</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Preview your palette in websites, apps, and various design layouts</p>
               </div>
               <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
                 <Layers className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">Instant Feedback</h3>
-                <p className="text-gray-600 text-sm">Get immediate visual feedback and make adjustments in real-time</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Instant Feedback</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Get immediate visual feedback and make adjustments in real-time</p>
               </div>
             </div>
           </div>
@@ -113,14 +95,14 @@ export default function VisualizerGuide() {
 
         {/* How to Use the Visualizer */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How to Use the Color Visualizer</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How to Use the Color Visualizer</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">1</span>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Create Your Palette</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Create Your Palette</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Start with a color palette from our generator or create your own custom palette.
               </p>
             </div>
@@ -129,8 +111,8 @@ export default function VisualizerGuide() {
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Choose a Template</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Choose a Template</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Select from website layouts, mobile apps, or design mockups to preview your colors.
               </p>
             </div>
@@ -139,8 +121,8 @@ export default function VisualizerGuide() {
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">3</span>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Apply Colors</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Apply Colors</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Our tool automatically applies your palette to different elements in the chosen template.
               </p>
             </div>
@@ -149,8 +131,8 @@ export default function VisualizerGuide() {
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">4</span>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Evaluate & Refine</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Evaluate & Refine</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Assess the results and make adjustments to perfect your color scheme.
               </p>
             </div>
@@ -159,11 +141,11 @@ export default function VisualizerGuide() {
 
         {/* Use Cases */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Perfect for Every Project</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Perfect for Every Project</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Web Design Projects</h3>
-              <ul className="space-y-3 text-gray-600">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Web Design Projects</h3>
+              <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0"></span>
                   Website headers and navigation elements
@@ -183,9 +165,9 @@ export default function VisualizerGuide() {
               </ul>
             </div>
             
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Brand & Marketing</h3>
-              <ul className="space-y-3 text-gray-600">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Brand & Marketing</h3>
+              <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
                   Logo and brand identity colors
@@ -260,30 +242,31 @@ export default function VisualizerGuide() {
 
         {/* Benefits Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Designers Love Our Visualizer</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Why Designers Love Our Visualizer</h2>
+
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">⚡</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Save Time</h3>
-              <p className="text-gray-600 text-sm">Instantly preview designs without manual mockup creation</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Save Time</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Instantly preview designs without manual mockup creation</p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Make Better Decisions</h3>
-              <p className="text-gray-600 text-sm">Visual feedback helps you choose the perfect color combinations</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Make Better Decisions</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Visual feedback helps you choose the perfect color combinations</p>
             </div>
             
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
               <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💡</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">Reduce Revisions</h3>
-              <p className="text-gray-600 text-sm">Catch potential issues early in the design process</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2">Reduce Revisions</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Catch potential issues early in the design process</p>
             </div>
           </div>
         </section>
@@ -293,7 +276,7 @@ export default function VisualizerGuide() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Ready to Visualize Your Colors?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             See your color palettes come to life in real design contexts.
           </p>
           <button

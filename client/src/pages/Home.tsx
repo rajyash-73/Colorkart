@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -158,18 +158,18 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
       <Helmet>
-        <title>Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes</title>
-        <meta name="description" content="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools." />
+        <title>Coolors - Free Color Palette Generator | Create Beautiful Color Schemes</title>
+        <meta name="description" content="Create and explore beautiful color combinations with Coolors, the free color palette generator. Design with confidence using our intuitive color tools." />
         <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="canonical" href="https://coolors.in/" />
+        <link rel="canonical" href="https://Coolors/" />
         {/* Dynamic structured data for the home page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Coolors.in Color Palette Generator",
-            "url": "https://coolors.in/",
+            "name": "Coolors Color Palette Generator",
+            "url": "https://Coolors/",
             "description": "Create beautiful color combinations with our intuitive color generator",
             "applicationCategory": "DesignApplication",
             "operatingSystem": "Any"

@@ -1,730 +1,665 @@
-import React, { useState, useRef, useCallback } from "react";
-import { Helmet } from "react-helmet-async";
-import { Upload, Camera, Sun, Moon, Palette, User, Eye, Sparkles, RefreshCw, Download, Copy, ChevronLeft } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-// Using plain components instead of shadcn UI for compatibility
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import {
+  Camera, Upload, Sun, Moon, Zap, Lightbulb,
+  RefreshCw, Check, X, Sparkles, Info, AlertCircle, ChevronDown,
+} from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 
-// Color analysis utilities
-const analyzeImageForSkinTone = async (imageData: string): Promise<{
-  skinTone: string;
-  undertone: string;
-  dominantColors: string[];
-}> => {
-  // Enhanced skin tone analysis - uses image characteristics for better results
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  const img = new Image();
-  
-  return new Promise((resolve) => {
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx?.drawImage(img, 0, 0);
-      
-      // Sample pixels from center area (face region)
-      const centerX = Math.floor(img.width / 2);
-      const centerY = Math.floor(img.height / 2);
-      const sampleSize = Math.min(img.width, img.height) / 4;
-      
-      let totalR = 0, totalG = 0, totalB = 0, sampleCount = 0;
-      
-      for (let x = centerX - sampleSize/2; x < centerX + sampleSize/2; x += 10) {
-        for (let y = centerY - sampleSize/2; y < centerY + sampleSize/2; y += 10) {
-          const imageData = ctx?.getImageData(x, y, 1, 1);
-          if (imageData) {
-            totalR += imageData.data[0];
-            totalG += imageData.data[1];
-            totalB += imageData.data[2];
-            sampleCount++;
-          }
-        }
-      }
-      
-      const avgR = totalR / sampleCount;
-      const avgG = totalG / sampleCount;
-      const avgB = totalB / sampleCount;
-      
-      // Determine skin tone based on RGB values
-      const brightness = (avgR + avgG + avgB) / 3;
-      let skinTone: string;
-      if (brightness > 200) skinTone = 'fair';
-      else if (brightness > 160) skinTone = 'light';
-      else if (brightness > 120) skinTone = 'medium';
-      else if (brightness > 80) skinTone = 'tan';
-      else skinTone = 'deep';
-      
-      // Determine undertone based on color ratios
-      const yellowness = avgR + avgG - avgB * 2;
-      const pinkness = avgR - avgG;
-      
-      let undertone: string;
-      if (Math.abs(yellowness) < 10 && Math.abs(pinkness) < 10) {
-        undertone = 'neutral';
-      } else if (yellowness > pinkness) {
-        undertone = 'warm';
-      } else {
-        undertone = 'cool';
-      }
-      
-      resolve({
-        skinTone,
-        undertone,
-        dominantColors: [`rgb(${Math.floor(avgR)}, ${Math.floor(avgG)}, ${Math.floor(avgB)})`]
-      });
-    };
-    
-    img.src = imageData;
-  });
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+type Lighting = 'warm' | 'natural' | 'cool' | 'evening';
+
+interface SkinAnalysis {
+  hex: string;
+  isWarm: boolean;
+  depth: 'light' | 'medium' | 'dark';
+  season: Season;
+}
+
+interface ColorSwatch { hex: string; name: string; }
+
+// ─── Season data ──────────────────────────────────────────────────────────────
+const SEASON_DATA: Record<Season, {
+  name: string; nameKo: string; emoji: string;
+  badgeCls: string;
+  description: string;
+  tips: string[];
+  good: string[];
+  avoid: string[];
+  colors: ColorSwatch[];
+}> = {
+  spring: {
+    name: 'Spring', nameKo: '봄 웜 브라이트', emoji: '🌸',
+    badgeCls: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800',
+    description: 'Warm, bright, and fresh undertones. Your skin glows with light peachy-golden hues.',
+    tips: [
+      'Choose warm, bright, and light shades',
+      'Avoid heavy, dark, or cool-toned colors',
+      'Best metals: gold and rose-gold',
+    ],
+    good: ['Coral', 'Peach', 'Warm Yellow', 'Mint', 'Camel', 'Salmon', 'Ivory'],
+    avoid: ['Black', 'Dark Navy', 'Ash Gray', 'Cool Pastels'],
+    colors: [
+      { hex: '#FF7F50', name: 'Coral' },
+      { hex: '#FFB347', name: 'Peach' },
+      { hex: '#F4C542', name: 'Warm Yellow' },
+      { hex: '#90EE90', name: 'Mint' },
+      { hex: '#87CEEB', name: 'Sky Blue' },
+      { hex: '#F08080', name: 'Light Coral' },
+      { hex: '#DEB887', name: 'Camel' },
+      { hex: '#FFDAB9', name: 'Peach Puff' },
+      { hex: '#98FB98', name: 'Pale Green' },
+      { hex: '#FFB6C1', name: 'Light Pink' },
+      { hex: '#FFA07A', name: 'Salmon' },
+      { hex: '#FFFACD', name: 'Ivory' },
+    ],
+  },
+  summer: {
+    name: 'Summer', nameKo: '여름 쿨 뮤트', emoji: '🌊',
+    badgeCls: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+    description: 'Cool, soft, and muted undertones. Rosy-pink or blue-tinted hues complement you best.',
+    tips: [
+      'Choose cool, muted, and soft shades',
+      'Avoid warm oranges, browns, and yellows',
+      'Best metals: silver and white gold',
+    ],
+    good: ['Dusty Rose', 'Lavender', 'Sage', 'Powder Blue', 'Mauve', 'Soft White'],
+    avoid: ['Orange', 'Warm Yellow', 'Olive', 'Bright Orange-Red'],
+    colors: [
+      { hex: '#C9A0B8', name: 'Dusty Rose' },
+      { hex: '#B0C4DE', name: 'Powder Blue' },
+      { hex: '#9A8FB5', name: 'Lavender' },
+      { hex: '#7B9EA5', name: 'Teal Sage' },
+      { hex: '#BC8F8F', name: 'Rosy Brown' },
+      { hex: '#A8B8C0', name: 'Cool Gray' },
+      { hex: '#8FA8B8', name: 'Slate Blue' },
+      { hex: '#C8A8B8', name: 'Mauve' },
+      { hex: '#A0B0A0', name: 'Sage Green' },
+      { hex: '#D4A5B5', name: 'Blush Pink' },
+      { hex: '#9098B8', name: 'Periwinkle' },
+      { hex: '#B8A0C0', name: 'Soft Violet' },
+    ],
+  },
+  autumn: {
+    name: 'Autumn', nameKo: '가을 웜 뮤트', emoji: '🍂',
+    badgeCls: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
+    description: 'Rich, earthy, and muted warm undertones. Deep golden or olive hints define your warmth.',
+    tips: [
+      'Choose earthy, rich, and muted warm shades',
+      'Avoid cool pinks, icy pastels, and bright neons',
+      'Best metals: antique gold and bronze',
+    ],
+    good: ['Rust', 'Terracotta', 'Olive', 'Camel', 'Brick Red', 'Forest Green'],
+    avoid: ['Bright Pink', 'Electric Blue', 'Pure White', 'Cool Pastels'],
+    colors: [
+      { hex: '#B7410E', name: 'Rust' },
+      { hex: '#C04A20', name: 'Terracotta' },
+      { hex: '#808000', name: 'Olive' },
+      { hex: '#556B2F', name: 'Dark Olive' },
+      { hex: '#CD853F', name: 'Camel' },
+      { hex: '#A0522D', name: 'Sienna' },
+      { hex: '#C68642', name: 'Caramel' },
+      { hex: '#8B4513', name: 'Brown' },
+      { hex: '#6B8E23', name: 'Moss Green' },
+      { hex: '#9B4A2A', name: 'Brick Red' },
+      { hex: '#8B7355', name: 'Warm Taupe' },
+      { hex: '#704214', name: 'Chocolate' },
+    ],
+  },
+  winter: {
+    name: 'Winter', nameKo: '겨울 쿨 비비드', emoji: '❄️',
+    badgeCls: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+    description: 'Bold, clear, and high-contrast cool undertones. Vivid colors and stark contrasts make you shine.',
+    tips: [
+      'Choose bold, vivid, and high-contrast colors',
+      'Avoid muted, warm, or earthy tones',
+      'Best metals: silver and platinum',
+    ],
+    good: ['Navy', 'Crimson', 'Emerald', 'Royal Blue', 'Hot Pink', 'Pure White'],
+    avoid: ['Camel', 'Warm Brown', 'Olive', 'Muted Earth Tones'],
+    colors: [
+      { hex: '#000080', name: 'Navy' },
+      { hex: '#DC143C', name: 'Crimson' },
+      { hex: '#228B22', name: 'Emerald' },
+      { hex: '#4169E1', name: 'Royal Blue' },
+      { hex: '#FF1493', name: 'Deep Pink' },
+      { hex: '#9400D3', name: 'Violet' },
+      { hex: '#006400', name: 'Dark Green' },
+      { hex: '#8B0000', name: 'Dark Red' },
+      { hex: '#191970', name: 'Midnight Blue' },
+      { hex: '#F8F8FF', name: 'Pure White' },
+      { hex: '#1C1C1C', name: 'Black' },
+      { hex: '#C0C0C0', name: 'Silver' },
+    ],
+  },
 };
 
-// Hair color options
-const hairColorOptions = [
-  { value: 'black', label: 'Black', color: '#2C1B18' },
-  { value: 'brown', label: 'Brown', color: '#8B4513' },
-  { value: 'blonde', label: 'Blonde', color: '#F4C2A1' },
-  { value: 'red', label: 'Red', color: '#B22222' },
-  { value: 'gray', label: 'Gray', color: '#808080' },
-  { value: 'white', label: 'White', color: '#FFFFFF' },
-  { value: 'other', label: 'Other', color: '#A0A0A0' }
+// ─── Lighting options ─────────────────────────────────────────────────────────
+const LIGHTING: { key: Lighting; label: string; icon: React.FC<any>; filter: string; desc: string }[] = [
+  { key: 'warm',    label: 'Golden Hour', icon: Sun,       filter: 'sepia(0.22) saturate(1.3) brightness(1.1) hue-rotate(-8deg)', desc: 'Warm sunset' },
+  { key: 'natural', label: 'Daylight',    icon: Lightbulb, filter: 'none',                                                         desc: 'Natural light' },
+  { key: 'cool',    label: 'Office',      icon: Zap,       filter: 'brightness(0.95) saturate(0.82) hue-rotate(12deg)',            desc: 'Cool fluorescent' },
+  { key: 'evening', label: 'Evening',     icon: Moon,      filter: 'brightness(0.62) sepia(0.18) saturate(1.1)',                   desc: 'Dim indoor' },
 ];
 
-// Enhanced clothing color recommendations with multiple variations
-const getClothingRecommendations = (skinTone: string, undertone: string, hairColor: string, isDayTime: boolean, variationIndex: number = 0) => {
-  
-  // Expanded color palettes with multiple themes and variations
-  const colorPalettes = {
-    cool: {
-      day: {
-        primary: [
-          // Classic Blues Theme
-          '#1e3a8a', '#1e40af', '#3b82f6', '#0ea5e9', '#0284c7', '#0891b2',
-          // Cool Teal Theme  
-          '#0f766e', '#0d9488', '#14b8a6', '#2dd4bf', '#06b6d4', '#0ea5e9',
-          // Sophisticated Navy Theme
-          '#1e293b', '#334155', '#475569', '#64748b'
-        ],
-        neutral: [
-          // Pure Whites & Grays
-          '#ffffff', '#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1', '#94a3b8',
-          // Cool Beiges
-          '#f8f9fa', '#e9ecef', '#dee2e6', '#ced4da', '#adb5bd', '#6c757d'
-        ],
-        accent: [
-          // Bright Cool Accents
-          '#ec4899', '#f43f5e', '#ef4444', '#f97316', '#10b981', '#06b6d4',
-          // Jewel Tones
-          '#7c3aed', '#8b5cf6', '#a855f7', '#c084fc', '#d946ef', '#e879f9'
-        ]
-      },
-      evening: {
-        primary: [
-          // Deep Sapphire Theme
-          '#1e1b4b', '#312e81', '#3730a3', '#4338ca', '#4f46e5', '#6366f1',
-          // Rich Navy Theme
-          '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8'
-        ],
-        neutral: [
-          // Sophisticated Grays
-          '#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db',
-          // Charcoal Elegance
-          '#111827', '#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af'
-        ],
-        accent: [
-          // Evening Jewels
-          '#dc2626', '#ea580c', '#059669', '#0891b2', '#7c2d92', '#a21caf',
-          // Rich Metallics
-          '#6366f1', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#f59e0b'
-        ]
-      }
-    },
-    warm: {
-      day: {
-        primary: [
-          // Warm Reds & Corals
-          '#dc2626', '#ef4444', '#f87171', '#fca5a5', '#ea580c', '#fb923c',
-          // Rich Earth Tones
-          '#92400e', '#a16207', '#ca8a04', '#eab308', '#facc15', '#fde047',
-          // Autumn Spice Theme
-          '#d97706', '#f59e0b', '#f59e0b', '#fbbf24'
-        ],
-        neutral: [
-          // Warm Creams & Beiges
-          '#fef7cd', '#fef3c7', '#fde68a', '#fcd34d', '#f59e0b', '#d97706',
-          // Natural Linens
-          '#faf5f0', '#f5f0e8', '#e6ddd4', '#d2c7b8', '#b8a690', '#9c8b72'
-        ],
-        accent: [
-          // Vibrant Warm Accents
-          '#f97316', '#fb923c', '#fdba74', '#fed7aa', '#84cc16', '#a3e635',
-          // Sunset Tones
-          '#f59e0b', '#eab308', '#facc15', '#fde047', '#84cc16', '#65a30d'
-        ]
-      },
-      evening: {
-        primary: [
-          // Deep Burgundy Theme
-          '#7f1d1d', '#991b1b', '#b91c1c', '#dc2626', '#92400e', '#a16207',
-          // Rich Brown & Gold Theme
-          '#451a03', '#78350f', '#92400e', '#a16207', '#ca8a04', '#eab308'
-        ],
-        neutral: [
-          // Warm Sophisticated Grays
-          '#44403c', '#57534e', '#78716c', '#a8a29e', '#d6d3d1', '#e7e5e4',
-          // Chocolate Browns
-          '#292524', '#44403c', '#57534e', '#78716c', '#a8a29e', '#d6d3d1'
-        ],
-        accent: [
-          // Evening Warm Accents
-          '#dc2626', '#ea580c', '#f59e0b', '#059669', '#0d9488', '#7c2d92',
-          // Rich Metallics
-          '#eab308', '#ca8a04', '#a16207', '#92400e', '#78350f', '#451a03'
-        ]
-      }
-    },
-    neutral: {
-      day: {
-        primary: [
-          // True Grays
-          '#374151', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#f3f4f6',
-          // Universal Colors
-          '#1e40af', '#dc2626', '#059669', '#7c2d92', '#ea580c', '#0891b2'
-        ],
-        neutral: [
-          // Perfect Neutrals
-          '#ffffff', '#f9fafb', '#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af',
-          // Warm-Cool Balance
-          '#fafaf9', '#f5f5f4', '#e7e5e4', '#d6d3d1', '#a8a29e', '#78716c'
-        ],
-        accent: [
-          // Universal Accents
-          '#3b82f6', '#ef4444', '#10b981', '#8b5cf6', '#f59e0b', '#06b6d4',
-          // Balanced Brights
-          '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#d97706', '#0284c7'
-        ]
-      },
-      evening: {
-        primary: [
-          // Sophisticated Neutrals
-          '#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af', '#d1d5db',
-          // Evening Jewel Tones
-          '#312e81', '#7f1d1d', '#064e3b', '#581c87', '#92400e', '#1e40af'
-        ],
-        neutral: [
-          // Evening Sophistication
-          '#111827', '#1f2937', '#374151', '#4b5563', '#6b7280', '#9ca3af',
-          // Elegant Darks
-          '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8'
-        ],
-        accent: [
-          // Evening Accents
-          '#4338ca', '#dc2626', '#059669', '#7c2d92', '#ea580c', '#0891b2',
-          // Refined Tones
-          '#6366f1', '#ef4444', '#10b981', '#a855f7', '#f59e0b', '#06b6d4'
-        ]
+// ─── Skin tone analysis ───────────────────────────────────────────────────────
+function analyzeSkin(canvas: HTMLCanvasElement): SkinAnalysis | null {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  const { width: w, height: h } = canvas;
+  const data = ctx.getImageData(0, 0, w, h).data;
+
+  const x0 = Math.floor(w * 0.2), x1 = Math.floor(w * 0.8);
+  const y0 = Math.floor(h * 0.1), y1 = Math.floor(h * 0.72);
+
+  let rS = 0, gS = 0, bS = 0, n = 0;
+  for (let y = y0; y < y1; y += 3) {
+    for (let x = x0; x < x1; x += 3) {
+      const i = (y * w + x) * 4;
+      const [r, g, b, a] = [data[i], data[i+1], data[i+2], data[i+3]];
+      if (a < 128) continue;
+      // Loose skin pixel filter
+      if (r > 60 && g > 30 && b > 15 && r > b * 1.05 && r > 80 && Math.abs(r - g) < 105) {
+        rS += r; gS += g; bS += b; n++;
       }
     }
-  };
+  }
+  if (n < 40) return null;
 
-  // Hair color modifications
-  const getHairColorAdjustments = (hairColor: string, baseColors: any) => {
-    const adjustments = { ...baseColors };
-    
-    switch (hairColor) {
-      case 'blonde':
-        // Blonde hair looks great with soft, muted colors
-        if (undertone === 'warm') {
-          adjustments.accent = ['#f97316', '#fbbf24', '#a3a3a3', '#f59e0b'];
-          adjustments.primary = ['#dc2626', '#ea580c', '#ca8a04', '#92400e'];
-        } else if (undertone === 'cool') {
-          adjustments.accent = ['#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
-          adjustments.primary = ['#1e40af', '#7c3aed', '#0ea5e9', '#1e3a8a'];
-        }
-        break;
-        
-      case 'red':
-        // Red hair pairs beautifully with greens, earth tones, avoid competing reds
-        adjustments.accent = ['#059669', '#0d9488', '#0891b2', '#7c2d92'];
-        adjustments.earth = ['#78716c', '#92400e', '#a16207', '#525252'];
-        // Remove competing reds from primary
-        adjustments.primary = adjustments.primary.filter((color: string) => 
-          !color.includes('dc2626') && !color.includes('ef4444')
-        );
-        break;
-        
-      case 'black':
-        // Black hair can handle bold, dramatic colors
-        adjustments.accent = ['#dc2626', '#7c3aed', '#059669', '#f97316'];
-        adjustments.primary = [...adjustments.primary, '#1a1a1a', '#0f172a'];
-        break;
-        
-      case 'brown':
-        // Brown hair is versatile, enhance earth tones
-        adjustments.earth = ['#92400e', '#a16207', '#78716c', '#a8a29e'];
-        break;
-        
-      case 'gray':
-      case 'white':
-        // Silver/white hair looks stunning with jewel tones and soft colors
-        adjustments.accent = ['#7c3aed', '#0ea5e9', '#ec4899', '#059669'];
-        adjustments.metallic = ['#6366f1', '#8b5cf6', '#06b6d4', '#a855f7'];
-        break;
+  const [aR, aG, aB] = [Math.round(rS / n), Math.round(gS / n), Math.round(bS / n)];
+  const warmScore = ((aR - aB) + (aG - aB)) / (aR + 1);
+  const isWarm = warmScore > 0.28;
+  const lightness = (Math.max(aR, aG, aB) + Math.min(aR, aG, aB)) / (2 * 255);
+  const depth: 'light' | 'medium' | 'dark' = lightness > 0.60 ? 'light' : lightness > 0.38 ? 'medium' : 'dark';
+
+  let season: Season;
+  if (isWarm && depth !== 'dark') season = 'spring';
+  else if (isWarm) season = 'autumn';
+  else if (!isWarm && depth !== 'dark') season = 'summer';
+  else season = 'winter';
+
+  const toH = (v: number) => v.toString(16).padStart(2, '0');
+  return { hex: `#${toH(aR)}${toH(aG)}${toH(aB)}`, isWarm, depth, season };
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+export default function KoreanColorAnalysis() {
+  const [step, setStep] = useState<'capture' | 'result'>('capture');
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<SkinAnalysis | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [manualSeason, setManualSeason] = useState<Season | null>(null);
+  const [selectedColor, setSelectedColor] = useState<ColorSwatch | null>(null);
+  const [lighting, setLighting] = useState<Lighting>('natural');
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+  }, []);
+
+  useEffect(() => () => stopCamera(), [stopCamera]);
+
+  // Attach stream to video element after it mounts (cameraActive triggers the mount)
+  useEffect(() => {
+    if (cameraActive && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
     }
-    
-    return adjustments;
-  };
+  }, [cameraActive]);
 
-  // Skin tone intensity adjustments
-  const getSkinToneAdjustments = (skinTone: string, colors: any) => {
-    const adjustments = { ...colors };
-    
-    switch (skinTone) {
-      case 'fair':
-        // Fair skin looks great with soft, medium-intensity colors
-        adjustments.primary = adjustments.primary.map((color: string) => 
-          color.replace(/1e|0f|7f|45/g, '3b').replace(/81|92|a1/g, '94')
-        );
-        break;
-        
-      case 'deep':
-        // Deep skin tones can handle bold, vibrant colors
-        adjustments.accent = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
-        adjustments.primary = [...adjustments.primary, '#1a1a1a', '#0f172a'];
-        break;
-        
-      case 'medium':
-      case 'tan':
-        // Medium skin tones look great with rich, warm colors
-        if (undertone === 'warm') {
-          adjustments.earth = ['#92400e', '#a16207', '#ca8a04', '#78716c'];
-        }
-        break;
+  const startCamera = async () => {
+    setCameraError(null);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      });
+      streamRef.current = stream;
+      setCameraActive(true); // triggers mount of <video>, then useEffect attaches stream
+    } catch (e: any) {
+      setCameraError(
+        e.name === 'NotAllowedError' ? 'Camera access denied. Please allow camera access or upload a photo instead.' :
+        e.name === 'NotFoundError'   ? 'No camera detected. Please upload a photo instead.' :
+        'Cannot access camera. Please upload a photo instead.',
+      );
     }
-    
-    return adjustments;
   };
 
-  // Helper function to randomly select unique colors from array
-  const selectRandomColors = (colorArray: string[], count: number, variationIndex: number): string[] => {
-    // First, ensure we have unique colors only
-    const uniqueColors = Array.from(new Set(colorArray));
-    
-    // If we don't have enough unique colors, pad with variations
-    while (uniqueColors.length < count && uniqueColors.length > 0) {
-      const baseColor = uniqueColors[uniqueColors.length % uniqueColors.length];
-      // Create a slight variation by adjusting brightness
-      const variation = adjustColorBrightness(baseColor, 0.1 * uniqueColors.length);
-      if (!uniqueColors.includes(variation)) {
-        uniqueColors.push(variation);
-      }
-    }
-    
-    // Shuffle using variationIndex for consistent but different results
-    const shuffled = [...uniqueColors];
-    const seed = variationIndex;
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(((seed * (i + 1)) % 997) / 997 * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled.slice(0, count);
+  const runAnalysis = (canvas: HTMLCanvasElement, imgSrc: string) => {
+    setCapturedImage(imgSrc);
+    stopCamera();
+    setManualSeason(null);
+    setSelectedColor(null);
+    setAnalyzing(true);
+    setStep('result');
+    setTimeout(() => {
+      const result = analyzeSkin(canvas);
+      setAnalysis(result);
+      setAnalyzing(false);
+    }, 1300);
   };
 
-  // Helper function to adjust color brightness
-  const adjustColorBrightness = (hex: string, factor: number): string => {
-    const num = parseInt(hex.replace("#", ""), 16);
-    const amt = Math.round(2.55 * factor * 100);
-    const R = (num >> 16) + amt;
-    const G = (num >> 8 & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
-    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-      (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-      (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+  const capture = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d')!.drawImage(video, 0, 0);
+    runAnalysis(canvas, canvas.toDataURL('image/jpeg', 0.92));
   };
 
-  const timeOfDay = isDayTime ? 'day' : 'evening';
-  let baseColors = colorPalettes[undertone as keyof typeof colorPalettes]?.[timeOfDay] || 
-                   colorPalettes.neutral[timeOfDay];
-  
-  // Apply hair color adjustments
-  baseColors = getHairColorAdjustments(hairColor, baseColors);
-  
-  // Apply skin tone adjustments  
-  baseColors = getSkinToneAdjustments(skinTone, baseColors);
-  
-  // Return organized palette with random selection based on variation
-  return {
-    primary: selectRandomColors(baseColors.primary, 4, variationIndex),
-    neutral: selectRandomColors(baseColors.neutral, 4, variationIndex + 1), 
-    accent: selectRandomColors(baseColors.accent, 4, variationIndex + 2)
-  };
-};
-
-export default function ClothingPalettePage() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [analyzedData, setAnalyzedData] = useState<{
-    skinTone: string;
-    undertone: string;
-    dominantColors: string[];
-  } | null>(null);
-  const [selectedHairColor, setSelectedHairColor] = useState<string>('brown');
-  const [isDayTime, setIsDayTime] = useState<boolean>(true);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [recommendations, setRecommendations] = useState<any>(null);
-  const [variationCount, setVariationCount] = useState<number>(0);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Create image preview
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file?.type.startsWith('image/')) return;
     const reader = new FileReader();
-    reader.onload = async (e) => {
-      const imageData = e.target?.result as string;
-      setSelectedImage(imageData);
-      
-      // Analyze the image
-      setIsAnalyzing(true);
-      try {
-        const analysis = await analyzeImageForSkinTone(imageData);
-        setAnalyzedData(analysis);
-        setVariationCount(0); // Reset variation count for new image
-        generateRecommendations(analysis.skinTone, analysis.undertone, selectedHairColor, isDayTime, 0);
-      } catch (error) {
-        console.error('Error analyzing image:', error);
-      } finally {
-        setIsAnalyzing(false);
-      }
+    reader.onload = ev => {
+      const src = ev.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = canvasRef.current!;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.getContext('2d')!.drawImage(img, 0, 0);
+        runAnalysis(canvas, src);
+      };
+      img.src = src;
     };
     reader.readAsDataURL(file);
-  }, [selectedHairColor, isDayTime]);
-
-  // Update recommendations when settings change
-  React.useEffect(() => {
-    if (analyzedData) {
-      setVariationCount(0); // Reset variation when settings change
-      generateRecommendations(analyzedData.skinTone, analyzedData.undertone, selectedHairColor, isDayTime, 0);
-    }
-  }, [selectedHairColor, isDayTime, analyzedData]);
-
-  const generateRecommendations = (skinTone: string, undertone: string, hairColor: string, dayTime: boolean, variation: number = 0) => {
-    const recs = getClothingRecommendations(skinTone, undertone, hairColor, dayTime, variation);
-    setRecommendations(recs);
   };
 
-  const handleGenerateRecommendations = async () => {
-    if (analyzedData) {
-      setIsGenerating(true);
-      
-      // Add a small delay for better UX feedback
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const newVariation = variationCount + 1;
-      setVariationCount(newVariation);
-      generateRecommendations(analyzedData.skinTone, analyzedData.undertone, selectedHairColor, isDayTime, newVariation);
-      
-      setIsGenerating(false);
-    }
+  const reset = () => {
+    setCapturedImage(null);
+    setAnalysis(null);
+    setManualSeason(null);
+    setSelectedColor(null);
+    setStep('capture');
+    setCameraError(null);
+    stopCamera();
   };
 
-  const copyColorToClipboard = (color: string) => {
-    navigator.clipboard.writeText(color);
-  };
-
-  const ColorPalette = ({ colors, title }: { colors: string[], title: string }) => (
-    <div className="mb-6 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
-      <div className="grid grid-cols-4 gap-3">
-        {colors.map((color, index) => (
-          <div key={index} className="group relative">
-            <div 
-              className="w-full h-16 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 shadow-md"
-              style={{ backgroundColor: color }}
-              onClick={() => copyColorToClipboard(color)}
-              title={`Click to copy ${color}`}
-            />
-            <p className="text-xs text-center mt-1 font-mono text-gray-600 group-hover:text-gray-900 transition-colors">
-              {color}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const activeSeason: Season | null = manualSeason ?? analysis?.season ?? null;
+  const seasonData = activeSeason ? SEASON_DATA[activeSeason] : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <Helmet>
-        <title>Clothing Color Palette Creator - Personalized Style Recommendations</title>
-        <meta name="description" content="Get personalized clothing color recommendations based on your skin tone, hair color, and occasion. Upload your photo for AI-powered style analysis." />
-        <meta name="keywords" content="clothing colors, personal style, skin tone analysis, fashion colors, color matching" />
-      </Helmet>
-
-      <Header 
-        mobileMenuOpen={false}
-        toggleMobileMenu={() => {}}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <SEOHead
+        title="Korean Personal Color Analysis — Find Your Color Season"
+        description="Discover your Korean personal color season (퍼스널 컬러). Take a selfie or upload a photo to find whether you're Spring, Summer, Autumn or Winter and get personalised color recommendations."
+        keywords="Korean color analysis, personal color, 퍼스널 컬러, color season analysis, skin tone color, spring summer autumn winter color, personal color test online"
+        canonicalPath="/clothing-palette"
       />
+      <Header mobileMenuOpen={false} toggleMobileMenu={() => {}} />
 
-      {/* Back to Home Navigation */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-3">
-          <div 
-            className="flex items-center text-purple-600 hover:text-purple-800 transition-colors cursor-pointer"
-            onClick={() => window.location.href = '/'}
-          >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            <span>Back to Home</span>
-          </div>
+      <div className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+
+        {/* Page heading */}
+        <div className="text-center mb-8">
+          <p className="text-sm text-purple-500 dark:text-purple-400 font-medium tracking-widest uppercase mb-1">퍼스널 컬러 분석</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 bg-clip-text text-transparent">
+            Korean Color Analysis
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm max-w-lg mx-auto">
+            Capture your face, discover your personal color season, and see which colors truly complement your unique skin tone.
+          </p>
         </div>
+
+        {/* ── Step 1: Capture ── */}
+        {step === 'capture' && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 max-w-md mx-auto">
+            <h2 className="text-base font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <Camera size={18} className="text-purple-500" />
+              Capture Your Face
+            </h2>
+
+            {/* Camera / placeholder */}
+            <div className="relative bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden mb-4" style={{ aspectRatio: '4/3' }}>
+              {cameraActive ? (
+                <>
+                  <video ref={videoRef} autoPlay playsInline muted
+                    className="w-full h-full object-cover"
+                    style={{ transform: 'scaleX(-1)' }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="border-[3px] border-white/70 rounded-[50%] w-36 h-48 shadow-lg" />
+                  </div>
+                  <p className="absolute bottom-2 left-0 right-0 text-center text-white text-[11px] bg-black/40 py-1">
+                    Align your face with the oval
+                  </p>
+                </>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6">
+                  <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                    <Camera size={28} className="text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm text-center">
+                    Take a selfie or upload a front-facing photo
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <canvas ref={canvasRef} className="hidden" />
+
+            {cameraError && (
+              <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-xl px-3 py-2.5 mb-4 text-xs">
+                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                {cameraError}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2.5">
+              {!cameraActive ? (
+                <>
+                  <button onClick={startCamera}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                    <Camera size={18} /> Open Camera
+                  </button>
+                  <label className="flex items-center justify-center gap-2 w-full py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer">
+                    <Upload size={18} /> Upload Photo
+                    <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+                  </label>
+                </>
+              ) : (
+                <div className="flex gap-2">
+                  <button onClick={capture}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                    <Camera size={18} /> Capture & Analyse
+                  </button>
+                  <button onClick={stopCamera}
+                    className="px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Tips */}
+            <div className="mt-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3.5">
+              <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-1 mb-1.5">
+                <Info size={12} /> Tips for accurate results
+              </p>
+              <ul className="text-xs text-purple-600 dark:text-purple-400 space-y-0.5 list-disc pl-4">
+                <li>Use soft, even natural lighting</li>
+                <li>Remove heavy makeup if possible</li>
+                <li>Face the camera directly, chin level</li>
+                <li>Keep background simple and bright</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 2: Results ── */}
+        {step === 'result' && (
+          <div className="space-y-5">
+
+            {/* Top bar */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-white">Your Analysis</h2>
+              <button onClick={reset}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors">
+                <RefreshCw size={14} /> Start over
+              </button>
+            </div>
+
+            {/* Photo + season card */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+              {/* Captured photo */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Your Photo</p>
+                {capturedImage && (
+                  <div className="rounded-xl overflow-hidden mb-3 aspect-square w-full max-w-[220px] mx-auto">
+                    <img src={capturedImage} alt="Captured face" className="w-full h-full object-cover object-top" />
+                  </div>
+                )}
+                {analysis && (
+                  <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-3">
+                    <div className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-600 shadow shrink-0"
+                      style={{ backgroundColor: analysis.hex }} />
+                    <div>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">Detected skin tone</p>
+                      <p className="font-mono text-sm font-bold text-gray-800 dark:text-white">{analysis.hex.toUpperCase()}</p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                        {analysis.isWarm ? '🔥 Warm' : '❄️ Cool'} · {analysis.depth} depth
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {!analysis && !analyzing && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+                    Could not detect skin tone automatically. Please select your season manually below.
+                  </p>
+                )}
+              </div>
+
+              {/* Season result */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Color Season</p>
+                {analyzing ? (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-3 py-6">
+                    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-gray-400 dark:text-gray-500">Analysing your complexion…</p>
+                  </div>
+                ) : activeSeason && seasonData ? (
+                  <>
+                    <div className="text-center flex-1">
+                      <div className="text-5xl mb-2">{seasonData.emoji}</div>
+                      <span className={`inline-flex items-center px-3 py-0.5 rounded-full border text-sm font-semibold mb-1 ${seasonData.badgeCls}`}>
+                        {seasonData.name}
+                      </span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{seasonData.nameKo}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{seasonData.description}</p>
+                    </div>
+                    <div className="mt-3 space-y-1.5">
+                      {seasonData.tips.map((t, i) => (
+                        <div key={i} className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                          <Check size={11} className="text-green-500 shrink-0 mt-0.5" /> {t}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
+                    Select your season below
+                  </div>
+                )}
+
+                {/* Manual season picker */}
+                {!analyzing && (
+                  <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2 flex items-center gap-1">
+                      <ChevronDown size={11} /> Not accurate? Select manually:
+                    </p>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {(Object.keys(SEASON_DATA) as Season[]).map(s => (
+                        <button key={s}
+                          onClick={() => { setManualSeason(s); setSelectedColor(null); }}
+                          className={`text-[11px] py-1.5 rounded-lg border font-medium transition-all ${
+                            activeSeason === s
+                              ? SEASON_DATA[s].badgeCls + ' scale-105'
+                              : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                          }`}>
+                          {SEASON_DATA[s].emoji}<br />{SEASON_DATA[s].name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── Color palette ── */}
+            {!analyzing && seasonData && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+                <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
+                  <Sparkles size={16} className="text-purple-500" />
+                  Your Best Colors
+                </h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                  Click a color to simulate how it looks with your face under different lighting
+                </p>
+                <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 mb-3">
+                  {seasonData.colors.map(c => (
+                    <button key={c.hex}
+                      title={c.name}
+                      onClick={() => setSelectedColor(c)}
+                      className={`aspect-square rounded-xl border-2 transition-all hover:scale-110 ${
+                        selectedColor?.hex === c.hex
+                          ? 'border-gray-900 dark:border-white scale-110 shadow-lg ring-2 ring-purple-400'
+                          : 'border-white dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+                      }`}
+                      style={{ backgroundColor: c.hex }}
+                    />
+                  ))}
+                </div>
+                {selectedColor && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <div className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 shrink-0"
+                      style={{ backgroundColor: selectedColor.hex }} />
+                    <span className="font-medium">{selectedColor.name}</span>
+                    <span className="font-mono text-xs text-gray-400">{selectedColor.hex.toUpperCase()}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Try-on simulator ── */}
+            {capturedImage && selectedColor && !analyzing && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+                <div className="flex items-start justify-between mb-4 gap-4">
+                  <div>
+                    <h3 className="text-base font-semibold text-gray-800 dark:text-white">Color Try-On Simulator</h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                      See how <strong className="text-gray-700 dark:text-gray-300">{selectedColor.name}</strong> looks next to your face across lighting conditions
+                    </p>
+                  </div>
+                  <div className="w-8 h-8 rounded-lg border-2 border-white dark:border-gray-600 shadow shrink-0"
+                    style={{ backgroundColor: selectedColor.hex }} />
+                </div>
+
+                {/* Lighting toggle */}
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {LIGHTING.map(opt => {
+                    const Icon = opt.icon;
+                    return (
+                      <button key={opt.key}
+                        onClick={() => setLighting(opt.key)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                          lighting === opt.key
+                            ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white shadow'
+                            : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                        }`}>
+                        <Icon size={12} /> {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 4-panel lighting grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {LIGHTING.map(opt => {
+                    const Icon = opt.icon;
+                    const isActive = lighting === opt.key;
+                    return (
+                      <div key={opt.key}
+                        onClick={() => setLighting(opt.key)}
+                        className={`rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
+                          isActive
+                            ? 'border-purple-500 shadow-lg shadow-purple-200 dark:shadow-purple-900/50'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}>
+                        {/* Face + colour band with lighting filter */}
+                        <div style={{ filter: opt.filter }}>
+                          <img
+                            src={capturedImage}
+                            alt={opt.label}
+                            className="w-full object-cover object-top"
+                            style={{ aspectRatio: '1', display: 'block' }}
+                          />
+                          {/* Clothing colour strip */}
+                          <div className="h-10 w-full" style={{ backgroundColor: selectedColor.hex }} />
+                        </div>
+                        <div className={`px-2 py-1.5 text-center ${isActive ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-gray-50 dark:bg-gray-700'}`}>
+                          <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-gray-700 dark:text-gray-300">
+                            <Icon size={10} /> {opt.label}
+                          </div>
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">{opt.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Colour info bar */}
+                <div className="mt-4 flex items-center gap-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-3">
+                  <div className="w-8 h-8 rounded-lg shadow border border-white dark:border-gray-600 shrink-0"
+                    style={{ backgroundColor: selectedColor.hex }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-white">{selectedColor.name}</p>
+                    <p className="font-mono text-xs text-gray-400 dark:text-gray-500">{selectedColor.hex.toUpperCase()}</p>
+                  </div>
+                  {seasonData && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full border font-medium shrink-0 ${seasonData.badgeCls}`}>
+                      {seasonData.name} ✓
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Prompt to select a color ── */}
+            {!selectedColor && !analyzing && seasonData && (
+              <p className="text-center text-sm text-purple-500 dark:text-purple-400 animate-pulse">
+                ↑ Select a color above to launch the try-on simulator
+              </p>
+            )}
+
+            {/* ── Good / Avoid ── */}
+            {!analyzing && seasonData && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <h4 className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1.5 mb-2">
+                      <Check size={13} /> Colors that suit you
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {seasonData.good.map(c => (
+                        <span key={c} className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 px-2 py-0.5 rounded-full">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-red-600 dark:text-red-400 flex items-center gap-1.5 mb-2">
+                      <X size={13} /> Colors to avoid
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {seasonData.avoid.map(c => (
+                        <span key={c} className="text-xs bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-2 py-0.5 rounded-full">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
       </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Clothing Color Palette Creator
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover your perfect clothing colors based on your unique skin tone, hair color, and lifestyle
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Left Panel - Input Section */}
-            <div className="space-y-6">
-              {/* Image Upload */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <Camera className="w-5 h-5" />
-                  Upload Your Photo
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Upload a clear photo of your face for skin tone analysis
-                </p>
-                <div className="space-y-4">
-                  {selectedImage ? (
-                    <div className="relative">
-                      <img 
-                        src={selectedImage} 
-                        alt="Uploaded face" 
-                        className="w-full max-w-md mx-auto rounded-lg shadow-md"
-                      />
-                      <button
-                        className="absolute top-2 right-2 px-3 py-1 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors"
-                        onClick={() => {
-                          setSelectedImage(null);
-                          setAnalyzedData(null);
-                          setRecommendations(null);
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <div 
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-purple-400 transition-colors"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-600">Click to upload your photo</p>
-                      <p className="text-sm text-gray-400 mt-2">JPG, PNG up to 10MB</p>
-                    </div>
-                  )}
-                  
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  
-                  {isAnalyzing && (
-                    <div className="flex items-center justify-center gap-2 text-purple-600">
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Analyzing skin tone...
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Hair Color Selection */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <Palette className="w-5 h-5" />
-                  Hair Color
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Select your hair color for better recommendations
-                </p>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {hairColorOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        className={`p-3 rounded-lg border-2 transition-all ${
-                          selectedHairColor === option.value 
-                            ? 'border-purple-500 bg-purple-50' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setSelectedHairColor(option.value)}
-                      >
-                        <div 
-                          className="w-8 h-8 rounded-full mx-auto mb-2 border border-gray-300"
-                          style={{ backgroundColor: option.color }}
-                        />
-                        <p className="text-xs font-medium">{option.label}</p>
-                      </button>
-                    ))}
-                  </div>
-              </div>
-
-              {/* Day/Night Toggle */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  {isDayTime ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                  Occasion Setting
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Choose between day and night color recommendations
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Sun className="w-5 h-5 text-yellow-500" />
-                    <label htmlFor="time-toggle" className="font-medium">Day</label>
-                  </div>
-                  <button
-                    id="time-toggle"
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      isDayTime ? 'bg-gray-300' : 'bg-blue-600'
-                    }`}
-                    onClick={() => setIsDayTime(!isDayTime)}
-                  >
-                    <div
-                      className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${
-                        isDayTime ? 'left-0.5' : 'left-6'
-                      }`}
-                    />
-                  </button>
-                  <div className="flex items-center gap-3">
-                    <label htmlFor="time-toggle" className="font-medium">Night</label>
-                    <Moon className="w-5 h-5 text-blue-600" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Analysis Results */}
-              {analyzedData && (
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    Analysis Results
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Skin Tone:</span>
-                      <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium capitalize">
-                        {analyzedData.skinTone}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Undertone:</span>
-                      <span className="px-3 py-1 border border-gray-300 text-gray-700 rounded-full text-sm font-medium capitalize">
-                        {analyzedData.undertone}
-                      </span>
-                    </div>
-                    
-                    <button
-                      onClick={handleGenerateRecommendations}
-                      disabled={isGenerating}
-                      className={`w-full px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 transform ${
-                        isGenerating
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
-                      }`}
-                    >
-                      {isGenerating ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4" />
-                          Generate New Recommendations
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Panel - Recommendations */}
-            <div>
-              {recommendations ? (
-                <div className="space-y-6">
-                  <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      Your Personalized Color Palette
-                    </h2>
-                    <p className="text-gray-600">
-                      {isDayTime ? 'Daytime' : 'Evening'} colors that complement your features
-                    </p>
-                  </div>
-
-                  <ColorPalette colors={recommendations.primary} title="Primary Colors" />
-                  <ColorPalette colors={recommendations.neutral} title="Neutral Colors" />
-                  <ColorPalette colors={recommendations.accent} title="Accent Colors" />
-
-                  {/* Style Tips */}
-                  <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5" />
-                      Style Tips
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <h4 className="font-semibold">How to Use These Colors:</h4>
-                        <ul className="text-sm space-y-1 text-gray-600">
-                          <li>• Use <strong>Primary colors</strong> for main clothing pieces</li>
-                          <li>• Use <strong>Neutral colors</strong> as your base wardrobe</li>
-                          <li>• Use <strong>Accent colors</strong> for accessories and details</li>
-                        </ul>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold">Best Combinations:</h4>
-                        <p className="text-sm text-gray-600">
-                          Try pairing neutral bases with primary pieces and accent accessories
-                          for a balanced, harmonious look.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-xl shadow-lg p-12 border border-gray-100 h-96 flex items-center justify-center">
-                  <div className="text-center">
-                    <User className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-500 mb-2">
-                      Upload Your Photo to Get Started
-                    </h3>
-                    <p className="text-gray-400">
-                      Upload a clear photo of your face to receive personalized clothing color recommendations
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <Footer className="mt-16" />
+      <Footer />
     </div>
   );
 }

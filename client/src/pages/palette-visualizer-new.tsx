@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
-import { ArrowLeft, Layout, Monitor, PieChart, MessageSquare, Calendar, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, Layout, Monitor, PieChart, MessageSquare, Calendar, ArrowRight, Check, GripVertical } from 'lucide-react';
 import { usePalette } from '@/contexts/PaletteContext';
 import { Color } from '@/types/Color';
 import { cn } from '@/lib/utils';
 import Footer from '@/components/Footer';
 import { isLightColor } from '@/lib/colorUtils';
-import { Helmet } from 'react-helmet-async';
+import SEOHead from '@/components/SEOHead';
 import html2canvas from 'html2canvas';
 
 // Template types
@@ -19,6 +19,7 @@ export default function PaletteVisualizer() {
   const [showExportToast, setShowExportToast] = useState(false);
   const [colorIndicators, setColorIndicators] = useState(false);
   const [localPalette, setLocalPalette] = useState<Color[]>(contextPalette);
+  const dragIdx = useRef<number | null>(null);
   
   // Load palette from localStorage if available
   useEffect(() => {
@@ -78,44 +79,39 @@ export default function PaletteVisualizer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex flex-col">
-      <Helmet>
-        <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors.in</title>
-        <meta name="description" content="Visualize your color palette in real UI templates. See how your colors work together in dashboards, landing pages, and app interfaces." />
-        <meta name="keywords" content="palette visualizer, color combinations, UI templates, color schemes in action" />
-        <link rel="canonical" href="https://coolors.in/visualize" />
-        {/* Dynamic structured data for the visualizer page */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Palette Visualizer | Coolors.in",
-            "url": "https://coolors.in/visualize",
-            "description": "Visualize your color palette in real UI templates with Coolors.in's Palette Visualizer",
-            "isPartOf": {
-              "@type": "WebApplication",
-              "name": "Coolors.in"
-            }
-          })}
-        </script>
-      </Helmet>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
+      <SEOHead
+        title="Color Palette Visualizer — Preview Colors in Real UI Templates"
+        description="Visualize your color palette in real dashboard, landing page, analytics and chat UI templates. See exactly how your colors work before you ship. Free preview tool."
+        keywords="color palette visualizer, UI color preview, palette mockup generator, colour palette visualizer, color scheme in UI, color combinations preview, UI template colors, design color preview, color in real UI, palette visualizer online, UI color scheme"
+        canonicalPath="/visualize"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Color Palette Visualizer",
+          "url": "https://coolors.in/visualize",
+          "applicationCategory": "DesignApplication",
+          "description": "Preview your color palette in real UI templates including dashboards, landing pages and chat apps.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        }}
+      />
       <header className="mb-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white bg-gradient-to-r from-purple-600 to-blue-400 bg-clip-text text-transparent">
             Palette Visualizer
           </h1>
-          <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+          <Link href="/generator" className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
             <ArrowLeft className="mr-1" size={20} />
             Back to Generator
           </Link>
         </div>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
           See how your color palette would look in different UI templates
         </p>
       </header>
 
       {/* Top action bar */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4">
         <div className="flex flex-wrap justify-between items-center">
           <div className="flex flex-wrap gap-2">
             <TemplateButton 
@@ -158,7 +154,7 @@ export default function PaletteVisualizer() {
                 checked={colorIndicators}
                 onChange={() => setColorIndicators(!colorIndicators)} 
               />
-              <label htmlFor="color-indicators" className="text-sm text-gray-600">Show color indicators</label>
+              <label htmlFor="color-indicators" className="text-sm text-gray-600 dark:text-gray-300">Show color indicators</label>
             </div>
             <button 
               onClick={exportAsPNG} 
@@ -171,9 +167,81 @@ export default function PaletteVisualizer() {
         </div>
       </div>
 
+      {/* Inline Palette Editor */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+            Edit Palette <span className="normal-case font-normal text-gray-400 ml-1">(drag swatches to reorder)</span>
+          </h3>
+          <button
+            onClick={() => window.location.href = '/generator'}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            Go to full generator →
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {localPalette.map((color, idx) => (
+            <div
+              key={idx}
+              className="flex flex-col items-center gap-1.5 cursor-grab active:cursor-grabbing"
+              draggable
+              onDragStart={() => { dragIdx.current = idx; }}
+              onDragOver={e => { e.preventDefault(); }}
+              onDrop={() => {
+                if (dragIdx.current === null || dragIdx.current === idx) return;
+                const updated = [...localPalette];
+                const [moved] = updated.splice(dragIdx.current, 1);
+                updated.splice(idx, 0, moved);
+                dragIdx.current = null;
+                setLocalPalette(updated);
+                setPalette(updated);
+              }}
+            >
+              <div className="relative group">
+                <GripVertical size={16} strokeWidth={2.5} className="absolute -top-1 left-1/2 -translate-x-1/2 text-gray-400 group-hover:text-gray-700" />
+                <input
+                  type="color"
+                  value={color.hex}
+                  onChange={e => {
+                    const newHex = e.target.value.toUpperCase();
+                    const updated = localPalette.map((c, i) =>
+                      i === idx ? { ...c, hex: newHex, rgb: { r: parseInt(newHex.slice(1,3),16), g: parseInt(newHex.slice(3,5),16), b: parseInt(newHex.slice(5,7),16) } } : c
+                    );
+                    setLocalPalette(updated);
+                    setPalette(updated);
+                  }}
+                  className="w-14 h-14 rounded-xl cursor-pointer border-2 border-white shadow-md appearance-none p-0 mt-2"
+                  style={{ backgroundColor: color.hex }}
+                  title={`Drag to reorder, click to change color ${idx + 1}`}
+                />
+              </div>
+              <div className="text-center">
+                <input
+                  type="text"
+                  value={color.hex}
+                  maxLength={7}
+                  onChange={e => {
+                    const v = e.target.value.toUpperCase();
+                    if (/^#[0-9A-F]{6}$/.test(v)) {
+                      const updated = localPalette.map((c, i) =>
+                        i === idx ? { ...c, hex: v, rgb: { r: parseInt(v.slice(1,3),16), g: parseInt(v.slice(3,5),16), b: parseInt(v.slice(5,7),16) } } : c
+                      );
+                      setLocalPalette(updated);
+                      setPalette(updated);
+                    }
+                  }}
+                  className="w-16 text-center text-xs font-mono border border-gray-200 dark:border-gray-600 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-400 uppercase bg-white dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Template visualization */}
-      <div 
-        id="template-visualizer" 
+      <div
+        id="template-visualizer"
         className="bg-white rounded-xl shadow-lg overflow-hidden flex-1 mb-6 relative"
       >
         {activeTemplate === 'dashboard' && (
@@ -194,8 +262,8 @@ export default function PaletteVisualizer() {
       </div>
 
       {/* Color palette reference */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-lg font-medium mb-2">Your Palette</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 className="text-lg font-medium dark:text-white mb-2">Your Palette</h3>
         <div className="flex h-12 rounded-md overflow-hidden">
           {localPalette.map((color, index) => (
             <div 
@@ -241,9 +309,9 @@ function TemplateButton({ active, onClick, icon, label }: TemplateButtonProps) {
       onClick={onClick}
       className={cn(
         "px-4 py-2 rounded-md font-medium flex items-center gap-2 transition-colors",
-        active 
-          ? "bg-gradient-to-r from-purple-600 to-blue-500 text-white" 
-          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        active
+          ? "bg-gradient-to-r from-purple-600 to-blue-500 text-white"
+          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
       )}
     >
       {icon}
