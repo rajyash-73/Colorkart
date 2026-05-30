@@ -1,5 +1,5 @@
 import React from "react";
-import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown } from "lucide-react";
+import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown, Home } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -54,6 +54,7 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
         </div>
 
         <div className="hidden md:flex items-center space-x-0.5">
+          <NavBtn href="/" icon={<Home size={15} />} label="Home" tooltip="Go to homepage" />
           <NavBtn href="/explore" icon={<Compass size={15} />} label="Explore" tooltip="Trending palettes" />
           <NavBtn href="/visualize" icon={<Eye size={15} />} label="Visualize" tooltip="Preview in UI templates" />
           <NavBtn href="/image-palette" icon={<ImageDown size={15} />} label="Extract" tooltip="Extract palette from image" />
@@ -110,6 +111,7 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
       {/* Mobile Menu */}
       <div className={`md:hidden bg-white dark:bg-gray-900 shadow-lg fixed top-[42px] sm:top-[52px] right-2 sm:right-4 w-52 z-50 rounded-xl transform origin-top-right transition-all duration-200 border border-gray-100 dark:border-gray-800 ${mobileMenuOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'}`}>
         <div className="py-2 px-2 flex flex-col space-y-0.5">
+          <MobileBtn href="/" icon={<Home size={15} />} label="Home" />
           <MobileBtn href="/explore" icon={<Compass size={15} />} label="Explore Palettes" />
           <MobileBtn href="/visualize" icon={<Eye size={15} />} label="Visualize" />
           <MobileBtn href="/image-palette" icon={<ImageDown size={15} />} label="Extract from Image" />
