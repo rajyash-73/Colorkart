@@ -357,33 +357,31 @@ export default function LandingPage() {
             {user && (
               <button
                 onClick={() => window.location.href = '/saved-palettes'}
-                className="group relative overflow-hidden flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+                className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
                 style={{
-                  background: 'rgba(139,92,246,0.12)',
+                  background: 'rgba(18, 20, 38, 0.88)',
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
                   border: '1px solid rgba(167,139,250,0.35)',
-                  color: '#c4b5fd',
-                  boxShadow: '0 4px 24px rgba(139,92,246,0.2), 0 1px 0 rgba(255,255,255,0.08) inset',
+                  color: 'rgba(255,255,255,0.92)',
+                  boxShadow: '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset',
                 }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLButtonElement).style.background =
                     'linear-gradient(135deg, rgba(167,139,250,0.3) 0%, rgba(236,72,153,0.2) 50%, rgba(99,102,241,0.3) 100%)';
                   (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(216,180,254,0.6)';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#ede9fe';
                   (e.currentTarget as HTMLButtonElement).style.boxShadow =
                     '0 8px 40px rgba(167,139,250,0.4), 0 1px 0 rgba(255,255,255,0.15) inset';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(139,92,246,0.12)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(18, 20, 38, 0.88)';
                   (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(167,139,250,0.35)';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd';
                   (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                    '0 4px 24px rgba(139,92,246,0.2), 0 1px 0 rgba(255,255,255,0.08) inset';
+                    '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset';
                 }}
               >
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
-                <BookMarked size={20} />
+                <span className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+                <BookMarked size={18} />
                 My Saved Palettes
               </button>
             )}
