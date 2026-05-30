@@ -1,5 +1,5 @@
 import React from "react";
-import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User } from "lucide-react";
+import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -41,7 +41,7 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
 
   return (
     <>
-      <header className="bg-white dark:bg-gray-900 shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-10 border-b border-gray-100 dark:border-gray-800">
+      <header className="sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center z-50 border-b border-gray-100 dark:border-gray-800">
         <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer" onClick={() => window.location.href = '/'}>
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="w-16 sm:w-20 md:w-24 h-6 sm:h-8">
@@ -54,13 +54,14 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
         </div>
 
         <div className="hidden md:flex items-center space-x-0.5">
-          <NavBtn href="/designers-guide" icon={<HelpCircle size={15} />} label="Help" tooltip="Designer's guide" />
           <NavBtn href="/explore" icon={<Compass size={15} />} label="Explore" tooltip="Trending palettes" />
           <NavBtn href="/visualize" icon={<Eye size={15} />} label="Visualize" tooltip="Preview in UI templates" />
+          <NavBtn href="/image-palette" icon={<ImageDown size={15} />} label="Extract" tooltip="Extract palette from image" />
           <NavBtn href="/contrast-checker" icon={<SplitSquareHorizontal size={15} />} label="Contrast" tooltip="WCAG contrast checker" />
           <NavBtn href="/gradient-generator" icon={<Layers size={15} />} label="Gradient" tooltip="CSS gradient builder" />
           <NavBtn href="/color-picker" icon={<Pipette size={15} />} label="Picker" tooltip="Shades, tints & tones" />
           <NavBtn href="/font-generator" icon={<Type size={15} />} label="Fonts" tooltip="Font generator" />
+          <NavBtn href="/designers-guide" icon={<HelpCircle size={15} />} label="Help" tooltip="Designer's guide" />
 
           <button
             onClick={toggleTheme}
@@ -109,13 +110,14 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
       {/* Mobile Menu */}
       <div className={`md:hidden bg-white dark:bg-gray-900 shadow-lg fixed top-[42px] sm:top-[52px] right-2 sm:right-4 w-52 z-50 rounded-xl transform origin-top-right transition-all duration-200 border border-gray-100 dark:border-gray-800 ${mobileMenuOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'}`}>
         <div className="py-2 px-2 flex flex-col space-y-0.5">
-          <MobileBtn href="/designers-guide" icon={<HelpCircle size={15} />} label="Help" />
           <MobileBtn href="/explore" icon={<Compass size={15} />} label="Explore Palettes" />
           <MobileBtn href="/visualize" icon={<Eye size={15} />} label="Visualize" />
+          <MobileBtn href="/image-palette" icon={<ImageDown size={15} />} label="Extract from Image" />
           <MobileBtn href="/contrast-checker" icon={<SplitSquareHorizontal size={15} />} label="Contrast" />
           <MobileBtn href="/gradient-generator" icon={<Layers size={15} />} label="Gradient" />
           <MobileBtn href="/color-picker" icon={<Pipette size={15} />} label="Color Picker" />
           <MobileBtn href="/font-generator" icon={<Type size={15} />} label="Font Generator" />
+          <MobileBtn href="/designers-guide" icon={<HelpCircle size={15} />} label="Help" />
           <div className="border-t border-gray-100 dark:border-gray-800 my-1 mx-3" />
           {user ? (
             <>

@@ -5,6 +5,7 @@ import { usePalette } from '@/contexts/PaletteContext';
 import { Color } from '@/types/Color';
 import { cn } from '@/lib/utils';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import { isLightColor } from '@/lib/colorUtils';
 import { Helmet } from 'react-helmet-async';
 
@@ -13,6 +14,7 @@ type TemplateType = 'dashboard' | 'landing' | 'analytics' | 'chat' | 'calendar';
 
 export default function PaletteVisualizer() {
   const { palette } = usePalette();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<TemplateType>('dashboard');
 
   // Helper to get a specific color from palette by index
@@ -29,7 +31,9 @@ export default function PaletteVisualizer() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
+      <div className="flex-1 p-4 md:p-8 flex flex-col">
       <Helmet>
         <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors</title>
         <meta name="description" content="Visualize your color palette in real UI templates. See how your colors work together in dashboards, landing pages, and app interfaces." />
@@ -50,20 +54,14 @@ export default function PaletteVisualizer() {
           })}
         </script>
       </Helmet>
-      <header className="mb-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-blue-400 bg-clip-text text-transparent">
-            Palette Visualizer
-          </h1>
-          <Link href="/" className="flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-            <ArrowLeft className="mr-1" size={20} />
-            Back to Generator
-          </Link>
-        </div>
+      <div className="mb-6 pt-4">
+        <h1 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-purple-600 to-blue-400 bg-clip-text text-transparent">
+          Palette Visualizer
+        </h1>
         <p className="text-gray-600 mt-2">
           See how your color palette would look in different UI templates
         </p>
-      </header>
+      </div>
 
       {/* Template selector */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-8">
@@ -142,6 +140,7 @@ export default function PaletteVisualizer() {
       
       {/* Footer */}
       <Footer />
+      </div>
     </div>
   );
 }

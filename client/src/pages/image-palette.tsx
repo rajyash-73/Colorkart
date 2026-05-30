@@ -6,6 +6,7 @@ import { hexToRgb, getColorName, rgbToHex, isLightColor } from '@/lib/colorUtils
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
+import Header from '@/components/Header';
 
 type ExtractionPoint = { x: number; y: number; color: string };
 
@@ -57,6 +58,7 @@ function CopyBtn({ text }: { text: string }) {
 export default function ImagePalette() {
   usePalette();
   const { toast } = useToast();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [palette, setPaletteState] = useState<Color[]>([]);
@@ -223,14 +225,7 @@ export default function ImagePalette() {
         }}
       />
 
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
-        <a href="/" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm flex items-center gap-1">
-          <ChevronLeft size={16} />Coolors
-        </a>
-        <span className="text-gray-300 dark:text-gray-600">|</span>
-        <h1 className="font-bold text-gray-800 dark:text-white">Image to Palette</h1>
-      </div>
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
       <div className="max-w-5xl mx-auto w-full px-4 py-8 flex-1">
         <div className="text-center mb-8">

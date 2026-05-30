@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import SEOHead from '@/components/SEOHead';
+import Header from '@/components/Header';
 import { Plus, Trash2, Copy, Check, RotateCcw } from 'lucide-react';
-import { Link } from 'wouter';
 
 type GradientType = 'linear' | 'radial' | 'conic';
 
@@ -42,6 +42,7 @@ function CopyButton({ text, label }: CopyButtonProps) {
 }
 
 export default function GradientGeneratorPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [stops, setStops] = useState<GradientStop[]>(DEFAULT_STOPS);
   const [type, setType] = useState<GradientType>('linear');
   const [angle, setAngle] = useState(90);
@@ -109,17 +110,7 @@ export default function GradientGeneratorPage() {
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
         }}
       />
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-4">
-        <Link href="/">
-          <a className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium">← Coolors</a>
-        </Link>
-        <span className="text-gray-300 dark:text-gray-700">|</span>
-        <h1 className="font-bold text-gray-800 dark:text-white">Gradient Generator</h1>
-        <button onClick={reset} className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-          <RotateCcw size={12} /> Reset
-        </button>
-      </div>
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-8">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Loader2, ChevronLeft, Plus, Share2, Copy, Check } from "lucide-react";
+import { Trash2, Loader2, ChevronLeft, Plus, Share2, Copy, Check, Globe, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getColorName } from "@/lib/colorUtils";
 import SEOHead from '@/components/SEOHead';
@@ -125,6 +125,28 @@ export default function SavedPalettes() {
             <Plus size={16} />New Palette
           </a>
         </div>
+
+        {/* Community nudge banner */}
+        {palettes.some(p => !p.is_public) && (
+          <div className="mb-6 rounded-2xl bg-gradient-to-r from-violet-600/10 to-blue-600/10 dark:from-violet-900/30 dark:to-blue-900/30 border border-violet-200 dark:border-violet-800/50 px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-start gap-3 flex-1">
+              <div className="p-2 rounded-xl bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5">
+                <Globe size={18} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800 dark:text-white text-sm">Share your palettes with the community</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                  Making a palette public adds it to the <span className="font-medium text-violet-600 dark:text-violet-400">Explore</span> page and enriches the color pool for every user's generator — your taste shapes what the world creates.
+                </p>
+                <div className="flex items-center gap-4 mt-2.5">
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500"><Users size={11} /> Discoverable by all users</span>
+                  <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500"><Sparkles size={11} /> Improves AI color suggestions</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 sm:text-right shrink-0">Use <span className="font-medium text-gray-600 dark:text-gray-300">Make Public</span> on any palette below ↓</p>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="animate-spin text-violet-500" size={32} /></div>

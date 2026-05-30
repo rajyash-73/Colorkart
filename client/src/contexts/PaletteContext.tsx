@@ -1,27 +1,41 @@
 import React, { useState, useCallback, useMemo, useContext } from 'react';
 import { Color } from '@/types/Color';
 import { getRandomColor, hexToRgb, getColorName, rgbToHex, hexToHsl, hslToHex } from '@/lib/colorUtils';
+import { POPULAR_PALETTES } from '@/lib/palettesData';
+
+// Flat pool of all curated colors from the static library (deduplicated)
+const STATIC_COLOR_POOL: string[] = Array.from(
+  new Set(POPULAR_PALETTES.flatMap(p => p.colors))
+);
+// All complete palettes from the static library
+const STATIC_PALETTE_LIBRARY: string[][] = POPULAR_PALETTES.map(p => p.colors);
+
+function pickFromPool(pool: string[]): string {
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 // Define the color theory types
-export type ColorTheory = 
-  | 'auto' 
-  | 'monochromatic' 
-  | 'analogous' 
-  | 'complementary' 
-  | 'split-complementary' 
-  | 'triadic' 
-  | 'tetradic' 
+export type ColorTheory =
+  | 'auto'
+  | 'from-library'
+  | 'monochromatic'
+  | 'analogous'
+  | 'complementary'
+  | 'split-complementary'
+  | 'triadic'
+  | 'tetradic'
   | 'neutral';
 
 export const colorTheoryOptions = [
-  { value: 'auto', label: 'Auto (Random)' },
-  { value: 'monochromatic', label: 'Monochromatic' },
-  { value: 'analogous', label: 'Analogous' },
-  { value: 'complementary', label: 'Complementary' },
+  { value: 'auto',              label: 'Auto (Random)' },
+  { value: 'from-library',      label: 'From Library' },
+  { value: 'monochromatic',     label: 'Monochromatic' },
+  { value: 'analogous',         label: 'Analogous' },
+  { value: 'complementary',     label: 'Complementary' },
   { value: 'split-complementary', label: 'Split-Complementary' },
-  { value: 'triadic', label: 'Triadic' },
-  { value: 'tetradic', label: 'Tetradic' },
-  { value: 'neutral', label: 'Neutral' }
+  { value: 'triadic',           label: 'Triadic' },
+  { value: 'tetradic',          label: 'Tetradic' },
+  { value: 'neutral',           label: 'Neutral' },
 ];
 
 // Define context shape
@@ -38,6 +52,8 @@ interface PaletteContextType {
   updateColor: (index: number, color: Color) => void;
   setPalette: (colors: Color[]) => void;
   reorderColors: (sourceIndex: number, targetIndex: number) => void;
+  enrichColorPool: (colors: string[]) => void;
+  enrichPaletteLibrary: (palettes: string[][]) => void;
 }
 
 // Create the context
@@ -75,28 +91,63 @@ function adjustLightness(hex: string, amount: number): string {
 
 // Provider component
 export function PaletteProvider({ children }: { children: React.ReactNode }) {
-  const [palette, setPaletteState] = useState<Color[]>(DEFAULT_COLORS);
+  const [palette, setPaletteState] = useState<Color[]>(() => {
+    const pool = [...STATIC_COLOR_POOL];
+    const result: Color[] = [];
+    for (let i = 0; i < 5 && pool.length > 0; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      const [hex] = pool.splice(idx, 1);
+      const rgb = hexToRgb(hex) || { r: 0, g: 0, b: 0 };
+      result.push({ hex, rgb, locked: false, name: getColorName(hex) });
+    }
+    return result;
+  });
   const [colorTheory, setColorTheory] = useState<ColorTheory>('auto');
-  
+  // Mutable refs for the enrichable pools (avoids stale-closure issues)
+  const colorPoolRef = React.useRef<string[]>([...STATIC_COLOR_POOL]);
+  const paletteLibraryRef = React.useRef<string[][]>([...STATIC_PALETTE_LIBRARY]);
+
+  const enrichColorPool = useCallback((colors: string[]) => {
+    const existing = new Set(colorPoolRef.current);
+    const novel = colors.filter(c => !existing.has(c));
+    if (novel.length > 0) colorPoolRef.current = [...colorPoolRef.current, ...novel];
+  }, []);
+
+  const enrichPaletteLibrary = useCallback((palettes: string[][]) => {
+    paletteLibraryRef.current = [...paletteLibraryRef.current, ...palettes];
+  }, []);
+
   const generatePalette = useCallback(() => {
-    console.log("Generating new palette...");
-    
-    // If using auto mode, just do random generation
+    // From-library mode: pick a random complete palette from the combined library
+    if (colorTheory === 'from-library') {
+      const lib = paletteLibraryRef.current;
+      const chosen = lib[Math.floor(Math.random() * lib.length)];
+      setPaletteState(prev => {
+        // Respect locked colors; fill unlocked slots with chosen palette's colors (cycling)
+        const unlocked = prev.filter(c => !c.locked);
+        let ci = 0;
+        return prev.map(color => {
+          if (color.locked) return color;
+          const hex = chosen[ci % chosen.length];
+          ci++;
+          const rgb = hexToRgb(hex) || { r: 0, g: 0, b: 0 };
+          return { hex, rgb, locked: false, name: getColorName(hex) };
+        });
+      });
+      return;
+    }
+
+    // Auto mode: draw from the enriched color pool (70%) or true random (30%) for diversity
     if (colorTheory === 'auto') {
-      setPaletteState(prevPalette => 
+      const pool = colorPoolRef.current;
+      setPaletteState(prevPalette =>
         prevPalette.map(color => {
           if (color.locked) return color;
-          
-          const hex = getRandomColor();
+          const hex = pool.length > 0 && Math.random() < 0.7
+            ? pickFromPool(pool)
+            : getRandomColor();
           const rgb = hexToRgb(hex) || { r: 0, g: 0, b: 0 };
-          const name = getColorName(hex);
-          
-          return {
-            hex,
-            rgb,
-            locked: false,
-            name
-          };
+          return { hex, rgb, locked: false, name: getColorName(hex) };
         })
       );
       return;
@@ -561,20 +612,24 @@ export function PaletteProvider({ children }: { children: React.ReactNode }) {
     resetPalette,
     updateColor,
     setPalette,
-    reorderColors
+    reorderColors,
+    enrichColorPool,
+    enrichPaletteLibrary,
   }), [
-    palette, 
-    colorTheory, 
-    setColorTheory, 
-    generatePalette, 
+    palette,
+    colorTheory,
+    setColorTheory,
+    generatePalette,
     generatePaletteWithTheory,
-    toggleLock, 
-    addColor, 
-    removeColor, 
-    resetPalette, 
-    updateColor, 
-    setPalette, 
-    reorderColors
+    toggleLock,
+    addColor,
+    removeColor,
+    resetPalette,
+    updateColor,
+    setPalette,
+    reorderColors,
+    enrichColorPool,
+    enrichPaletteLibrary,
   ]);
   
   return (

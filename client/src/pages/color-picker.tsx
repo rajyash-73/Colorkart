@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import SEOHead from '@/components/SEOHead';
+import Header from '@/components/Header';
 import { Copy, Check } from 'lucide-react';
-import { Link } from 'wouter';
 import {
   hexToRgb, rgbToHex, rgbToHsl, hslToHex, hexToHsl,
   getColorName, isLightColor, generateShades, generateTints, generateTones,
@@ -59,6 +59,7 @@ function SwatchRow({ colors, onSelect, label }: SwatchRowProps) {
 }
 
 export default function ColorPickerPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hex, setHexState] = useState('#7C3AED');
   const [cbMode, setCbMode] = useState<ColorBlindnessType>('normal');
 
@@ -109,14 +110,7 @@ export default function ColorPickerPage() {
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
         }}
       />
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-4">
-        <Link href="/">
-          <a className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium">← Coolors</a>
-        </Link>
-        <span className="text-gray-300 dark:text-gray-700">|</span>
-        <h1 className="font-bold text-gray-800 dark:text-white">Color Picker</h1>
-      </div>
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-8">

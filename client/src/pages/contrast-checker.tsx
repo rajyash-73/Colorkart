@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import SEOHead from '@/components/SEOHead';
+import Header from '@/components/Header';
 import { ArrowLeftRight, Check, X, Info } from 'lucide-react';
 import { getContrastRatio, WCAG_AA_NORMAL, WCAG_AA_LARGE, WCAG_AAA_NORMAL, WCAG_AAA_LARGE } from '@/lib/colorUtils';
-import { Link } from 'wouter';
 
 interface ColorInputProps {
   label: string;
@@ -72,6 +72,7 @@ function WCAGBadge({ level, size, pass }: WCAGBadgeProps) {
 }
 
 export default function ContrastCheckerPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [fg, setFg] = useState('#000000');
   const [bg, setBg] = useState('#FFFFFF');
 
@@ -109,17 +110,7 @@ export default function ContrastCheckerPage() {
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
         }}
       />
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-4">
-        <Link href="/">
-          <a className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm font-medium">← Coolors</a>
-        </Link>
-        <span className="text-gray-300 dark:text-gray-700">|</span>
-        <h1 className="font-bold text-gray-800 dark:text-white">Contrast Checker</h1>
-        <a href="https://www.w3.org/TR/WCAG21/#contrast-minimum" target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-blue-500 hover:underline flex items-center gap-1">
-          <Info size={12} /> WCAG 2.1
-        </a>
-      </div>
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-8">

@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from '@/components/SEOHead';
-import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles } from "lucide-react";
+import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Copy, Check, X, BookmarkCheck } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
@@ -11,7 +11,20 @@ const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slic
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) return;
+    if (sessionStorage.getItem('signin_prompt_dismissed')) return;
+    const t = setTimeout(() => setShowSignInPrompt(true), 2000);
+    return () => clearTimeout(t);
+  }, [user]);
+
+  const dismissPrompt = () => {
+    setShowSignInPrompt(false);
+    sessionStorage.setItem('signin_prompt_dismissed', '1');
+  };
   const heroRef = useRef<HTMLSpanElement>(null);
 
   const handleGetStarted = () => {
@@ -37,105 +50,169 @@ export default function LandingPage() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [handleMouseMove]);
 
-  // Animated Color Palette Showcase Component
-  const AnimatedPaletteShowcase = () => {
-    const [currentSet, setCurrentSet] = useState(0);
-    
-    const paletteSets = [
-      [
-        ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'],
-        ['#6C5CE7', '#A29BFE', '#FD79A8', '#E17055', '#00B894'],
-        ['#2D3436', '#636E72', '#DDD', '#74B9FF', '#00CEC9'],
-        ['#FF7675', '#FD79A8', '#FDCB6E', '#6C5CE7', '#74B9FF']
-      ],
-      [
-        ['#1ABC9C', '#2ECC71', '#3498DB', '#9B59B6', '#E74C3C'],
-        ['#F39C12', '#E67E22', '#D35400', '#C0392B', '#8E44AD'],
-        ['#2C3E50', '#34495E', '#7F8C8D', '#95A5A6', '#BDC3C7'],
-        ['#E8F5E8', '#FFF3CD', '#D1ECF1', '#F8D7DA', '#E2E3E5']
-      ],
-      [
-        ['#FF9FF3', '#F368E0', '#FF6B6B', '#4ECDC4', '#45B7D1'],
-        ['#A8E6CF', '#FFD93D', '#6BCF7F', '#4D96FF', '#9B59B6'],
-        ['#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'],
-        ['#F8BBD9', '#E8F5E8', '#FFF8DC', '#E6E6FA', '#F0F8FF']
-      ]
-    ];
-    
+  const SHOWCASE_STYLE = `
+@keyframes showcase-slide-in-right {
+  from { transform: translateX(108%); }
+  to   { transform: translateX(0%); }
+}
+@keyframes showcase-slide-in-left {
+  from { transform: translateX(-108%); }
+  to   { transform: translateX(0%); }
+}
+@keyframes showcase-slide-out-left {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-108%); }
+}
+@keyframes showcase-slide-out-right {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(108%); }
+}
+`;
+
+  // Interactive hero palette showcase
+  const HeroPaletteShowcase = () => {
+    const [active, setActive] = useState(0);
+    const [prev, setPrev] = useState<number | null>(null);
+    const [direction, setDirection] = useState<'forward' | 'back'>('forward');
+    const [paused, setPaused] = useState(false);
+    const [copied, setCopied] = useState<string | null>(null);
+
+    const palettes = TRENDING.slice(0, 5);
+    const n = palettes.length;
+
+    const goTo = useCallback((next: number, dir: 'forward' | 'back' = 'forward') => {
+      if (prev !== null || next === active) return;
+      setDirection(dir);
+      setPrev(active);
+      setActive(next);
+      setTimeout(() => setPrev(null), 500);
+    }, [active, prev]);
+
     useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentSet((prev) => (prev + 1) % paletteSets.length);
-      }, 3000);
-      
-      return () => clearInterval(interval);
-    }, []);
-    
-    return (
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 opacity-50"></div>
-        
-        <div className="relative z-10">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Endless Palette Possibilities</h3>
-            <p className="text-gray-600 dark:text-gray-300">Discover thousands of beautiful color combinations</p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {paletteSets[currentSet].map((palette, paletteIndex) => (
-              <div 
-                key={`${currentSet}-${paletteIndex}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-500 transform hover:scale-105 animate-fade-in"
-                style={{
-                  animationDelay: `${paletteIndex * 0.1}s`
-                }}
-              >
-                <div className="flex h-20">
-                  {palette.map((color, colorIndex) => (
-                    <div
-                      key={colorIndex}
-                      className="flex-1 transition-all duration-300 hover:scale-110 relative group"
-                      style={{ backgroundColor: color }}
-                    >
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                        <span className="text-white text-xs font-mono opacity-0 group-hover:opacity-100 transition-all duration-300">
-                          {color}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+      if (paused) return;
+      const t = setInterval(() => goTo((active + 1) % n, 'forward'), 2800);
+      return () => clearInterval(t);
+    }, [paused, active, goTo, n]);
+
+    const copyHex = (hex: string) => {
+      navigator.clipboard.writeText(hex);
+      setCopied(hex);
+      setTimeout(() => setCopied(null), 1500);
+    };
+
+    const current = palettes[active];
+    const inAnim = direction === 'forward' ? 'showcase-slide-in-right' : 'showcase-slide-in-left';
+    const outAnim = direction === 'forward' ? 'showcase-slide-out-left' : 'showcase-slide-out-right';
+    const slideStyle = { animationDuration: '0.46s', animationTimingFunction: 'cubic-bezier(.4,0,.2,1)', animationFillMode: 'both' as const };
+
+    const CardContent = ({ p, interactive }: { p: typeof palettes[0]; interactive: boolean }) => (
+      <>
+        <div className="flex h-48">
+          {p.colors.map((c, ci) => (
+            <div
+              key={ci}
+              className="flex-1 relative group/swatch"
+              style={{ backgroundColor: c }}
+              onClick={e => { e.stopPropagation(); if (interactive) copyHex(c); }}
+            >
+              {interactive && (
+                <div className="absolute inset-0 flex flex-col items-center justify-end pb-2 gap-1 opacity-0 group-hover/swatch:opacity-100 transition-opacity duration-200">
+                  <span className={`text-[10px] font-mono font-semibold px-1 py-0.5 rounded ${isLightColor(c) ? 'text-black/70' : 'text-white/90'}`}>
+                    {c.slice(1).toUpperCase()}
+                  </span>
+                  <span className={isLightColor(c) ? 'text-black/60' : 'text-white/70'}>
+                    {copied === c ? <Check size={12} /> : <Copy size={12} />}
+                  </span>
                 </div>
-                <div className="p-2 text-center">
-                  <div className="flex justify-center space-x-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="bg-gray-900/95 dark:bg-gray-950/95 px-4 py-3 flex items-center justify-between">
+          <div>
+            <p className="text-white font-semibold text-sm">{p.name}</p>
+            <p className="text-gray-400 text-xs">{p.colors.length} colors</p>
           </div>
-          
-          <div className="flex justify-center mt-6 space-x-2">
-            {paletteSets.map((_, index) => (
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-xs text-gray-400">
+              <Heart size={12} className="text-pink-400" />{p.likes}
+            </span>
+            {interactive && (
               <button
-                key={index}
-                onClick={() => setCurrentSet(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSet 
-                    ? 'bg-blue-600 scale-125' 
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
+                onClick={e => { e.stopPropagation(); window.location.href = '/explore'; }}
+                className="text-xs text-violet-400 hover:text-violet-300 font-medium transition-colors"
+              >
+                Use →
+              </button>
+            )}
+          </div>
+        </div>
+      </>
+    );
+
+    return (
+      <div
+        className="relative w-full h-full flex flex-col justify-between select-none py-2"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <style dangerouslySetInnerHTML={{ __html: SHOWCASE_STYLE }} />
+
+        {/* Card area */}
+        <div className="relative h-[260px]">
+
+          {/* Slide viewport — clips outgoing/incoming cards */}
+          <div className="absolute inset-x-0 overflow-hidden rounded-2xl" style={{ zIndex: 20, height: '100%' }}>
+            {/* Exiting card */}
+            {prev !== null && (
+              <div
+                key={`prev-${prev}`}
+                className="absolute inset-0 rounded-2xl overflow-hidden"
+                style={{ ...slideStyle, animationName: outAnim, boxShadow: '0 20px 56px rgba(0,0,0,0.3)' }}
+              >
+                <CardContent p={palettes[prev]} interactive={false} />
+              </div>
+            )}
+            {/* Entering card */}
+            <div
+              key={`active-${active}`}
+              className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10 dark:border-white/8"
+              style={{
+                ...slideStyle,
+                animationName: prev !== null ? inAnim : 'none',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.2)',
+              }}
+            >
+              <CardContent p={current} interactive={true} />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom: dots + hex strip */}
+        <div>
+          <div className="flex justify-center lg:justify-start gap-2 mb-4">
+            {palettes.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i, i >= active ? 'forward' : 'back')}
+                className={`rounded-full transition-all duration-300 ${i === active ? 'w-6 h-2 bg-violet-500' : 'w-2 h-2 bg-gray-600 hover:bg-gray-400'}`}
               />
             ))}
           </div>
-          
-          <div className="text-center mt-6">
-            <button
-              onClick={() => window.location.href = '/generator'}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              Start Creating Palettes
-            </button>
+
+          <div className="flex gap-2 flex-wrap justify-center lg:justify-start">
+            {current?.colors.map((c, i) => (
+              <button
+                key={i}
+                onClick={() => copyHex(c)}
+                title={`Copy ${c}`}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-semibold transition-all duration-200 hover:scale-105 hover:-translate-y-0.5 shadow-md border border-white/15"
+                style={{ backgroundColor: c, color: isLightColor(c) ? '#111' : '#fff' }}
+              >
+                {copied === c ? <Check size={11} /> : <Copy size={11} className="opacity-60" />}
+                {c.slice(1).toUpperCase()}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -174,10 +251,34 @@ export default function LandingPage() {
 
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
+      {/* Sign-in prompt */}
+      {!user && (
+        <div className={`fixed top-16 right-4 z-40 transition-all duration-500 ${showSignInPrompt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+          <div className="flex items-center gap-3 bg-gray-900 dark:bg-gray-800 text-white pl-4 pr-3 py-3 rounded-2xl shadow-2xl border border-white/10 max-w-sm sm:max-w-md">
+            <BookmarkCheck size={20} className="text-violet-400 flex-shrink-0" />
+            <p className="text-sm leading-snug">
+              <span className="font-semibold">Sign in</span> to save unlimited palettes and access them anywhere.
+            </p>
+            <button
+              onClick={() => window.location.href = '/auth'}
+              className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+            >
+              Sign In
+            </button>
+            <button onClick={dismissPrompt} className="flex-shrink-0 p-1 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10">
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight">
+        <div className="flex flex-col lg:flex-row items-stretch gap-10 mb-12">
+          {/* Left: text + CTA */}
+          <div className="flex-1 flex flex-col justify-between text-center lg:text-left py-2">
+          <div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             The super fast color
             <br />
             <span
@@ -188,106 +289,119 @@ export default function LandingPage() {
               palette generator!
             </span>
           </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed">
             Create the perfect palette or get inspired by thousands of beautiful color schemes.
           </p>
+          </div>
           
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          {/* CTA Buttons — sits at bottom of left col, mirrors hex strip on right */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center lg:items-start">
+            {/* Primary CTA — deep indigo glass */}
             <button
               onClick={handleGetStarted}
-              className="group bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center"
+              className="group relative overflow-hidden flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg text-white transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+              style={{
+                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%)',
+                boxShadow: '0 0 0 1px rgba(255,255,255,0.15) inset, 0 8px 32px rgba(99,102,241,0.45), 0 2px 8px rgba(0,0,0,0.25)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 0 0 1px rgba(255,255,255,0.3) inset, 0 12px 48px rgba(139,92,246,0.65), 0 4px 16px rgba(0,0,0,0.3), 0 0 80px rgba(99,102,241,0.3)';
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'linear-gradient(135deg, #6366f1 0%, #a855f7 40%, #3b82f6 80%, #06b6d4 100%)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 0 0 1px rgba(255,255,255,0.15) inset, 0 8px 32px rgba(99,102,241,0.45), 0 2px 8px rgba(0,0,0,0.25)';
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%)';
+              }}
             >
+              {/* glass sheen overlay */}
+              <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
               Start the generator!
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" size={20} />
+              <ArrowRight className="group-hover:translate-x-1 transition-transform duration-300" size={20} />
             </button>
 
+            {/* Secondary — dark charcoal, works in both light & dark mode */}
             <button
               onClick={handleExplorePalettes}
-              className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              className="group relative overflow-hidden px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+              style={{
+                background: 'rgba(18, 20, 38, 0.88)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.92)',
+                boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset, 0 4px 20px rgba(0,0,0,0.28)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'linear-gradient(120deg, rgba(99,102,241,0.75) 0%, rgba(139,92,246,0.7) 35%, rgba(168,85,247,0.65) 65%, rgba(99,102,241,0.7) 100%)';
+                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(167,139,250,0.5)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 0 0 1px rgba(255,255,255,0.15) inset, 0 0 24px rgba(139,92,246,0.6), 0 0 48px rgba(99,102,241,0.35), 0 8px 24px rgba(0,0,0,0.3)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(18, 20, 38, 0.88)';
+                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.12)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 0 0 1px rgba(255,255,255,0.06) inset, 0 4px 20px rgba(0,0,0,0.28)';
+              }}
             >
+              <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
               Explore trending palettes
             </button>
 
             {user && (
               <button
                 onClick={() => window.location.href = '/saved-palettes'}
-                className="flex items-center gap-2 bg-white dark:bg-gray-800 text-violet-600 dark:text-violet-400 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-violet-200 dark:border-violet-800 hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="group relative overflow-hidden flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+                style={{
+                  background: 'rgba(139,92,246,0.12)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(167,139,250,0.35)',
+                  color: '#c4b5fd',
+                  boxShadow: '0 4px 24px rgba(139,92,246,0.2), 0 1px 0 rgba(255,255,255,0.08) inset',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    'linear-gradient(135deg, rgba(167,139,250,0.3) 0%, rgba(236,72,153,0.2) 50%, rgba(99,102,241,0.3) 100%)';
+                  (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(216,180,254,0.6)';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#ede9fe';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                    '0 8px 40px rgba(167,139,250,0.4), 0 1px 0 rgba(255,255,255,0.15) inset';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(139,92,246,0.12)';
+                  (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(167,139,250,0.35)';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                    '0 4px 24px rgba(139,92,246,0.2), 0 1px 0 rgba(255,255,255,0.08) inset';
+                }}
               >
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
                 <BookMarked size={20} />
                 My Saved Palettes
               </button>
             )}
           </div>
-          
-        </div>
 
-        {/* Animated Palette Showcase */}
-        <section className="mb-20">
-          <style>
-            {`
-              @keyframes fade-in {
-                from {
-                  opacity: 0;
-                  transform: translateY(20px);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-              .animate-fade-in {
-                animation: fade-in 0.8s ease-in-out both;
-              }
-            `}
-          </style>
-          <AnimatedPaletteShowcase />
-        </section>
+          </div>{/* end left col */}
 
-        {/* Trending Palettes */}
-        <section className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Trending Palettes</h2>
-            <a href="/explore" className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
-              View all <ArrowRight size={14} />
-            </a>
+          {/* Right: interactive palette showcase — mirrors left col structure */}
+          <div className="flex-1 w-full max-w-md lg:max-w-none">
+            <HeroPaletteShowcase />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {TRENDING.map(p => (
-              <div key={p.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 transition-shadow group">
-                <div className="flex h-20">
-                  {p.colors.map((c, i) => (
-                    <div key={i} className="flex-1 relative" style={{ backgroundColor: c }}>
-                      <span className={`absolute inset-0 flex items-end justify-center pb-1 text-[9px] font-mono opacity-0 group-hover:opacity-100 transition-opacity ${isLightColor(c) ? 'text-black/70' : 'text-white/80'}`}>
-                        {c.slice(1)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-4 py-2.5 flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate block">{p.name}</span>
-                    <span className="text-xs text-gray-400">{p.colors.length} colors</span>
-                  </div>
-                  <button
-                    onClick={() => { window.location.href = '/explore'; }}
-                    className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:text-violet-600 hover:border-violet-400 transition-colors flex-shrink-0"
-                    aria-label="Explore palettes"
-                  >
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        </div>{/* end hero flex */}
 
         {/* Apps & Tools Showcase */}
         <section className="mb-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Color Palette Generator */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+            <div onClick={() => window.location.href = '/generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                 <Palette className="w-6 h-6 text-white" />
               </div>
@@ -295,118 +409,11 @@ export default function LandingPage() {
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                 Create beautiful color palettes with advanced algorithms and color theory.
               </p>
-              <button 
-                onClick={() => window.location.href = '/'}
-                className="text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors"
-              >
-                Start creating →
-              </button>
-            </div>
-
-            {/* Korean Color Analysis */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Korean Color Analysis</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                Discover your personal color season — Spring, Summer, Autumn or Winter — and find the colors that make you glow.
-              </p>
-              <button
-                onClick={() => window.location.href = '/korean-color-analysis'}
-                className="text-purple-600 font-medium text-sm hover:text-purple-700 transition-colors"
-              >
-                Try now →
-              </button>
-            </div>
-
-            {/* Visualizer */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
-                <Monitor className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Visualizer</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                See your color palettes in action with real-time mockups and previews.
-              </p>
-              <button 
-                onClick={() => window.location.href = '/visualize'}
-                className="text-green-600 font-medium text-sm hover:text-green-700 transition-colors"
-              >
-                Visualize →
-              </button>
-            </div>
-
-            {/* Image to Palette */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
-                <Download className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Image to Palette</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                Extract beautiful color palettes from any image you upload.
-              </p>
-              <button
-                onClick={() => window.location.href = '/image-palette'}
-                className="text-orange-600 font-medium text-sm hover:text-orange-700 transition-colors"
-              >
-                Extract colors →
-              </button>
-            </div>
-
-            {/* Contrast Checker */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
-                <SplitSquareHorizontal className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Contrast Checker</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                Check WCAG AA/AAA contrast ratios for accessible, readable design.
-              </p>
-              <button
-                onClick={() => window.location.href = '/contrast-checker'}
-                className="text-sky-600 font-medium text-sm hover:text-sky-700 transition-colors"
-              >
-                Check contrast →
-              </button>
-            </div>
-
-            {/* Gradient Generator */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4">
-                <Layers className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Gradient Generator</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                Build CSS gradients visually with precise stop controls and instant export.
-              </p>
-              <button
-                onClick={() => window.location.href = '/gradient-generator'}
-                className="text-pink-600 font-medium text-sm hover:text-pink-700 transition-colors"
-              >
-                Make gradient →
-              </button>
-            </div>
-
-            {/* Color Picker */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
-                <Pipette className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Color Picker</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                Inspect any color and explore its shades, tints, tones, and formats.
-              </p>
-              <button
-                onClick={() => window.location.href = '/color-picker'}
-                className="text-teal-600 font-medium text-sm hover:text-teal-700 transition-colors"
-              >
-                Pick a color →
-              </button>
+              <span className="text-blue-600 font-medium text-sm">Start creating →</span>
             </div>
 
             {/* Explore Palettes */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+            <div onClick={() => window.location.href = '/explore'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                 <Compass className="w-6 h-6 text-white" />
               </div>
@@ -414,16 +421,83 @@ export default function LandingPage() {
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                 Discover, like, and share thousands of trending color palettes from the community.
               </p>
-              <button
-                onClick={() => window.location.href = '/explore'}
-                className="text-violet-600 font-medium text-sm hover:text-violet-700 transition-colors"
-              >
-                Explore trending palettes →
-              </button>
+              <span className="text-violet-600 font-medium text-sm">Explore trending palettes →</span>
+            </div>
+
+            {/* Visualizer */}
+            <div onClick={() => window.location.href = '/visualize'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
+                <Monitor className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Visualizer</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                See your color palettes in action with real-time mockups and previews.
+              </p>
+              <span className="text-green-600 font-medium text-sm">Visualize →</span>
+            </div>
+
+            {/* Image to Palette */}
+            <div onClick={() => window.location.href = '/image-palette'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+                <Download className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Image to Palette</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                Extract beautiful color palettes from any image you upload.
+              </p>
+              <span className="text-orange-600 font-medium text-sm">Extract colors →</span>
+            </div>
+
+            {/* Contrast Checker */}
+            <div onClick={() => window.location.href = '/contrast-checker'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                <SplitSquareHorizontal className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Contrast Checker</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                Check WCAG AA/AAA contrast ratios for accessible, readable design.
+              </p>
+              <span className="text-sky-600 font-medium text-sm">Check contrast →</span>
+            </div>
+
+            {/* Gradient Generator */}
+            <div onClick={() => window.location.href = '/gradient-generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4">
+                <Layers className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Gradient Generator</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                Build CSS gradients visually with precise stop controls and instant export.
+              </p>
+              <span className="text-pink-600 font-medium text-sm">Make gradient →</span>
+            </div>
+
+            {/* Color Picker */}
+            <div onClick={() => window.location.href = '/color-picker'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
+                <Pipette className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Color Picker</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                Inspect any color and explore its shades, tints, tones, and formats.
+              </p>
+              <span className="text-teal-600 font-medium text-sm">Pick a color →</span>
+            </div>
+
+            {/* Korean Color Analysis */}
+            <div onClick={() => window.location.href = '/korean-color-analysis'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Korean Color Analysis</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                Discover your personal color season — Spring, Summer, Autumn or Winter — and find the colors that make you glow.
+              </p>
+              <span className="text-purple-600 font-medium text-sm">Try now →</span>
             </div>
 
             {/* Font Generator */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
+            <div onClick={() => window.location.href = '/font-generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                 <Type className="w-6 h-6 text-white" />
               </div>
@@ -431,17 +505,12 @@ export default function LandingPage() {
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                 Preview Google Fonts with custom sizes, weights, and colors. Export as CSS or SVG.
               </p>
-              <button
-                onClick={() => window.location.href = '/font-generator'}
-                className="text-rose-600 font-medium text-sm hover:text-rose-700 transition-colors"
-              >
-                Generate fonts →
-              </button>
+              <span className="text-rose-600 font-medium text-sm">Generate fonts →</span>
             </div>
 
             {/* Saved Palettes — shown to logged-in users */}
             {user && (
-              <div className="bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/20 dark:to-blue-900/20 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-violet-200 dark:border-violet-800">
+              <div onClick={() => window.location.href = '/saved-palettes'} className="bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/20 dark:to-blue-900/20 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-500 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
                 <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
                   <BookMarked className="w-6 h-6 text-white" />
                 </div>
@@ -449,12 +518,7 @@ export default function LandingPage() {
                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                   View and manage all the palettes you've saved to your account.
                 </p>
-                <button
-                  onClick={() => window.location.href = '/saved-palettes'}
-                  className="text-violet-600 font-medium text-sm hover:text-violet-700 transition-colors"
-                >
-                  View saved →
-                </button>
+                <span className="text-violet-600 font-medium text-sm">View saved →</span>
               </div>
             )}
           </div>

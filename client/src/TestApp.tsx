@@ -9,9 +9,10 @@ import {
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import ColorAdjustmentModal from '@/components/ColorAdjustmentModal';
-import TrendingPalettes from '@/components/TrendingPalettes';
+import BrowsePalettes from '@/components/BrowsePalettes';
 import WelcomeModal from '@/components/modals/WelcomeModal';
 import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import { usePalette, colorTheoryOptions, ColorTheory } from '@/contexts/PaletteContext';
 import { Link } from 'wouter';
 import { supabase } from '@/lib/supabase';
@@ -57,19 +58,21 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 
 // Main component that uses the context
 function PaletteApp() {
-  const { 
-    palette, 
+  const {
+    palette,
     colorTheory,
     setColorTheory,
-    generatePalette, 
+    generatePalette,
     generatePaletteWithTheory,
-    toggleLock, 
-    addColor, 
-    removeColor, 
+    toggleLock,
+    addColor,
+    removeColor,
     resetPalette,
     updateColor,
     setPalette: setPaletteColors,
-    reorderColors
+    reorderColors,
+    enrichColorPool,
+    enrichPaletteLibrary,
   } = usePalette();
   
   const { user } = useAuth();
@@ -88,7 +91,65 @@ function PaletteApp() {
     }
   }, [setPaletteColors]);
 
+  // Effect A — Community pool: fetch all public palettes on mount (no login needed), cached 1 hour
+  const COMMUNITY_POOL_KEY = 'colorkart_community_pool';
+  useEffect(() => {
+    const cached = localStorage.getItem(COMMUNITY_POOL_KEY);
+    if (cached) {
+      try {
+        const { colors, palettes, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 3_600_000) {
+          enrichColorPool(colors);
+          enrichPaletteLibrary(palettes);
+          return;
+        }
+      } catch {}
+    }
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('public_palettes')
+          .select('colors')
+          .eq('is_public', true)
+          .limit(500);
+        if (data && data.length > 0) {
+          const palettes = data
+            .map((r: any) => (Array.isArray(r.colors) ? r.colors as string[] : []))
+            .filter((p: string[]) => p.length >= 2);
+          const colors = Array.from(new Set(palettes.flat()));
+          enrichColorPool(colors);
+          enrichPaletteLibrary(palettes);
+          localStorage.setItem(COMMUNITY_POOL_KEY, JSON.stringify({ colors, palettes, ts: Date.now() }));
+        }
+      } catch {}
+    })();
+  }, [enrichColorPool, enrichPaletteLibrary]);
+
+  // Effect B — Private user palettes: add only when logged in (public ones already in Effect A)
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('public_palettes')
+          .select('colors')
+          .eq('user_id', user.id)
+          .eq('is_public', false);
+        if (data && data.length > 0) {
+          const userPalettes = data
+            .map((r: any) => (Array.isArray(r.colors) ? r.colors as string[] : []))
+            .filter((p: string[]) => p.length >= 2);
+          enrichPaletteLibrary(userPalettes);
+          enrichColorPool(userPalettes.flat());
+        }
+      } catch {}
+    })();
+  }, [user, enrichColorPool, enrichPaletteLibrary]);
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [paletteHistory, setPaletteHistory] = useState<Color[][]>([]);
+  const [generateCount, setGenerateCount] = useState(0);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showInfoTooltip, setShowInfoTooltip] = useState<number | null>(null);
   const [showAdjustModal, setShowAdjustModal] = useState<boolean>(false);
@@ -110,12 +171,13 @@ function PaletteApp() {
         user_id: user.id,
         name: saveName.trim(),
         colors: palette.map(c => c.hex),
-        is_public: false,
+        is_public: true,
         likes: 0,
         user_email: user.email,
         user_name: user.name,
       });
       if (error) throw new Error(error.message);
+      localStorage.removeItem(COMMUNITY_POOL_KEY); // invalidate cache so next load picks up new palette
       setToast(`Saved "${saveName}"`);
       setShowSaveModal(false);
       setSaveName('');
@@ -156,6 +218,13 @@ function PaletteApp() {
   const handleGenerate = () => {
     setPaletteHistory(prev => [...prev.slice(-2), [...palette]]);
     generatePalette();
+    setGenerateCount(n => {
+      const next = n + 1;
+      if (next === 2 && !user && !sessionStorage.getItem('save_prompt_dismissed')) {
+        setTimeout(() => setShowSavePrompt(true), 600);
+      }
+      return next;
+    });
   };
 
   const handleUndo = () => {
@@ -283,6 +352,7 @@ function PaletteApp() {
   
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <SEOHead
         title="Color Palette Generator — Random & Theory-Based Color Schemes"
         description="Create perfect color palettes using color theory. Generate complementary, analogous, triadic & monochromatic schemes. Free palette maker trusted by designers in US, UK, India & worldwide."
@@ -301,216 +371,124 @@ function PaletteApp() {
           ]
         }}
       />
-      {/* Hero Section */}
-      <header className="relative mb-8 sm:mb-12 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-850 rounded-2xl p-6 sm:p-8 overflow-hidden shadow-sm">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-500 rounded-full"></div>
-          <div className="absolute top-20 -right-10 w-60 h-60 bg-purple-500 rounded-full"></div>
-          <div className="absolute -bottom-20 left-40 w-80 h-80 bg-indigo-500 rounded-full"></div>
-        </div>
-        
-        <div className="relative">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-white bg-gradient-to-r from-purple-600 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                Palette Generator
-              </h1>
-              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-xl">
-                Create beautiful, harmonious color combinations with the power of color theory. Design like a pro in seconds.
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-full shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
-                onClick={() => window.location.href = '/'}
-              >
-                <ChevronLeft size={16} />
-                <span>Back to Home</span>
-              </div>
-
-              <div
-                className="px-4 py-2 text-sm font-medium text-blue-600 bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 border border-blue-200 dark:border-gray-600 rounded-full shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
-                onClick={() => window.location.href = '/designers-guide'}
-              >
-                <Eye size={16} />
-                <span>Designer's Guide</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300">
-                <RefreshCw size={14} className="mr-1.5 text-gray-500 dark:text-gray-400" />
-                <span>Press <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-600 dark:text-gray-200 rounded text-xs font-semibold border border-gray-200 dark:border-gray-500 shadow-sm">spacebar</kbd> to generate</span>
-              </div>
-
-              <div className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300">
-                <LockIcon size={14} className="mr-1.5 text-gray-500 dark:text-gray-400" />
-                <span>Click lock to keep a color</span>
-              </div>
-
-              <div className="flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300">
-                <GripVertical size={14} className="mr-1.5 text-gray-500 dark:text-gray-400" />
-                <span>Drag to reorder</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col bg-blue-50 dark:bg-blue-900/30 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
-              <div className="flex items-center gap-2">
-                <label htmlFor="color-theory" className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">Color Theory:</label>
-                <select
-                  id="color-theory"
-                  value={colorTheory}
-                  onChange={(e) => setColorTheory(e.target.value as ColorTheory)}
-                  className="text-sm border border-blue-200 dark:border-blue-700 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-700 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {colorTheoryOptions.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              {colorTheory !== 'auto' && (
-                <p className="text-xs text-blue-700 mt-2 max-w-[220px] sm:max-w-xs">
-                  {colorTheory === 'monochromatic' ? "Variations in lightness and saturation of one color" : 
-                   colorTheory === 'analogous' ? "Colors that sit next to each other on the color wheel" :
-                   colorTheory === 'complementary' ? "Opposite colors that create strong contrast" :
-                   colorTheory === 'split-complementary' ? "A base color and two adjacent to its complement" :
-                   colorTheory === 'triadic' ? "Three colors evenly spaced on the wheel for balance" :
-                   colorTheory === 'tetradic' ? "Two complementary pairs for rich diversity" :
-                   colorTheory === 'neutral' ? "Desaturated colors for clean aesthetics" : 
-                   ""}
-                  
-                  {" - Select 'Use as Base' on any color"}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-8 shadow-md border border-gray-100 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Actions</h2>
-          <div className="flex gap-2">
-            <button
-              onClick={resetPalette}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-              title="Reset palette"
-            >
-              <RefreshCw size={18} />
-            </button>
-          </div>
-        </div>
-      
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
-          <button
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 sm:px-6 py-3 rounded-xl shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-indigo-700 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
-            onClick={handleGenerate}
+      {/* Compact top bar */}
+      <div className="flex flex-wrap items-center gap-2 mb-4 pt-2">
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white mr-1">Palette Generator</h1>
+        <span className="hidden sm:flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+          <span className="flex items-center gap-1"><RefreshCw size={11} /> <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px] font-semibold border border-gray-200 dark:border-gray-600">space</kbd> generate</span>
+          <span className="flex items-center gap-1"><LockIcon size={11} /> lock to keep</span>
+          <span className="flex items-center gap-1"><GripVertical size={11} /> drag to reorder</span>
+        </span>
+        <div className="flex items-center gap-2 ml-auto">
+          <label htmlFor="color-theory" className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap hidden sm:block">Color Theory:</label>
+          <select
+            id="color-theory"
+            value={colorTheory}
+            onChange={(e) => setColorTheory(e.target.value as ColorTheory)}
+            className="text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <RefreshCw size={18} className="sm:w-5 sm:h-5" />
-            <span>Generate</span>
-          </button>
-
-          <button
-            className="relative bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 px-4 sm:px-5 py-3 rounded-xl shadow hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-1.5 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
-            onClick={handleUndo}
-            disabled={paletteHistory.length === 0}
-            title="Undo last generation"
-          >
-            <Undo2 size={18} />
-            <span>Undo</span>
-            {paletteHistory.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-indigo-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {paletteHistory.length}
-              </span>
-            )}
-          </button>
-          
-          <button
-            className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 px-4 sm:px-6 py-3 rounded-xl shadow hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
-            onClick={addColor}
-            disabled={palette.length >= 10}
-          >
-            <Plus size={18} className="sm:w-5 sm:h-5" />
-            <span>Add Color</span>
-          </button>
-          
-          <div
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 sm:px-6 py-3 rounded-xl shadow hover:shadow-md hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium cursor-pointer"
-            onClick={() => window.location.href = '/image-palette'}
-          >
-            <ImageIcon size={18} className="sm:w-5 sm:h-5" />
-            <span>From Image</span>
-          </div>
-          
-          <div
-            className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 sm:px-6 py-3 rounded-xl shadow hover:shadow-md hover:from-emerald-600 hover:to-teal-600 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium cursor-pointer"
-            onClick={handleVisualize}
-          >
-            <Eye size={18} className="sm:w-5 sm:h-5" />
-            <span>Visualize</span>
-          </div>
-          
-          {/* Save Palette */}
-          <button
-            className="bg-gradient-to-r from-violet-500 to-purple-600 text-white px-4 sm:px-5 py-3 rounded-xl shadow hover:shadow-md hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
-            onClick={() => user ? setShowSaveModal(true) : window.location.href = '/auth'}
-          >
-            <Save size={16} />
-            <span>Save</span>
-          </button>
-
-          {/* Export dropdown */}
-          <div className="relative">
-            <button
-              className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 px-4 sm:px-6 py-3 rounded-xl shadow hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium w-full"
-              onClick={() => setShowExportMenu(v => !v)}
-            >
-              <Download size={18} className="sm:w-5 sm:h-5" />
-              <span>Export</span>
-              <ChevronDown size={14} />
-            </button>
-            {showExportMenu && (
-              <div className="absolute right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 min-w-[160px] py-1 overflow-hidden">
-                {[
-                  { label: 'PNG',             action: () => { exportPalette(); setShowExportMenu(false); } },
-                  { label: 'JSON',            action: () => { exportPaletteAsJSON(); setShowExportMenu(false); } },
-                  { label: 'CSS Variables',   action: exportAsCSSVariables },
-                  { label: 'SCSS Variables',  action: exportAsSCSS },
-                  { label: 'Tailwind Config', action: exportAsTailwind },
-                ].map(({ label, action }) => (
-                  <button key={label} onClick={action} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Color Blindness Simulation Bar */}
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Simulate:</span>
-            {CB_MODES.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setSimulationMode(key)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${simulationMode === key ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
-              >
-                {label}
-              </button>
+            {colorTheoryOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
             ))}
-            {simulationMode !== 'normal' && (
-              <span className="text-xs text-gray-400 dark:text-gray-500 ml-1 italic">Visual preview only — exported colors are unchanged</span>
-            )}
-          </div>
+          </select>
+          <button
+            onClick={resetPalette}
+            className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Reset palette"
+          >
+            <RefreshCw size={15} />
+          </button>
+        </div>
+      </div>
+
+      {/* Actions row */}
+      <div className="flex flex-wrap items-center gap-2 mb-5">
+        <button
+          className="h-10 w-28 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
+          onClick={handleGenerate}
+        >
+          <RefreshCw size={15} /><span>Generate</span>
+        </button>
+
+        <button
+          className="relative h-10 w-28 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-1.5 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          onClick={handleUndo}
+          disabled={paletteHistory.length === 0}
+          title="Undo last generation"
+        >
+          <Undo2 size={15} /><span>Undo</span>
+          {paletteHistory.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-indigo-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+              {paletteHistory.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          className="h-10 w-28 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-1.5 text-sm font-medium disabled:opacity-40"
+          onClick={addColor}
+          disabled={palette.length >= 10}
+        >
+          <Plus size={15} /><span>Add Color</span>
+        </button>
+
+        <button
+          className="h-10 w-28 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
+          onClick={() => window.location.href = '/image-palette'}
+        >
+          <ImageIcon size={15} /><span>Extract</span>
+        </button>
+
+        <button
+          className="h-10 w-28 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
+          onClick={handleVisualize}
+        >
+          <Eye size={15} /><span>Visualize</span>
+        </button>
+
+        <button
+          className="h-10 w-28 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
+          onClick={() => user ? setShowSaveModal(true) : window.location.href = '/auth'}
+        >
+          <Save size={15} /><span>Save</span>
+        </button>
+
+        <div className="relative">
+          <button
+            className="h-10 w-28 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
+            onClick={() => setShowExportMenu(v => !v)}
+          >
+            <Download size={15} /><span>Export</span><ChevronDown size={13} />
+          </button>
+          {showExportMenu && (
+            <div className="absolute left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 min-w-[160px] py-1 overflow-hidden">
+              {[
+                { label: 'PNG',             action: () => { exportPalette(); setShowExportMenu(false); } },
+                { label: 'JSON',            action: () => { exportPaletteAsJSON(); setShowExportMenu(false); } },
+                { label: 'CSS Variables',   action: exportAsCSSVariables },
+                { label: 'SCSS Variables',  action: exportAsSCSS },
+                { label: 'Tailwind Config', action: exportAsTailwind },
+              ].map(({ label, action }) => (
+                <button key={label} onClick={action} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Simulate bar inline */}
+        <div className="flex items-center gap-1.5 ml-auto flex-wrap">
+          <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Simulate:</span>
+          {CB_MODES.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setSimulationMode(key)}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${simulationMode === key ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
       
@@ -642,9 +620,9 @@ function PaletteApp() {
         </div>
       </div>
       
-      {/* Trending Palettes Section */}
+      {/* Browse Palettes — static + community + saved */}
       <div id="trending">
-        <TrendingPalettes onSelectPalette={handleTrendingPaletteSelect} />
+        <BrowsePalettes onSelectPalette={handleTrendingPaletteSelect} userId={user?.id} />
       </div>
       
       <div className="mt-10 sm:mt-14 p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm text-center">
@@ -669,6 +647,35 @@ function PaletteApp() {
         </div>
       </div>
       
+      {/* Save palette prompt */}
+      {showSavePrompt && !user && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-start gap-3 bg-gray-900 dark:bg-gray-800 text-white p-4 rounded-2xl shadow-2xl border border-white/10 max-w-xs">
+            <div className="p-2 rounded-xl bg-violet-600/20 text-violet-400 flex-shrink-0 mt-0.5">
+              <Save size={16} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm">Like this palette?</p>
+              <p className="text-xs text-gray-400 mt-0.5 leading-snug">Sign in to save it and access your palettes from anywhere.</p>
+              <div className="flex gap-2 mt-3">
+                <button
+                  onClick={() => window.location.href = '/auth'}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-semibold hover:opacity-90 transition-opacity"
+                >
+                  <LogIn size={12} /> Sign In
+                </button>
+                <button
+                  onClick={() => { setShowSavePrompt(false); sessionStorage.setItem('save_prompt_dismissed', '1'); }}
+                  className="px-3 py-1.5 rounded-lg text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <Footer className="mt-8" />
       
