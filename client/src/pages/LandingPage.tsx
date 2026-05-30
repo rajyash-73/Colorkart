@@ -296,11 +296,11 @@ export default function LandingPage() {
           </div>
           
           {/* CTA Buttons — sits at bottom of left col, mirrors hex strip on right */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center lg:items-start">
+          <div className="flex flex-row flex-wrap gap-3 justify-center lg:justify-start items-center">
             {/* Primary CTA — deep indigo glass */}
             <button
               onClick={handleGetStarted}
-              className="group relative overflow-hidden flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg text-white transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+              className="group relative overflow-hidden flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white whitespace-nowrap transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
               style={{
                 background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%)',
                 boxShadow: '0 0 0 1px rgba(255,255,255,0.15) inset, 0 8px 32px rgba(99,102,241,0.45), 0 2px 8px rgba(0,0,0,0.25)',
@@ -324,40 +324,40 @@ export default function LandingPage() {
               <ArrowRight className="group-hover:translate-x-1 transition-transform duration-300" size={20} />
             </button>
 
-            {/* Secondary — dark charcoal, works in both light & dark mode */}
+            {/* Secondary — violet glow dark */}
             <button
               onClick={handleExplorePalettes}
-              className="group relative overflow-hidden px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+              className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
               style={{
                 background: 'rgba(18, 20, 38, 0.88)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                border: '1px solid rgba(167,139,250,0.35)',
                 color: 'rgba(255,255,255,0.92)',
-                boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset, 0 4px 20px rgba(0,0,0,0.28)',
+                boxShadow: '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset',
               }}
               onMouseEnter={e => {
                 (e.currentTarget as HTMLButtonElement).style.background =
-                  'linear-gradient(120deg, rgba(99,102,241,0.75) 0%, rgba(139,92,246,0.7) 35%, rgba(168,85,247,0.65) 65%, rgba(99,102,241,0.7) 100%)';
-                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(167,139,250,0.5)';
+                  'linear-gradient(135deg, rgba(167,139,250,0.3) 0%, rgba(236,72,153,0.2) 50%, rgba(99,102,241,0.3) 100%)';
+                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(216,180,254,0.6)';
                 (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  '0 0 0 1px rgba(255,255,255,0.15) inset, 0 0 24px rgba(139,92,246,0.6), 0 0 48px rgba(99,102,241,0.35), 0 8px 24px rgba(0,0,0,0.3)';
+                  '0 8px 40px rgba(167,139,250,0.4), 0 1px 0 rgba(255,255,255,0.15) inset';
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLButtonElement).style.background = 'rgba(18, 20, 38, 0.88)';
-                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.12)';
+                (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(167,139,250,0.35)';
                 (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  '0 0 0 1px rgba(255,255,255,0.06) inset, 0 4px 20px rgba(0,0,0,0.28)';
+                  '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset';
               }}
             >
-              <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+              <span className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
               Explore trending palettes
             </button>
 
             {user && (
               <button
                 onClick={() => window.location.href = '/saved-palettes'}
-                className="group relative overflow-hidden flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
+                className="group relative overflow-hidden flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm whitespace-nowrap transition-all duration-500 hover:-translate-y-1 hover:scale-[1.03]"
                 style={{
                   background: 'rgba(18, 20, 38, 0.88)',
                   backdropFilter: 'blur(16px)',
