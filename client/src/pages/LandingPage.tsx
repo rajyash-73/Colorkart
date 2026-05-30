@@ -176,7 +176,7 @@ export default function LandingPage() {
             {/* Entering card */}
             <div
               key={`active-${active}`}
-              className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10 dark:border-white/8"
+              className="absolute inset-0 rounded-2xl overflow-hidden border border-gray-300 dark:border-white/10"
               style={{
                 ...slideStyle,
                 animationName: prev !== null ? inAnim : 'none',
@@ -189,7 +189,7 @@ export default function LandingPage() {
         </div>
 
         {/* Bottom: dots + hex strip */}
-        <div>
+        <div className="mt-4">
           <div className="flex justify-center lg:justify-start gap-2 mb-4">
             {palettes.map((_, i) => (
               <button
