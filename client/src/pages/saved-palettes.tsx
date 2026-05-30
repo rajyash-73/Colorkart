@@ -185,7 +185,7 @@ export default function SavedPalettes() {
                       Use in Generator
                     </button>
                     <button onClick={() => togglePublic(palette)} className="flex items-center gap-1 px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-green-400 transition-colors">
-                      <Share2 size={11} />{palette.is_public ? 'Make Private' : 'Share'}
+                      <Share2 size={11} />{palette.is_public ? 'Make Private' : 'Make Public'}
                     </button>
                     <button
                       onClick={() => handleDelete(palette.id)}
