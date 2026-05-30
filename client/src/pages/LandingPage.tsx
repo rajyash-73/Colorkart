@@ -361,20 +361,17 @@ export default function LandingPage() {
                   WebkitBackdropFilter: 'blur(16px)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: 'rgba(255,255,255,0.92)',
-                  boxShadow: '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset',
+                  boxShadow: 'none',
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background =
-                    'linear-gradient(135deg, rgba(167,139,250,0.3) 0%, rgba(236,72,153,0.2) 50%, rgba(99,102,241,0.3) 100%)';
-                  (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(216,180,254,0.6)';
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                    '0 8px 40px rgba(167,139,250,0.4), 0 1px 0 rgba(255,255,255,0.15) inset';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(40, 42, 60, 0.95)';
+                  (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.18)';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLButtonElement).style.background = 'rgba(18, 20, 38, 0.88)';
                   (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.1)';
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                    '0 4px 24px rgba(139,92,246,0.3), 0 1px 0 rgba(255,255,255,0.08) inset';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
                 }}
               >
                 <span className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
