@@ -495,7 +495,7 @@ function PaletteApp() {
       <div className="flex-1">
         <div 
           ref={paletteRef} 
-          className="flex flex-col md:flex-row h-auto md:h-[500px] rounded-2xl overflow-hidden shadow-2xl border border-gray-200"
+          className="flex flex-col md:flex-row h-auto md:h-[350px] rounded-2xl overflow-hidden shadow-2xl border border-gray-200"
         >
           {palette.map((color, index) => {
             const displayHex = simulateColorBlindness(color.hex, simulationMode);
@@ -503,7 +503,7 @@ function PaletteApp() {
             return (
               <div
                 key={index}
-                className={`flex-1 relative transition-all group ${draggedIndex === index ? 'opacity-50' : ''} min-h-[200px] md:min-h-0`}
+                className={`flex-1 relative transition-all group ${draggedIndex === index ? 'opacity-50' : ''} min-h-[140px] md:min-h-0`}
                 style={{ backgroundColor: displayHex }}
                 draggable={true}
                 onDragStart={() => handleDragStart(index)}
