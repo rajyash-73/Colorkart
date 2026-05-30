@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, Github, Mail, Heart } from 'lucide-react';
+import { ArrowUpRight, Mail, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FooterProps {
@@ -77,15 +77,6 @@ export default function Footer({ className }: FooterProps) {
               </a>
             </div>
             <div className="flex items-center mt-4 gap-2">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full border border-gray-200 dark:border-gray-700 transition-colors"
-                aria-label="GitHub"
-              >
-                <Github size={16} />
-              </a>
               <a
                 href="mailto:rajyash73@gmail.com"
                 className="p-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full border border-gray-200 dark:border-gray-700 transition-colors"
