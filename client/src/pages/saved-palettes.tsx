@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Loader2, ChevronLeft, Plus, Share2, Copy, Check, Globe, Users, Sparkles } from "lucide-react";
+import { Trash2, Loader2, Plus, Share2, Copy, Check, Globe, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getColorName } from "@/lib/colorUtils";
 import SEOHead from '@/components/SEOHead';
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 type SavedPalette = {
   id: string;
@@ -28,6 +29,7 @@ function CopyBtn({ text }: { text: string }) {
 export default function SavedPalettes() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [palettes, setPalettes] = useState<SavedPalette[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -107,13 +109,7 @@ export default function SavedPalettes() {
         noIndex={true}
       />
 
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
-        <a href="/" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1 text-sm">
-          <ChevronLeft size={16} />Coolors
-        </a>
-        <span className="text-gray-300 dark:text-gray-600">|</span>
-        <h1 className="font-bold text-gray-800 dark:text-white">My Palettes</h1>
-      </div>
+      <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
       <div className="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
         <div className="flex items-center justify-between mb-6">
