@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, ArrowRight, Heart, User, Star } from 'lucide-react';
+import { Search, ArrowRight, Heart, User, Star, Globe, Users, Sparkles, Share2 } from 'lucide-react';
 import { Color } from '../types/Color';
 import { getColorName } from '@/lib/colorUtils';
 import { POPULAR_PALETTES } from '@/lib/palettesData';
@@ -16,6 +16,7 @@ interface PaletteItem {
   colors: string[];
   likes: number;
   source: 'static' | 'community' | 'saved';
+  is_public?: boolean;
 }
 
 function hexToColor(hex: string): Color {
@@ -77,7 +78,7 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
       try {
         const { data } = await supabase
           .from('public_palettes')
-          .select('id, name, colors, likes')
+          .select('id, name, colors, likes, is_public')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
         if (data) {
@@ -88,12 +89,20 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
               colors: Array.isArray(p.colors) ? p.colors : [],
               likes: p.likes ?? 0,
               source: 'saved' as const,
+              is_public: p.is_public ?? false,
             })).filter(p => p.colors.length >= 2)
           );
         }
       } catch {}
     })();
   }, [userId]);
+
+  const togglePublic = async (e: React.MouseEvent, palette: PaletteItem) => {
+    e.stopPropagation();
+    const newPublic = !palette.is_public;
+    await supabase.from('public_palettes').update({ is_public: newPublic }).eq('id', palette.id);
+    setSavedPalettes(prev => prev.map(p => p.id === palette.id ? { ...p, is_public: newPublic } : p));
+  };
 
   // Merge community + static (deduplicate by id)
   const allPalettes = useMemo<PaletteItem[]>(() => {
@@ -198,6 +207,27 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
           </p>
         )}
 
+        {/* Community nudge banner — My Saved tab only, when private palettes exist */}
+        {tab === 'saved' && userId && savedPalettes.some(p => !p.is_public) && (
+          <div className="mb-4 rounded-xl bg-gradient-to-r from-violet-600/10 to-blue-600/10 dark:from-violet-900/30 dark:to-blue-900/30 border border-violet-200 dark:border-violet-800/50 px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-start gap-3 flex-1">
+              <div className="p-1.5 rounded-lg bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5">
+                <Globe size={15} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800 dark:text-white text-xs">Share your palettes with the community</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                  Public palettes appear on the <span className="font-medium text-violet-600 dark:text-violet-400">Explore</span> page and improve color suggestions for everyone.
+                </p>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <span className="flex items-center gap-1 text-[10px] text-gray-400"><Users size={10} /> Discoverable by all</span>
+                  <span className="flex items-center gap-1 text-[10px] text-gray-400"><Sparkles size={10} /> Improves AI suggestions</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {displayPalettes.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
             {displayPalettes.slice(0, showCount).map(p => (
@@ -213,23 +243,39 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
                   ))}
                 </div>
                 {/* Footer */}
-                <div className="px-3 py-2 flex items-center justify-between bg-white dark:bg-gray-800">
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">{p.name}</p>
-                    <p className="text-[10px] text-gray-400 leading-tight">{p.colors.length} colors</p>
-                  </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
-                    {p.likes > 0 && (
-                      <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                        <Heart size={10} className="text-pink-400" />{p.likes}
+                <div className="px-3 py-2 bg-white dark:bg-gray-800">
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">{p.name}</p>
+                      <p className="text-[10px] text-gray-400 leading-tight">{p.colors.length} colors</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                      {p.likes > 0 && (
+                        <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                          <Heart size={10} className="text-pink-400" />{p.likes}
+                        </span>
+                      )}
+                      {p.source === 'saved' && <User size={11} className="text-violet-400" />}
+                      {p.source === 'static' && p.likes >= 1500 && <Star size={11} className="text-amber-400" />}
+                      <span className="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:bg-violet-100 dark:group-hover:bg-violet-900 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
+                        <ArrowRight size={11} />
                       </span>
-                    )}
-                    {p.source === 'saved' && <User size={11} className="text-violet-400" />}
-                    {p.source === 'static' && p.likes >= 1500 && <Star size={11} className="text-amber-400" />}
-                    <span className="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:bg-violet-100 dark:group-hover:bg-violet-900 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
-                      <ArrowRight size={11} />
-                    </span>
+                    </div>
                   </div>
+                  {/* Make Public / Make Private — only in My Saved tab */}
+                  {tab === 'saved' && p.source === 'saved' && (
+                    <button
+                      onClick={e => togglePublic(e, p)}
+                      className={`mt-2 w-full flex items-center justify-center gap-1 py-1 rounded-lg text-[10px] font-medium transition-colors ${
+                        p.is_public
+                          ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40'
+                          : 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400'
+                      }`}
+                    >
+                      <Share2 size={9} />
+                      {p.is_public ? 'Make Private' : 'Make Public'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
