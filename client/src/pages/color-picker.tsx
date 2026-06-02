@@ -96,8 +96,8 @@ export default function ColorPickerPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="Color Picker & Inspector — HEX, RGB, HSL Converter"
-        description="Pick any color and get HEX, RGB, HSL codes instantly. Explore shades, tints and tones. Color format converter with color blindness simulation. Free online color picker."
+        title="Color Picker & HSL Converter | Coolors"
+        description="Pick any color and get HEX, RGB, HSL codes instantly. Explore shades, tints and tones. Format converter with color blindness simulation."
         keywords="color picker online, hex color picker, colour picker online, RGB to hex converter, HSL color picker, color code finder, color shades generator, color tints tones, color inspector, hex code picker, color format converter, color blindness simulator, 颜色选择器"
         canonicalPath="/color-picker"
         structuredData={{

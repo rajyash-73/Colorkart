@@ -222,8 +222,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Free Color Palette Generator — Create Beautiful Color Schemes"
-        description="Generate stunning color palettes instantly. Free online color scheme generator for designers, developers & artists. Trusted by users in US, UK, Europe, India and worldwide."
+        title="Free Color Palette Generator | Coolors"
+        description="Generate beautiful color palettes instantly. Free online color scheme tool for designers, developers & artists. Trusted by users worldwide."
         keywords="color palette generator, colour palette generator, free color palette, color scheme generator, colour scheme generator, color combinations, CSS color palette, hex color picker, web design colors, UI color tool, color theory, Korean color analysis, personal color season, skin tone color analysis, 配色方案生成器, रंग पैलेट, Farbpaletten-Generator, générateur de palette de couleurs"
         canonicalPath="/"
         structuredData={[
@@ -290,8 +290,11 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
             Create the perfect palette or get inspired by thousands of beautiful color schemes.
+          </p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
+            Free to use — sign-up to save unlimited color palettes.
           </p>
           </div>
           
@@ -393,7 +396,7 @@ export default function LandingPage() {
         <section className="mb-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Color Palette Generator */}
-            <div onClick={() => window.location.href = '/generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/generator" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                 <Palette className="w-6 h-6 text-white" />
               </div>
@@ -402,10 +405,10 @@ export default function LandingPage() {
                 Create beautiful color palettes with advanced algorithms and color theory.
               </p>
               <span className="text-blue-600 font-medium text-sm">Start creating →</span>
-            </div>
+            </a>
 
             {/* Explore Palettes */}
-            <div onClick={() => window.location.href = '/explore'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/explore" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                 <Compass className="w-6 h-6 text-white" />
               </div>
@@ -414,10 +417,10 @@ export default function LandingPage() {
                 Discover, like, and share thousands of trending color palettes from the community.
               </p>
               <span className="text-violet-600 font-medium text-sm">Explore trending palettes →</span>
-            </div>
+            </a>
 
             {/* Visualizer */}
-            <div onClick={() => window.location.href = '/visualize'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/visualize" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
                 <Monitor className="w-6 h-6 text-white" />
               </div>
@@ -426,10 +429,10 @@ export default function LandingPage() {
                 See your color palettes in action with real-time mockups and previews.
               </p>
               <span className="text-green-600 font-medium text-sm">Visualize →</span>
-            </div>
+            </a>
 
             {/* Image to Palette */}
-            <div onClick={() => window.location.href = '/image-palette'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/image-palette" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
                 <Download className="w-6 h-6 text-white" />
               </div>
@@ -438,10 +441,10 @@ export default function LandingPage() {
                 Extract beautiful color palettes from any image you upload.
               </p>
               <span className="text-orange-600 font-medium text-sm">Extract colors →</span>
-            </div>
+            </a>
 
             {/* Contrast Checker */}
-            <div onClick={() => window.location.href = '/contrast-checker'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/contrast-checker" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                 <SplitSquareHorizontal className="w-6 h-6 text-white" />
               </div>
@@ -450,10 +453,10 @@ export default function LandingPage() {
                 Check WCAG AA/AAA contrast ratios for accessible, readable design.
               </p>
               <span className="text-sky-600 font-medium text-sm">Check contrast →</span>
-            </div>
+            </a>
 
             {/* Gradient Generator */}
-            <div onClick={() => window.location.href = '/gradient-generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/gradient-generator" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4">
                 <Layers className="w-6 h-6 text-white" />
               </div>
@@ -462,10 +465,10 @@ export default function LandingPage() {
                 Build CSS gradients visually with precise stop controls and instant export.
               </p>
               <span className="text-pink-600 font-medium text-sm">Make gradient →</span>
-            </div>
+            </a>
 
             {/* Color Picker */}
-            <div onClick={() => window.location.href = '/color-picker'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/color-picker" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
                 <Pipette className="w-6 h-6 text-white" />
               </div>
@@ -474,10 +477,10 @@ export default function LandingPage() {
                 Inspect any color and explore its shades, tints, tones, and formats.
               </p>
               <span className="text-teal-600 font-medium text-sm">Pick a color →</span>
-            </div>
+            </a>
 
             {/* Korean Color Analysis */}
-            <div onClick={() => window.location.href = '/korean-color-analysis'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/korean-color-analysis" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
@@ -486,10 +489,10 @@ export default function LandingPage() {
                 Discover your personal color season — Spring, Summer, Autumn or Winter — and find the colors that make you glow.
               </p>
               <span className="text-purple-600 font-medium text-sm">Try now →</span>
-            </div>
+            </a>
 
             {/* Font Generator */}
-            <div onClick={() => window.location.href = '/font-generator'} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+            <a href="/font-generator" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
               <div className="w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                 <Type className="w-6 h-6 text-white" />
               </div>
@@ -498,11 +501,11 @@ export default function LandingPage() {
                 Preview Google Fonts with custom sizes, weights, and colors. Export as CSS or SVG.
               </p>
               <span className="text-rose-600 font-medium text-sm">Generate fonts →</span>
-            </div>
+            </a>
 
             {/* Saved Palettes — shown to logged-in users */}
             {user && (
-              <div onClick={() => window.location.href = '/saved-palettes'} className="bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/20 dark:to-blue-900/20 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-500 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+              <a href="/saved-palettes" className="block bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-900/20 dark:to-blue-900/20 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-violet-200 dark:border-violet-800 hover:border-violet-400 dark:hover:border-violet-500 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
                 <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
                   <BookMarked className="w-6 h-6 text-white" />
                 </div>
@@ -511,7 +514,7 @@ export default function LandingPage() {
                   View and manage all the palettes you've saved to your account.
                 </p>
                 <span className="text-violet-600 font-medium text-sm">View saved →</span>
-              </div>
+              </a>
             )}
           </div>
         </section>

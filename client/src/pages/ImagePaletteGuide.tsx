@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 export default function ImagePaletteGuide() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
         title="Image Color Palette Guide — Extract Colors from Any Photo"
         description="Learn how to extract and use color palettes from images. Step-by-step guide for designers, photographers and digital artists. Turn any photo into your design inspiration."
@@ -125,7 +125,7 @@ export default function ImagePaletteGuide() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How to Extract Colors from Images</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Upload className="w-8 h-8 text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Upload Your Image</h3>
@@ -135,7 +135,7 @@ export default function ImagePaletteGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Camera className="w-8 h-8 text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">AI Analysis</h3>
@@ -145,7 +145,7 @@ export default function ImagePaletteGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Palette className="w-8 h-8 text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Get Your Palette</h3>
@@ -259,7 +259,7 @@ export default function ImagePaletteGuide() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">🎯</span>
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">Smart Color Detection</h3>
@@ -269,7 +269,7 @@ export default function ImagePaletteGuide() {
               </div>
               
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">⚖️</span>
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">Color Harmony</h3>
@@ -279,7 +279,7 @@ export default function ImagePaletteGuide() {
               </div>
               
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-100 to-red-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">📊</span>
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-2">Multiple Formats</h3>
@@ -292,7 +292,7 @@ export default function ImagePaletteGuide() {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-12">
+        <section className="text-center bg-gradient-to-r from-orange-50 to-red-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-12 border border-transparent dark:border-gray-700">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Ready to Extract Colors from Your Images?
           </h2>

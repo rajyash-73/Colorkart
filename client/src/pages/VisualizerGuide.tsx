@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 export default function VisualizerGuide() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
         title="Palette Visualizer Guide — Preview Colors in Real UI Designs"
         description="Learn how to use the Palette Visualizer to preview color schemes in real UI templates. Complete guide for designers and developers. See colors in dashboards, landing pages and more."
@@ -74,17 +74,17 @@ export default function VisualizerGuide() {
               Color visualization is crucial for making informed design decisions. Our visualizer helps you understand how your color choices will look in real applications, preventing costly mistakes and ensuring your designs achieve the desired impact.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
+              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-700 dark:to-gray-700 rounded-xl">
                 <Eye className="w-12 h-12 text-green-600 mx-auto mb-4" />
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Test Before Implementation</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">See how colors work together before applying them to your actual project</p>
               </div>
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
+              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-700 dark:to-gray-700 rounded-xl">
                 <Monitor className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Multiple Contexts</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">Preview your palette in websites, apps, and various design layouts</p>
               </div>
-              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl">
+              <div className="text-center p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-700 dark:to-gray-700 rounded-xl">
                 <Layers className="w-12 h-12 text-green-600 mx-auto mb-4" />
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Instant Feedback</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">Get immediate visual feedback and make adjustments in real-time</p>
@@ -98,7 +98,7 @@ export default function VisualizerGuide() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How to Use the Color Visualizer</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">1</span>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Create Your Palette</h3>
@@ -108,7 +108,7 @@ export default function VisualizerGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Choose a Template</h3>
@@ -118,7 +118,7 @@ export default function VisualizerGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">3</span>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Apply Colors</h3>
@@ -128,7 +128,7 @@ export default function VisualizerGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">4</span>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Evaluate & Refine</h3>
@@ -246,7 +246,7 @@ export default function VisualizerGuide() {
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">⚡</span>
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Save Time</h3>
@@ -254,7 +254,7 @@ export default function VisualizerGuide() {
             </div>
             
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Make Better Decisions</h3>
@@ -262,7 +262,7 @@ export default function VisualizerGuide() {
             </div>
             
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💡</span>
               </div>
               <h3 className="font-bold text-gray-900 dark:text-white mb-2">Reduce Revisions</h3>
@@ -272,8 +272,8 @@ export default function VisualizerGuide() {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <section className="text-center bg-gradient-to-r from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-12 border border-transparent dark:border-gray-700">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Ready to Visualize Your Colors?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">

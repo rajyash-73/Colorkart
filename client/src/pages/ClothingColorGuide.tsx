@@ -6,12 +6,12 @@ import Footer from "@/components/Footer";
 
 export default function ClothingColorGuide() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Clothing Color Guide — How to Combine Colors in Fashion"
+        title="Clothing Color Guide | Coolors"
         description="Master clothing color combinations with our complete guide. Learn which colors work together, seasonal palettes, and how to build a cohesive wardrobe for every style."
         keywords="clothing color combinations, fashion color guide, outfit color matching, wardrobe color palette, what colors go with what clothing, colour combinations for clothes, fashion colour theory, style color guide, color matching outfits"
-        canonicalPath="/clothing-color-guide"
+        canonicalPath="/korean-color-analysis-guide"
         ogType="article"
         structuredData={{
           "@context": "https://schema.org",
@@ -115,7 +115,7 @@ export default function ClothingColorGuide() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How to Use Our Clothing Color Creator</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">1</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Upload Your Photo</h3>
@@ -125,7 +125,7 @@ export default function ClothingColorGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">2</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Get Your Analysis</h3>
@@ -135,7 +135,7 @@ export default function ClothingColorGuide() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-gray-700 dark:to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">3</span>
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Discover Your Colors</h3>
@@ -175,7 +175,7 @@ export default function ClothingColorGuide() {
 
         {/* Tips Section */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Pro Tips for Better Results</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Pro Tips for Better Results</h2>
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
             <div className="grid md:grid-cols-2 gap-8">
               <div>
@@ -225,7 +225,7 @@ export default function ClothingColorGuide() {
         </section>
 
         {/* CTA Section */}
-        <section className="text-center bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-12">
+        <section className="text-center bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-12 border border-transparent dark:border-gray-700">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Ready to Discover Your Perfect Colors?
           </h2>

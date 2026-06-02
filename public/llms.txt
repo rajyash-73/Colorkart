@@ -1,0 +1,20 @@
+# Coolors.in — Free Color Palette Generator
+
+> Generate, explore, and export beautiful color palettes for any design project. Free, no sign-up required.
+
+## Tools
+- [Color Palette Generator](https://www.coolors.in/generator): Generate palettes instantly using color theory — complementary, analogous, triadic, tetradic and monochromatic modes. Press spacebar to generate, lock colors to keep, export as PNG, CSS, SCSS, Tailwind or JSON.
+- [Explore Palettes](https://www.coolors.in/explore): Browse 190+ curated color palettes from the community. Filter by color, style or mood.
+- [Contrast Checker](https://www.coolors.in/contrast-checker): WCAG 2.1 AA/AAA accessibility compliance checker. Verify text readability for any color combination.
+- [Gradient Generator](https://www.coolors.in/gradient-generator): CSS linear, radial and conic gradient builder with live preview. Export ready-to-use CSS, Tailwind or SCSS.
+- [Color Picker](https://www.coolors.in/color-picker): HEX, RGB, HSL converter with shades, tints and color blindness simulation.
+- [Image to Palette](https://www.coolors.in/image-palette): Extract dominant colors from any photo. Download as CSS, PNG or load directly into the generator.
+- [Font Generator](https://www.coolors.in/font-generator): Preview 30+ Google Fonts with custom size, weight, spacing and color. Export CSS font stack.
+- [Palette Visualizer](https://www.coolors.in/visualize): Preview palettes in real UI templates — dashboard, landing page, analytics, chat app and calendar.
+
+## Guides
+- [Generator Guide](https://www.coolors.in/generator-guide): How to use the palette generator — color theory modes, locking colors, reordering and exporting palettes.
+- [Designer's Guide to Color Theory](https://www.coolors.in/designers-guide): Monochromatic, analogous, complementary, triadic and tetradic harmonies explained for designers.
+- [Korean Color Analysis Guide](https://www.coolors.in/korean-color-analysis-guide): Learn how personal color analysis works, what the seasonal categories mean, and how to build a wardrobe around your results.
+- [Korean Personal Color Analysis](https://www.coolors.in/korean-color-analysis): Find your Spring/Summer/Autumn/Winter personal color season.
+- [FAQ](https://www.coolors.in/faq): Common questions about generating, saving and exporting color palettes.

@@ -236,17 +236,24 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="Explore Color Palettes — Thousands of Beautiful Color Combinations"
-        description="Browse thousands of curated color palettes. Discover trending combinations, save your favorites, and get inspired for your next design project. Free palette library."
-        keywords="color palette ideas, explore color palettes, colour palette ideas, color scheme examples, trending color palettes 2025, color inspiration, popular color combinations, color scheme library, colour combinations, design color inspiration, palette collection"
+        title="Explore Color Palettes | Coolors"
+        description="Browse thousands of curated color palettes. Discover trending combinations, save favorites and get inspired. Free palette library."
+        keywords="color palette ideas, explore color palettes, colour palette ideas, color scheme examples, color inspiration, popular color combinations, color scheme library, colour combinations, design color inspiration, palette collection"
         canonicalPath="/explore"
         structuredData={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           "name": "Explore Color Palettes",
-          "url": "https://coolors.in/explore",
-          "description": "Browse thousands of curated color palettes and find inspiration for your next design project.",
-          "provider": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" }
+          "url": "https://www.coolors.in/explore",
+          "description": "Browse curated color palettes for your next design project.",
+          "provider": { "@type": "Organization", "name": "Coolors", "url": "https://www.coolors.in" },
+          "numberOfItems": POPULAR_PALETTES.length,
+          "itemListElement": POPULAR_PALETTES.slice(0, 10).map((p: { name: string }, i: number) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "name": p.name,
+            "url": "https://www.coolors.in/explore"
+          }))
         }}
       />
 
@@ -256,7 +263,12 @@ export default function ExplorePage() {
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Explore Palettes</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">Discover, save, and share beautiful color combinations</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-3">Discover, save, and share beautiful color combinations</p>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl text-sm leading-relaxed mb-6">
+            Browse hand-curated color palettes — from warm earth tones to cool modern monochromes.
+            Click any palette to apply it to the generator instantly. Filter by color, style or mood.
+            Free to use, sign-up to save unlimited color palettes.
+          </p>
 
           {/* Search bar */}
           <div className="flex gap-2">

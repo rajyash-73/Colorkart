@@ -162,14 +162,14 @@ export default function Home() {
         <meta name="description" content="Create and explore beautiful color combinations with Coolors, the free color palette generator. Design with confidence using our intuitive color tools." />
         <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="canonical" href="https://Coolors/" />
+        <link rel="canonical" href="https://www.coolors.in/" />
         {/* Dynamic structured data for the home page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "Coolors Color Palette Generator",
-            "url": "https://Coolors/",
+            "url": "https://www.coolors.in/",
             "description": "Create beautiful color combinations with our intuitive color generator",
             "applicationCategory": "DesignApplication",
             "operatingSystem": "Any"

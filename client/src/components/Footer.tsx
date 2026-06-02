@@ -20,7 +20,8 @@ const APP_LINKS = [
 
 const RESOURCE_LINKS = [
   { label: "Designer's Guide",    href: '/designers-guide' },
-  { label: 'Clothing Color Guide',href: '/clothing-color-guide' },
+  { label: 'Generator Guide',     href: '/generator-guide' },
+  { label: 'Korean Color Analysis Guide', href: '/korean-color-analysis-guide' },
   { label: 'Visualizer Guide',    href: '/visualizer-guide' },
   { label: 'Image Palette Guide', href: '/image-palette-guide' },
   { label: 'FAQ',                 href: '/faq' },

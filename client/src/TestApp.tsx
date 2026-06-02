@@ -354,26 +354,25 @@ function PaletteApp() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <SEOHead
-        title="Color Palette Generator — Random & Theory-Based Color Schemes"
-        description="Create perfect color palettes using color theory. Generate complementary, analogous, triadic & monochromatic schemes. Free palette maker trusted by designers in US, UK, India & worldwide."
+        title="Color Palette Generator | Coolors"
+        description="Create perfect color palettes using color theory — complementary, analogous, triadic schemes. Free palette maker for designers worldwide."
         keywords="color palette generator, random color generator, colour palette generator, color scheme maker, complementary colors, analogous colors, triadic colors, CSS color variables, hex color generator, palette maker online, color theory tool, design color picker, color harmony generator"
         canonicalPath="/generator"
         structuredData={{
           "@context": "https://schema.org",
-          "@type": "HowTo",
-          "name": "How to Generate a Color Palette",
-          "description": "Create beautiful color palettes using color theory with Coolors",
-          "step": [
-            { "@type": "HowToStep", "name": "Press spacebar or click Generate", "text": "Press the spacebar or click the Generate button to create a new random color palette." },
-            { "@type": "HowToStep", "name": "Lock colors you like", "text": "Click the lock icon on any color to keep it while regenerating the rest." },
-            { "@type": "HowToStep", "name": "Choose a color theory mode", "text": "Select a color harmony like Complementary, Analogous or Triadic from the dropdown." },
-            { "@type": "HowToStep", "name": "Export your palette", "text": "Export as PNG, CSS variables, SCSS, Tailwind config or JSON." }
+          "@type": "FAQPage",
+          "mainEntity": [
+            { "@type": "Question", "name": "How do I generate a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Press the spacebar or click Generate to create a new random palette instantly. Lock any color you want to keep, then regenerate the rest." } },
+            { "@type": "Question", "name": "What color theory modes are available?", "acceptedAnswer": { "@type": "Answer", "text": "Five modes: Complementary (opposite hues, high contrast), Analogous (adjacent hues, harmonious), Triadic (3 equidistant hues, vibrant), Tetradic (4 hues, rich), and Monochromatic (one hue at varying lightness)." } },
+            { "@type": "Question", "name": "Can I save my color palettes for free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create a free Coolors account to save unlimited palettes, share them publicly with the community and access them from any device." } },
+            { "@type": "Question", "name": "How do I export a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Click Export in the generator toolbar. Choose from PNG image, CSS custom properties, SCSS variables, Tailwind config or JSON format." } },
+            { "@type": "Question", "name": "Is the color palette generator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Coolors is completely free to use — no subscription or sign-up required to generate, export and share color palettes." } }
           ]
         }}
       />
       {/* Compact top bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4 pt-2">
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white mr-1">Palette Generator</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white mr-1">Color Palette Generator</h1>
         <span className="hidden sm:flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
           <span className="flex items-center gap-1"><RefreshCw size={11} /> <kbd className="px-1 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px] font-semibold border border-gray-200 dark:border-gray-600">space</kbd> generate</span>
           <span className="flex items-center gap-1"><LockIcon size={11} /> lock to keep</span>
@@ -624,7 +623,7 @@ function PaletteApp() {
       <div id="trending">
         <BrowsePalettes onSelectPalette={handleTrendingPaletteSelect} userId={user?.id} />
       </div>
-      
+
       <div className="mt-10 sm:mt-14 p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm text-center">
         <h3 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-4">Start creating beautiful designs today</h3>
         <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base max-w-2xl mx-auto">
@@ -632,18 +631,24 @@ function PaletteApp() {
           Experiment with different color theories, save your favorite palettes, and visualize them in real-world designs.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <div
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all font-medium cursor-pointer"
-            onClick={() => window.location.href = '/designers-guide'}
+          <a
+            href="/generator-guide"
+            className="bg-gradient-to-r from-violet-500 to-blue-600 text-white px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all font-medium"
           >
-            Read the Designer's Guide
-          </div>
-          <div
-            className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 px-5 py-3 rounded-lg shadow hover:shadow-md transition-all font-medium cursor-pointer"
-            onClick={() => window.location.href = '/visualize'}
+            Generator Guide
+          </a>
+          <a
+            href="/designers-guide"
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-5 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all font-medium"
+          >
+            Designer's Guide
+          </a>
+          <a
+            href="/visualize"
+            className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600 px-5 py-3 rounded-lg shadow hover:shadow-md transition-all font-medium"
           >
             Try Visualizer
-          </div>
+          </a>
         </div>
       </div>
       

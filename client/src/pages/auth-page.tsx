@@ -107,7 +107,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Sign In or Create Account"
+        title="Sign In or Create Account | Coolors"
         description="Sign in or create a free Coolors account to save unlimited color palettes, share with the community and export in multiple formats."
         canonicalPath="/auth"
         noIndex={true}

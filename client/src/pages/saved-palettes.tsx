@@ -102,7 +102,7 @@ export default function SavedPalettes() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <SEOHead
-        title="My Saved Palettes — Manage Your Color Collections"
+        title="My Saved Palettes | Coolors"
         description="View and manage your saved color palettes. Share palettes publicly, use them in the generator, or keep them private. Sign in to access your palette library."
         keywords="saved color palettes, my palettes, color palette library, saved color schemes, palette management"
         canonicalPath="/saved-palettes"

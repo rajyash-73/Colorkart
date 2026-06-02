@@ -10,28 +10,28 @@ interface HeaderProps {
 
 function NavBtn({ href, icon, label, tooltip }: { href: string; icon: React.ReactNode; label: string; tooltip: string }) {
   return (
-    <button
+    <a
+      href={href}
       className="text-gray-600 dark:text-gray-300 hover:text-blue-600 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group relative"
-      onClick={() => window.location.href = href}
     >
       {icon}
       <span className="font-medium text-sm">{label}</span>
       <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition shadow-lg whitespace-nowrap pointer-events-none z-50">
         {tooltip}
       </span>
-    </button>
+    </a>
   );
 }
 
 function MobileBtn({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
   return (
-    <button
+    <a
+      href={href}
       className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center gap-2 py-1.5 px-3 rounded-lg transition-colors text-sm w-full"
-      onClick={() => window.location.href = href}
     >
       <span className="text-gray-400">{icon}</span>
       <span className="font-medium">{label}</span>
-    </button>
+    </a>
   );
 }
 

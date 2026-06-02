@@ -7,8 +7,8 @@ export default function DesignersGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900 flex flex-col">
       <SEOHead
-        title="Designer's Guide to Color Theory — Palettes & Color Harmonies"
-        description="Learn color theory from scratch. Understand monochromatic, analogous, complementary, triadic and tetradic harmonies. Complete guide for designers, developers & artists."
+        title="Designer's Guide to Color Theory | Coolors"
+        description="Learn color theory from scratch. Understand monochromatic, analogous, complementary and triadic harmonies. Complete guide for designers."
         keywords="color theory guide, color harmonies, monochromatic palette, analogous colors, complementary colors, triadic color scheme, tetradic palette, designer color guide, colour theory guide, color wheel theory, web design color theory, color combinations explained"
         canonicalPath="/designers-guide"
         ogType="article"

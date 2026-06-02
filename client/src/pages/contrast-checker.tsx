@@ -96,8 +96,8 @@ export default function ContrastCheckerPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="WCAG Color Contrast Checker — Accessibility Compliance Tool"
-        description="Check color contrast ratios against WCAG 2.1 AA & AAA standards. Ensure your text is readable and your designs meet accessibility requirements. Free online tool."
+        title="Free WCAG Contrast Checker | Coolors"
+        description="Check color contrast ratios against WCAG 2.1 AA & AAA standards. Ensure text is readable and meets accessibility requirements. Free tool."
         keywords="WCAG contrast checker, color contrast ratio, accessibility color checker, colour contrast checker, AA contrast ratio, AAA contrast, web accessibility tool, WCAG 2.1, WCAG 2.2, text readability checker, accessible design tool, contrast ratio calculator, ADA compliance"
         canonicalPath="/contrast-checker"
         structuredData={{

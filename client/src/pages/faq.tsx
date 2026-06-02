@@ -8,7 +8,7 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
       <SEOHead
-        title="FAQ — Color Palette Generator Help & Answers"
+        title="FAQ — Color Palette Generator | Coolors"
         description="Find answers to common questions about Coolors color palette generator. Learn how to generate, save, export palettes and use color theory. Help for designers worldwide."
         keywords="color palette generator FAQ, color tool help, how to use color palette generator, palette generator guide, colour palette generator FAQ, color tool questions, color theory help"
         canonicalPath="/faq"

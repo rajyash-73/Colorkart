@@ -96,8 +96,8 @@ export default function GradientGeneratorPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="CSS Gradient Generator — Linear, Radial & Conic Gradients"
-        description="Create beautiful CSS gradients with live preview. Generate linear, radial and conic gradients. Export ready-to-use CSS, Tailwind and SCSS code instantly. Free online tool."
+        title="CSS Gradient Generator | Coolors"
+        description="Create beautiful CSS gradients with live preview. Generate linear, radial and conic gradients. Export CSS, Tailwind and SCSS instantly. Free."
         keywords="CSS gradient generator, linear gradient generator, colour gradient maker, gradient CSS code, radial gradient tool, conic gradient generator, gradient background generator, CSS background gradient, Tailwind gradient, SCSS gradient, gradient picker online, CSS gradient tool"
         canonicalPath="/gradient-generator"
         structuredData={{

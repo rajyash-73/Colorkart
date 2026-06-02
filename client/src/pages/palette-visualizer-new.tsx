@@ -69,7 +69,7 @@ export default function PaletteVisualizer() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <SEOHead
-        title="Color Palette Visualizer — Preview Colors in Real UI Templates"
+        title="Color Palette Visualizer | Coolors"
         description="Visualize your color palette in real dashboard, landing page, analytics and chat UI templates. See exactly how your colors work before you ship. Free preview tool."
         keywords="color palette visualizer, UI color preview, palette mockup generator, colour palette visualizer, color scheme in UI, color combinations preview, UI template colors, design color preview, color in real UI, palette visualizer online, UI color scheme"
         canonicalPath="/visualize"

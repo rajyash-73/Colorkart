@@ -1,39 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://coolors.in/</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
+    <loc>https://www.coolors.in/</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
   <url>
-    <loc>https://coolors.in/designers-guide</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://www.coolors.in/generator</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
   <url>
-    <loc>https://coolors.in/faq</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://www.coolors.in/explore</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
   <url>
-    <loc>https://coolors.in/privacy-policy</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://www.coolors.in/visualize</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
   <url>
-    <loc>https://coolors.in/visualizer</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <loc>https://www.coolors.in/image-palette</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
   <url>
-    <loc>https://coolors.in/image-palette</loc>
-    <lastmod>2023-05-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <loc>https://www.coolors.in/contrast-checker</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/gradient-generator</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/color-picker</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/font-generator</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/korean-color-analysis</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/korean-color-analysis-guide</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/designers-guide</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/generator-guide</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/visualizer-guide</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/image-palette-guide</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/faq</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://www.coolors.in/privacy-policy</loc>
+    <lastmod>2026-06-02</lastmod>
   </url>
 </urlset>

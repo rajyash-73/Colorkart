@@ -1,8 +1,9 @@
 User-agent: *
 Allow: /
 
-# Crawlers should respect all directives
 Disallow: /api/
+Disallow: /auth
+Disallow: /saved-palettes
+Disallow: /visualize-old
 
-# Sitemap
-Sitemap: https://coolors.in/api/sitemap.xml
+Sitemap: https://www.coolors.in/sitemap.xml
