@@ -4,5 +4,6 @@ Allow: /
 Disallow: /api/
 Disallow: /auth
 Disallow: /saved-palettes
+Disallow: /visualize-old
 
 Sitemap: https://www.coolors.in/sitemap.xml
