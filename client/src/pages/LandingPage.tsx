@@ -229,21 +229,58 @@ export default function LandingPage() {
         structuredData={[
           {
             "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Coolors",
+            "url": "https://www.coolors.in",
+            "description": "Coolors.in is a free color palette generator for designers, developers and artists. Generate harmonious color schemes instantly, lock colors you love, and export as CSS, PNG or Tailwind config.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": { "@type": "EntryPoint", "urlTemplate": "https://www.coolors.in/explore?search={search_term_string}" },
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Coolors",
+            "url": "https://www.coolors.in",
+            "logo": "https://www.coolors.in/logo_circles.svg",
+            "contactPoint": { "@type": "ContactPoint", "email": "rajyash73@gmail.com", "contactType": "customer support" }
+          },
+          {
+            "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Coolors Color Palette Generator",
-            "url": "https://coolors.in",
+            "name": "Coolors — Free Color Palette Generator",
+            "url": "https://www.coolors.in",
             "applicationCategory": "DesignApplication",
+            "applicationSubCategory": "Color Palette Generator",
             "operatingSystem": "Any",
-            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-            "description": "Generate stunning color palettes instantly. Free online tool for designers and developers worldwide."
+            "browserRequirements": "Requires a modern web browser",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+            "description": "Coolors.in is a free color palette generator. Press spacebar to instantly generate harmonious color palettes using color theory modes — complementary, analogous, triadic, tetradic and monochromatic. Lock colors, adjust hues, and export as CSS variables, SCSS, Tailwind config, JSON or PNG. No sign-up required.",
+            "featureList": [
+              "Instant color palette generation with spacebar",
+              "Color theory modes: complementary, analogous, triadic, tetradic, monochromatic",
+              "Lock individual colors while regenerating the rest",
+              "Export as CSS, SCSS, Tailwind config, JSON and PNG",
+              "WCAG contrast checker for accessibility",
+              "CSS gradient generator",
+              "Color picker with HEX, RGB and HSL",
+              "Extract palette from image",
+              "Korean personal color analysis",
+              "Community palette library"
+            ],
+            "creator": { "@type": "Person", "name": "Yash", "email": "rajyash73@gmail.com" }
           },
           {
             "@context": "https://schema.org",
             "@type": "FAQPage",
             "mainEntity": [
-              { "@type": "Question", "name": "Is Coolors free to use?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, Coolors is completely free. Generate, save and export unlimited color palettes at no cost." } },
-              { "@type": "Question", "name": "Can I use the palettes commercially?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, all palettes generated on Coolors are free to use for personal and commercial projects." } },
-              { "@type": "Question", "name": "What color formats can I export?", "acceptedAnswer": { "@type": "Answer", "text": "Export in CSS variables, SCSS, Tailwind config, JSON, and PNG formats." } }
+              { "@type": "Question", "name": "What is the best free color palette generator?", "acceptedAnswer": { "@type": "Answer", "text": "Coolors.in is a free color palette generator that lets you create harmonious color schemes instantly. Press spacebar to generate, lock colors you want to keep, choose from 5 color theory modes, and export as CSS, PNG or Tailwind config — no sign-up required." } },
+              { "@type": "Question", "name": "Is Coolors free to use?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, Coolors.in is completely free. Generate, save and export unlimited color palettes at no cost. Sign up only to save palettes to your personal library." } },
+              { "@type": "Question", "name": "Can I use the palettes commercially?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, all palettes generated on Coolors.in are free to use for personal and commercial projects." } },
+              { "@type": "Question", "name": "What color formats can I export?", "acceptedAnswer": { "@type": "Answer", "text": "Export in CSS custom properties, SCSS variables, Tailwind config, JSON, and PNG image formats." } },
+              { "@type": "Question", "name": "How do I generate a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Visit coolors.in/generator and press the spacebar to instantly generate a new color palette. Lock any colors you like and keep pressing spacebar until you find your perfect combination." } }
             ]
           }
         ]}
@@ -563,16 +600,16 @@ export default function LandingPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="text-center bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-12 text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to create amazing palettes?
-          </h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Join thousands of designers who trust Coolors for their color needs.
-          </p>
+        <section className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-gray-800 dark:to-gray-900 rounded-2xl px-8 py-7 border border-transparent dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="text-left">
+            <h2 className="text-xl font-bold text-white mb-1">Ready to create amazing palettes?</h2>
+            <p className="text-blue-100/80 dark:text-gray-400 text-sm leading-relaxed max-w-2xl">
+              <strong className="text-white">Coolors.in</strong> — free color palette generator for designers, developers and artists. Generate instantly using color theory, lock colors, export as CSS, SCSS, Tailwind or PNG. No sign-up required.
+            </p>
+          </div>
           <button
             onClick={handleGetStarted}
-            className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg"
+            className="flex-shrink-0 bg-white text-blue-600 dark:bg-violet-600 dark:text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-100 dark:hover:bg-violet-700 transition-colors duration-300 shadow-md whitespace-nowrap"
           >
             Start Creating Now
           </button>

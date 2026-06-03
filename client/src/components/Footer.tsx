@@ -28,6 +28,7 @@ const RESOURCE_LINKS = [
 ];
 
 const LEGAL_LINKS = [
+  { label: 'About',          href: '/about' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
 ];
 

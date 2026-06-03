@@ -18,3 +18,4 @@
 - [Korean Color Analysis Guide](https://www.coolors.in/korean-color-analysis-guide): Learn how personal color analysis works, what the seasonal categories mean, and how to build a wardrobe around your results.
 - [Korean Personal Color Analysis](https://www.coolors.in/korean-color-analysis): Find your Spring/Summer/Autumn/Winter personal color season.
 - [FAQ](https://www.coolors.in/faq): Common questions about generating, saving and exporting color palettes.
+- [About](https://www.coolors.in/about): Who built Coolors.in, the mission, and the full list of tools offered.

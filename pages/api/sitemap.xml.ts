@@ -28,6 +28,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     '/visualizer-guide',
     '/image-palette-guide',
     '/faq',
+    '/about',
     '/privacy-policy',
   ];
 

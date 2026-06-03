@@ -24,6 +24,7 @@ const PrivacyPolicy = React.lazy(() => import("@/pages/privacy-policy"));
 const FAQPage = React.lazy(() => import("@/pages/faq"));
 const DesignersGuide = React.lazy(() => import("@/pages/designers-guide"));
 const GeneratorGuide = React.lazy(() => import("@/pages/GeneratorGuide"));
+const AboutPage = React.lazy(() => import("@/pages/about"));
 const ContrastChecker = React.lazy(() => import("@/pages/contrast-checker"));
 const GradientGenerator = React.lazy(() => import("@/pages/gradient-generator"));
 const ColorPicker = React.lazy(() => import("@/pages/color-picker"));
@@ -64,6 +65,7 @@ const PaletteRoutes = () => (
     <Route path="/faq"><LazyRoute component={FAQPage} /></Route>
     <Route path="/designers-guide"><LazyRoute component={DesignersGuide} /></Route>
     <Route path="/generator-guide"><LazyRoute component={GeneratorGuide} /></Route>
+    <Route path="/about"><LazyRoute component={AboutPage} /></Route>
     <Route path="/korean-color-analysis-guide"><LazyRoute component={ClothingColorGuide} /></Route>
     <Route path="/clothing-color-guide"><Redirect to="/korean-color-analysis-guide" /></Route>
     <Route path="/visualizer-guide"><LazyRoute component={VisualizerGuide} /></Route>

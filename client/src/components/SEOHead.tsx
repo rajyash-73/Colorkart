@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const BASE_URL = (import.meta.env.VITE_BASE_URL as string | undefined) || 'https://coolors.in';
+const BASE_URL = (import.meta.env.VITE_BASE_URL as string | undefined) || 'https://www.coolors.in';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 
 export interface SEOHeadProps {
