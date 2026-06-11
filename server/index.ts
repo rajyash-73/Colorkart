@@ -15,9 +15,9 @@ async function startDevServer() {
     server: {
       port: 5000,
       host: '0.0.0.0',
-      hmr: {
-        clientPort: 443
-      },
+      // Replit proxies the dev server through HTTPS on 443; locally the
+      // websocket must connect back to the real port or HMR breaks
+      hmr: process.env.REPL_ID ? { clientPort: 443 } : true,
       strictPort: true,
       cors: true,
       headers: {

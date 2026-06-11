@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Camera, Upload, Sun, Moon, Zap, Lightbulb,
   RefreshCw, Check, X, Sparkles, Info, AlertCircle, ChevronDown,
+  SplitSquareHorizontal, Eye, EyeOff, Download, ArrowRight, Palette,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -29,6 +30,8 @@ const SEASON_DATA: Record<Season, {
   good: string[];
   avoid: string[];
   colors: ColorSwatch[];
+  avoidColors: ColorSwatch[];
+  makeup: string[];
 }> = {
   spring: {
     name: 'Spring', nameKo: '봄 웜 브라이트', emoji: '🌸',
@@ -41,20 +44,29 @@ const SEASON_DATA: Record<Season, {
     ],
     good: ['Coral', 'Peach', 'Warm Yellow', 'Mint', 'Camel', 'Salmon', 'Ivory'],
     avoid: ['Black', 'Dark Navy', 'Ash Gray', 'Cool Pastels'],
+    // True spring = warm + bright. No cool pastels here — those are in avoidColors,
+    // and overlapping look-alikes (sky blue vs icy blue) confuse the best/avoid tabs.
     colors: [
       { hex: '#FF7F50', name: 'Coral' },
       { hex: '#FFB347', name: 'Peach' },
       { hex: '#F4C542', name: 'Warm Yellow' },
       { hex: '#90EE90', name: 'Mint' },
-      { hex: '#87CEEB', name: 'Sky Blue' },
+      { hex: '#40E0D0', name: 'Turquoise' },
       { hex: '#F08080', name: 'Light Coral' },
       { hex: '#DEB887', name: 'Camel' },
       { hex: '#FFDAB9', name: 'Peach Puff' },
-      { hex: '#98FB98', name: 'Pale Green' },
-      { hex: '#FFB6C1', name: 'Light Pink' },
+      { hex: '#8DB600', name: 'Apple Green' },
+      { hex: '#FF5349', name: 'Poppy Red' },
       { hex: '#FFA07A', name: 'Salmon' },
       { hex: '#FFFACD', name: 'Ivory' },
     ],
+    avoidColors: [
+      { hex: '#1C1C1C', name: 'Black' },
+      { hex: '#1F2A44', name: 'Dark Navy' },
+      { hex: '#A9AFB3', name: 'Ash Gray' },
+      { hex: '#CDE0EA', name: 'Icy Blue' },
+    ],
+    makeup: ['Coral or peach lips', 'Peachy-pink blush', 'Golden-brown eye tones', 'Honey / golden-brown hair'],
   },
   summer: {
     name: 'Summer', nameKo: '여름 쿨 뮤트', emoji: '🌊',
@@ -81,6 +93,13 @@ const SEASON_DATA: Record<Season, {
       { hex: '#9098B8', name: 'Periwinkle' },
       { hex: '#B8A0C0', name: 'Soft Violet' },
     ],
+    avoidColors: [
+      { hex: '#FF7F2A', name: 'Orange' },
+      { hex: '#F4C542', name: 'Warm Yellow' },
+      { hex: '#808000', name: 'Olive' },
+      { hex: '#E2552C', name: 'Orange Red' },
+    ],
+    makeup: ['Rose-pink or berry lips', 'Soft mauve blush', 'Taupe / gray-brown eye tones', 'Ash-brown or ash-blonde hair'],
   },
   autumn: {
     name: 'Autumn', nameKo: '가을 웜 뮤트', emoji: '🍂',
@@ -107,6 +126,13 @@ const SEASON_DATA: Record<Season, {
       { hex: '#8B7355', name: 'Warm Taupe' },
       { hex: '#704214', name: 'Chocolate' },
     ],
+    avoidColors: [
+      { hex: '#FF5FA2', name: 'Bright Pink' },
+      { hex: '#2E6CF6', name: 'Electric Blue' },
+      { hex: '#FAFAFA', name: 'Pure White' },
+      { hex: '#BFE3F2', name: 'Icy Pastel' },
+    ],
+    makeup: ['Brick or MLBB lips', 'Terracotta blush', 'Bronze / khaki eye tones', 'Chocolate or copper hair'],
   },
   winter: {
     name: 'Winter', nameKo: '겨울 쿨 비비드', emoji: '❄️',
@@ -133,16 +159,72 @@ const SEASON_DATA: Record<Season, {
       { hex: '#1C1C1C', name: 'Black' },
       { hex: '#C0C0C0', name: 'Silver' },
     ],
+    avoidColors: [
+      { hex: '#CD853F', name: 'Camel' },
+      { hex: '#8B6F47', name: 'Warm Brown' },
+      { hex: '#808000', name: 'Olive' },
+      { hex: '#C8B89A', name: 'Beige' },
+    ],
+    makeup: ['True red or fuchsia lips', 'Cool pink blush', 'Charcoal / plum eye tones', 'Blue-black or cool dark hair'],
   },
 };
 
 // ─── Lighting options ─────────────────────────────────────────────────────────
 const LIGHTING: { key: Lighting; label: string; icon: React.FC<any>; filter: string; desc: string }[] = [
-  { key: 'warm',    label: 'Golden Hour', icon: Sun,       filter: 'sepia(0.22) saturate(1.3) brightness(1.1) hue-rotate(-8deg)', desc: 'Warm sunset' },
   { key: 'natural', label: 'Daylight',    icon: Lightbulb, filter: 'none',                                                         desc: 'Natural light' },
+  { key: 'warm',    label: 'Golden Hour', icon: Sun,       filter: 'sepia(0.22) saturate(1.3) brightness(1.1) hue-rotate(-8deg)', desc: 'Warm sunset' },
   { key: 'cool',    label: 'Office',      icon: Zap,       filter: 'brightness(0.95) saturate(0.82) hue-rotate(12deg)',            desc: 'Cool fluorescent' },
   { key: 'evening', label: 'Evening',     icon: Moon,      filter: 'brightness(0.62) sepia(0.18) saturate(1.1)',                   desc: 'Dim indoor' },
 ];
+
+const METALLIC_STOPS: Record<'gold' | 'silver', { stops: [string, string, string]; cast: string }> = {
+  gold:   { stops: ['#F9E79F', '#D4AF37', '#9A7B1E'], cast: '#D4AF37' },
+  silver: { stops: ['#F4F6F7', '#BDC3C7', '#7F8C8D'], cast: '#C0C6CC' },
+};
+
+/** Photo set inside a solid color frame (like holding it against colored fabric),
+ *  with a soft reflected color cast on the face. Framing-independent — works for
+ *  selfies and wide shots alike. */
+function TryOnPhoto({
+  src, color, metallic, hideColor, filter, className,
+}: {
+  src: string;
+  color?: string;
+  metallic?: 'gold' | 'silver';
+  hideColor?: boolean;
+  filter?: string;
+  className?: string;
+}) {
+  const frame = metallic
+    ? `linear-gradient(135deg, ${METALLIC_STOPS[metallic].stops.join(', ')})`
+    : color;
+  const cast = metallic ? METALLIC_STOPS[metallic].cast : color;
+  return (
+    <div className={`overflow-hidden ${className ?? ''}`} style={{ filter }}>
+      <div className="p-3 sm:p-4 transition-colors" style={{ background: hideColor ? 'transparent' : frame }}>
+        <div className="relative rounded-lg overflow-hidden">
+          <img
+            src={src}
+            alt="Your photo against the selected color"
+            className="w-full h-full object-cover object-top"
+            style={{ aspectRatio: '1', display: 'block' }}
+          />
+          {!hideColor && (
+            // Reflected color cast — how the surrounding color "throws" onto the face
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(ellipse 70% 45% at 50% 55%, ${cast}, transparent 75%)`,
+                mixBlendMode: 'soft-light',
+                opacity: 0.5,
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Skin tone analysis ───────────────────────────────────────────────────────
 function analyzeSkin(canvas: HTMLCanvasElement): SkinAnalysis | null {
@@ -194,6 +276,10 @@ export default function KoreanColorAnalysis() {
   const [analyzing, setAnalyzing] = useState(false);
   const [manualSeason, setManualSeason] = useState<Season | null>(null);
   const [selectedColor, setSelectedColor] = useState<ColorSwatch | null>(null);
+  const [compareColor, setCompareColor] = useState<ColorSwatch | null>(null);
+  const [compareMode, setCompareMode] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [paletteTab, setPaletteTab] = useState<'best' | 'avoid'>('best');
   const [lighting, setLighting] = useState<Lighting>('natural');
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -233,16 +319,27 @@ export default function KoreanColorAnalysis() {
     }
   };
 
+  // Pre-select drape colors so the simulator is alive the moment results appear
+  const applySeasonDefaults = (s: Season) => {
+    setSelectedColor(SEASON_DATA[s].colors[0]);
+    setCompareColor(SEASON_DATA[s].avoidColors[0]);
+  };
+
   const runAnalysis = (canvas: HTMLCanvasElement, imgSrc: string) => {
     setCapturedImage(imgSrc);
     stopCamera();
     setManualSeason(null);
     setSelectedColor(null);
+    setCompareColor(null);
+    setCompareMode(false);
+    setShowOriginal(false);
+    setPaletteTab('best');
     setAnalyzing(true);
     setStep('result');
     setTimeout(() => {
       const result = analyzeSkin(canvas);
       setAnalysis(result);
+      if (result) applySeasonDefaults(result.season);
       setAnalyzing(false);
     }, 1300);
   };
@@ -281,6 +378,8 @@ export default function KoreanColorAnalysis() {
     setAnalysis(null);
     setManualSeason(null);
     setSelectedColor(null);
+    setCompareColor(null);
+    setCompareMode(false);
     setStep('capture');
     setCameraError(null);
     stopCamera();
@@ -288,14 +387,87 @@ export default function KoreanColorAnalysis() {
 
   const activeSeason: Season | null = manualSeason ?? analysis?.season ?? null;
   const seasonData = activeSeason ? SEASON_DATA[activeSeason] : null;
+  const lightingFilter = LIGHTING.find(l => l.key === lighting)?.filter ?? 'none';
+
+  const pickSwatch = (c: ColorSwatch) => {
+    if (compareMode) setCompareColor(c);
+    else setSelectedColor(c);
+  };
+
+  // ─── Downloadable result card (1000×1300 PNG) ───────────────────────────────
+  const downloadResultCard = async () => {
+    if (!capturedImage || !activeSeason || !seasonData || !selectedColor) return;
+    const img = new Image();
+    img.src = capturedImage;
+    await img.decode();
+
+    const W = 1000, H = 1300;
+    const card = document.createElement('canvas');
+    card.width = W; card.height = H;
+    const ctx = card.getContext('2d')!;
+
+    // Photo set inside a frame of the selected color (matches on-screen try-on)
+    const s = Math.min(img.width, img.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = selectedColor.hex;
+    ctx.fillRect(0, 0, W, W);
+    const inset = 40;
+    ctx.drawImage(img, (img.width - s) / 2, 0, s, s, inset, inset, W - inset * 2, W - inset * 2);
+
+    // Season text
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 56px system-ui, sans-serif';
+    ctx.fillText(`${seasonData.emoji} ${seasonData.name}`, 48, 1090);
+    ctx.font = '34px system-ui, sans-serif';
+    ctx.fillStyle = '#6B7280';
+    ctx.fillText(`${seasonData.nameKo} · My personal color season`, 48, 1140);
+    ctx.font = '28px system-ui, sans-serif';
+    ctx.fillStyle = '#9CA3AF';
+    ctx.textAlign = 'right';
+    ctx.fillText('coolors.in/korean-color-analysis', W - 48, 1090);
+    ctx.textAlign = 'left';
+
+    // Palette strip
+    const swW = W / seasonData.colors.length;
+    seasonData.colors.forEach((c, i) => {
+      ctx.fillStyle = c.hex;
+      ctx.fillRect(i * swW, 1180, swW, 120);
+    });
+
+    const a = document.createElement('a');
+    a.href = card.toDataURL('image/png');
+    a.download = `my-personal-color-${activeSeason}.png`;
+    a.click();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <SEOHead
-        title="Korean Personal Color Analysis | Coolors"
-        description="Discover your Korean personal color season (퍼스널 컬러). Take a selfie or upload a photo to find whether you're Spring, Summer, Autumn or Winter and get personalised color recommendations."
-        keywords="Korean color analysis, personal color, 퍼스널 컬러, color season analysis, skin tone color, spring summer autumn winter color, personal color test online"
+        title="Korean Color Analysis — Free Personal Color Test | Coolors"
+        description="Find your Korean personal color season (퍼스널 컬러) online. Upload a selfie, try 48 colors against your photo, compare gold vs silver, and download your result card. Free."
+        keywords="Korean color analysis, personal color analysis, 퍼스널 컬러, personal color test online free, color season analysis, skin tone color test, spring summer autumn winter color, warm cool undertone test"
         canonicalPath="/korean-color-analysis"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Korean Personal Color Analysis — Color Try-On Studio",
+          "url": "https://www.coolors.in/korean-color-analysis",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript and a camera or photo upload",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "description": "Free online Korean personal color (퍼스널 컬러) test. Detects your color season from a selfie, lets you try every season color against your photo, compares gold vs silver undertones, and generates a shareable result card.",
+          "featureList": [
+            "Automatic skin-tone and season detection from a selfie",
+            "Live color try-on with your photo",
+            "Best color vs avoid color side-by-side comparison",
+            "Gold vs silver undertone test",
+            "Lighting simulation: daylight, golden hour, office, evening",
+            "Season makeup and hair recommendations",
+            "Downloadable, shareable result card"
+          ]
+        }}
       />
       <Header mobileMenuOpen={false} toggleMobileMenu={() => {}} />
 
@@ -308,7 +480,7 @@ export default function KoreanColorAnalysis() {
             Korean Color Analysis
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm max-w-lg mx-auto">
-            Capture your face, discover your personal color season, and see which colors truly complement your unique skin tone.
+            Upload a selfie, discover your personal color season, and try every color against your own photo — just like a real 퍼스널 컬러 studio session.
           </p>
         </div>
 
@@ -482,7 +654,7 @@ export default function KoreanColorAnalysis() {
                     <div className="grid grid-cols-4 gap-1.5">
                       {(Object.keys(SEASON_DATA) as Season[]).map(s => (
                         <button key={s}
-                          onClick={() => { setManualSeason(s); setSelectedColor(null); }}
+                          onClick={() => { setManualSeason(s); applySeasonDefaults(s); setPaletteTab('best'); }}
                           className={`text-[11px] py-1.5 rounded-lg border font-medium transition-all ${
                             activeSeason === s
                               ? SEASON_DATA[s].badgeCls + ' scale-105'
@@ -497,62 +669,50 @@ export default function KoreanColorAnalysis() {
               </div>
             </div>
 
-            {/* ── Color palette ── */}
-            {!analyzing && seasonData && (
+            {/* ── Virtual Drape Studio ── */}
+            {capturedImage && !analyzing && seasonData && selectedColor && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-                <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
-                  <Sparkles size={16} className="text-purple-500" />
-                  Your Best Colors
-                </h3>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
-                  Click a color to simulate how it looks with your face under different lighting
-                </p>
-                <div className="grid grid-cols-6 sm:grid-cols-12 gap-2 mb-3">
-                  {seasonData.colors.map(c => (
-                    <button key={c.hex}
-                      title={c.name}
-                      onClick={() => setSelectedColor(c)}
-                      className={`aspect-square rounded-xl border-2 transition-all hover:scale-110 ${
-                        selectedColor?.hex === c.hex
-                          ? 'border-gray-900 dark:border-white scale-110 shadow-lg ring-2 ring-purple-400'
-                          : 'border-white dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
-                      }`}
-                      style={{ backgroundColor: c.hex }}
-                    />
-                  ))}
-                </div>
-                {selectedColor && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <div className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 shrink-0"
-                      style={{ backgroundColor: selectedColor.hex }} />
-                    <span className="font-medium">{selectedColor.name}</span>
-                    <span className="font-mono text-xs text-gray-400">{selectedColor.hex.toUpperCase()}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ── Try-on simulator ── */}
-            {capturedImage && selectedColor && !analyzing && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-                <div className="flex items-start justify-between mb-4 gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                   <div>
-                    <h3 className="text-base font-semibold text-gray-800 dark:text-white">Color Try-On Simulator</h3>
+                    <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                      <Palette size={16} className="text-purple-500" /> Color Try-On Studio
+                    </h3>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                      See how <strong className="text-gray-700 dark:text-gray-300">{selectedColor.name}</strong> looks next to your face across lighting conditions
+                      Your photo is set against each color, like a real consultation — watch how your face brightens or dulls
                     </p>
                   </div>
-                  <div className="w-8 h-8 rounded-lg border-2 border-white dark:border-gray-600 shadow shrink-0"
-                    style={{ backgroundColor: selectedColor.hex }} />
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setCompareMode(v => !v)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                        compareMode
+                          ? 'bg-purple-600 text-white border-purple-600 shadow'
+                          : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                      }`}>
+                      <SplitSquareHorizontal size={12} /> Compare
+                    </button>
+                    <button onClick={() => setShowOriginal(v => !v)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                        showOriginal
+                          ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white'
+                          : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                      }`}>
+                      {showOriginal ? <EyeOff size={12} /> : <Eye size={12} />} {showOriginal ? 'Show color' : 'Original'}
+                    </button>
+                    <button onClick={downloadResultCard}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-opacity border border-transparent">
+                      <Download size={12} /> Result card
+                    </button>
+                  </div>
                 </div>
 
                 {/* Lighting toggle */}
-                <div className="flex flex-wrap gap-2 mb-5">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {LIGHTING.map(opt => {
                     const Icon = opt.icon;
                     return (
                       <button key={opt.key}
                         onClick={() => setLighting(opt.key)}
+                        title={opt.desc}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                           lighting === opt.key
                             ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white shadow'
@@ -564,69 +724,137 @@ export default function KoreanColorAnalysis() {
                   })}
                 </div>
 
-                {/* 4-panel lighting grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {LIGHTING.map(opt => {
-                    const Icon = opt.icon;
-                    const isActive = lighting === opt.key;
-                    return (
-                      <div key={opt.key}
-                        onClick={() => setLighting(opt.key)}
-                        className={`rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
-                          isActive
-                            ? 'border-purple-500 shadow-lg shadow-purple-200 dark:shadow-purple-900/50'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                        }`}>
-                        {/* Face + colour band with lighting filter */}
-                        <div style={{ filter: opt.filter }}>
-                          <img
-                            src={capturedImage}
-                            alt={opt.label}
-                            className="w-full object-cover object-top"
-                            style={{ aspectRatio: '1', display: 'block' }}
-                          />
-                          {/* Clothing colour strip */}
-                          <div className="h-10 w-full" style={{ backgroundColor: selectedColor.hex }} />
-                        </div>
-                        <div className={`px-2 py-1.5 text-center ${isActive ? 'bg-purple-50 dark:bg-purple-900/20' : 'bg-gray-50 dark:bg-gray-700'}`}>
-                          <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-gray-700 dark:text-gray-300">
-                            <Icon size={10} /> {opt.label}
+                {/* Draped preview — single or A/B compare */}
+                {!compareMode ? (
+                  <div className="max-w-sm mx-auto">
+                    <TryOnPhoto
+                      src={capturedImage}
+                      color={selectedColor.hex}
+                      hideColor={showOriginal}
+                      filter={lightingFilter}
+                      className="rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                    />
+                    <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <span className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 shrink-0" style={{ backgroundColor: selectedColor.hex }} />
+                      <span className="font-medium">{selectedColor.name}</span>
+                      <span className="font-mono text-xs text-gray-400">{selectedColor.hex.toUpperCase()}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
+                    {[
+                      { swatch: selectedColor, tag: '✓ Your color', tagCls: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+                      (() => {
+                        const swatch = compareColor ?? seasonData.avoidColors[0];
+                        const isAvoid = seasonData.avoidColors.some(c => c.hex === swatch.hex);
+                        return isAvoid
+                          ? { swatch, tag: '✗ Avoid this', tagCls: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' }
+                          : { swatch, tag: '✓ Also suits you', tagCls: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' };
+                      })(),
+                    ].map(({ swatch, tag, tagCls }, i) => (
+                      <div key={i}>
+                        <TryOnPhoto
+                          src={capturedImage}
+                          color={swatch.hex}
+                          hideColor={showOriginal}
+                          filter={lightingFilter}
+                          className="rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                        />
+                        <div className="mt-2 flex flex-col items-center gap-1">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${tagCls}`}>{tag}</span>
+                          <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+                            <span className="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-600 shrink-0" style={{ backgroundColor: swatch.hex }} />
+                            <span className="font-medium">{swatch.name}</span>
                           </div>
-                          <p className="text-[10px] text-gray-400 dark:text-gray-500">{opt.desc}</p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-
-                {/* Colour info bar */}
-                <div className="mt-4 flex items-center gap-3 bg-gray-50 dark:bg-gray-700 rounded-xl p-3">
-                  <div className="w-8 h-8 rounded-lg shadow border border-white dark:border-gray-600 shrink-0"
-                    style={{ backgroundColor: selectedColor.hex }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 dark:text-white">{selectedColor.name}</p>
-                    <p className="font-mono text-xs text-gray-400 dark:text-gray-500">{selectedColor.hex.toUpperCase()}</p>
+                    ))}
                   </div>
-                  {seasonData && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full border font-medium shrink-0 ${seasonData.badgeCls}`}>
-                      {seasonData.name} ✓
-                    </span>
-                  )}
+                )}
+
+                {/* Swatch picker with Best / Avoid tabs */}
+                <div className="mt-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <button onClick={() => setPaletteTab('best')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                        paletteTab === 'best'
+                          ? 'bg-green-600 text-white border-green-600'
+                          : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                      }`}>
+                      <span className="inline-flex items-center gap-1"><Check size={11} /> Best for you</span>
+                    </button>
+                    <button onClick={() => setPaletteTab('avoid')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                        paletteTab === 'avoid'
+                          ? 'bg-red-500 text-white border-red-500'
+                          : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                      }`}>
+                      <span className="inline-flex items-center gap-1"><X size={11} /> Colors to avoid</span>
+                    </button>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 ml-auto">
+                      {compareMode ? 'Tap a color to change the right photo' : 'Tap a color to try it'}
+                    </p>
+                  </div>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-2">
+                    Best and avoid colors are specific to your season — a shade that flatters one season often washes out another.
+                  </p>
+                  <div className="grid grid-cols-6 sm:grid-cols-12 gap-2">
+                    {(paletteTab === 'best' ? seasonData.colors : seasonData.avoidColors).map(c => {
+                      const isActive = (compareMode ? compareColor?.hex : selectedColor.hex) === c.hex;
+                      return (
+                        <button key={c.hex}
+                          title={c.name}
+                          onClick={() => pickSwatch(c)}
+                          className={`aspect-square rounded-xl border-2 transition-all hover:scale-110 ${
+                            isActive
+                              ? 'border-gray-900 dark:border-white scale-110 shadow-lg ring-2 ring-purple-400'
+                              : 'border-white dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* ── Prompt to select a color ── */}
-            {!selectedColor && !analyzing && seasonData && (
-              <p className="text-center text-sm text-purple-500 dark:text-purple-400 animate-pulse">
-                ↑ Select a color above to launch the try-on simulator
-              </p>
+            {/* ── Gold vs Silver undertone test ── */}
+            {capturedImage && !analyzing && seasonData && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+                <h3 className="text-base font-semibold text-gray-800 dark:text-white flex items-center gap-2 mb-1">
+                  <Sparkles size={16} className="text-amber-500" /> Gold vs Silver Test
+                </h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                  The classic undertone check — which metal makes your skin glow? Gold flatters warm tones (Spring/Autumn), silver flatters cool tones (Summer/Winter).
+                </p>
+                <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
+                  {(['gold', 'silver'] as const).map(metal => (
+                    <div key={metal}>
+                      <TryOnPhoto
+                        src={capturedImage}
+                        metallic={metal}
+                        filter={lightingFilter}
+                        className="rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-sm"
+                      />
+                      <p className="mt-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 capitalize">
+                        {metal === 'gold' ? '🥇 Gold — warm undertone' : '🥈 Silver — cool undertone'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {analysis && (
+                  <p className="mt-3 text-center text-xs text-gray-500 dark:text-gray-400">
+                    Based on your skin tone, <strong className="text-gray-700 dark:text-gray-200">{analysis.isWarm ? 'gold' : 'silver'}</strong> should suit you better.
+                  </p>
+                )}
+              </div>
             )}
 
-            {/* ── Good / Avoid ── */}
+            {/* ── Good / Avoid + Makeup ── */}
             {!analyzing && seasonData && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <h4 className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1.5 mb-2">
                       <Check size={13} /> Colors that suit you
@@ -651,7 +879,37 @@ export default function KoreanColorAnalysis() {
                       ))}
                     </div>
                   </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-400 flex items-center gap-1.5 mb-2">
+                      <Sparkles size={13} /> Makeup & hair
+                    </h4>
+                    <ul className="space-y-1">
+                      {seasonData.makeup.map(m => (
+                        <li key={m} className="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-1.5">
+                          <span className="text-purple-400 mt-0.5">•</span> {m}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
+              </div>
+            )}
+
+            {/* ── Learn more CTA ── */}
+            {!analyzing && seasonData && (
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-100 dark:border-purple-800 p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-white">
+                    What does {seasonData.name} ({seasonData.nameKo}) mean?
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    Read the full guide to Korean personal color analysis — seasons, undertones and wardrobe tips.
+                  </p>
+                </div>
+                <a href="/korean-color-analysis-guide"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 rounded-xl text-sm font-semibold hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors shrink-0">
+                  Read the guide <ArrowRight size={14} />
+                </a>
               </div>
             )}
 

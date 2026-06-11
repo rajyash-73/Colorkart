@@ -17,13 +17,10 @@ export interface SEOHeadProps {
   noIndex?: boolean;
 }
 
-// All language/locale variants we target — same URL, multiple hreflang entries
-const HREFLANG = [
-  'x-default', 'en', 'en-US', 'en-GB', 'en-IN', 'en-AU', 'en-CA',
-  'zh-CN', 'zh-TW', 'de', 'fr', 'es', 'pt', 'it', 'nl', 'ko', 'ja',
-];
-
-const OG_LOCALES_ALT = ['en_GB', 'en_IN', 'zh_CN', 'de_DE', 'fr_FR', 'es_ES', 'pt_BR'];
+// Single-language site: hreflang only needs the default + language entry.
+// Pointing many locales (zh, de, fr…) at one English URL is invalid hreflang
+// and sends Google conflicting geo signals. Primary market: US.
+const HREFLANG = ['x-default', 'en'];
 
 export default function SEOHead({
   title,
@@ -52,7 +49,7 @@ export default function SEOHead({
       <meta name="author" content="Coolors" />
       <link rel="canonical" href={canonicalUrl} />
 
-      {/* ── hreflang — US · UK · Europe · India · China ───── */}
+      {/* ── hreflang ─────────────────────────────────────── */}
       {HREFLANG.map(hl => (
         <link key={hl} rel="alternate" hrefLang={hl} href={canonicalUrl} />
       ))}
@@ -68,9 +65,6 @@ export default function SEOHead({
       <meta property="og:image:alt" content={title} />
       <meta property="og:site_name" content="Coolors" />
       <meta property="og:locale" content="en_US" />
-      {OG_LOCALES_ALT.map(loc => (
-        <meta key={loc} property="og:locale:alternate" content={loc} />
-      ))}
 
       {/* ── Twitter / X Card ─────────────────────────────── */}
       <meta name="twitter:card" content="summary_large_image" />

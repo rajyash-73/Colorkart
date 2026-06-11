@@ -223,8 +223,8 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
         title="Free Color Palette Generator | Coolors"
-        description="Generate beautiful color palettes instantly. Free online color scheme tool for designers, developers & artists. Trusted by users worldwide."
-        keywords="color palette generator, colour palette generator, free color palette, color scheme generator, colour scheme generator, color combinations, CSS color palette, hex color picker, web design colors, UI color tool, color theory, Korean color analysis, personal color season, skin tone color analysis, 配色方案生成器, रंग पैलेट, Farbpaletten-Generator, générateur de palette de couleurs"
+        description="Generate beautiful color palettes instantly. Free color scheme generator for designers, developers & artists — explore trending palettes, check contrast, export CSS & Tailwind."
+        keywords="color palette generator, color palettes, free color palette, color scheme generator, color schemes, color combinations, trending color palettes, CSS color palette, hex color picker, web design colors, UI color tool, color theory"
         canonicalPath="/"
         structuredData={[
           {

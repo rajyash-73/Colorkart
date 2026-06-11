@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Heart, Share2, Download, Copy, ArrowRight, Plus, X, Palette, Filter } from 'lucide-react';
+import { FaPinterestP, FaXTwitter } from 'react-icons/fa6';
 import { Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase, SupabasePalette } from '@/lib/supabase';
@@ -24,6 +25,16 @@ const STATIC_PALETTES: SupabasePalette[] = POPULAR_PALETTES.map((p, i) => ({
   created_at: new Date(BASE_DATE - i * 86_400_000).toISOString(),
 }));
 
+// ─── Social sharing — every share carries a link back to the site ────────────
+// Always the canonical production URL: Pinterest rejects pins that link to
+// localhost/preview hosts, and backlinks must point at the www domain anyway.
+const SHARE_ORIGIN = 'https://www.coolors.in';
+const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
+const paletteCaption = (p: SupabasePalette) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+
+const openPopup = (url: string) =>
+  window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
+
 const COLOR_TAGS = ['Red','Orange','Yellow','Green','Blue','Violet','Pink','Brown','Black','White','Gray','Turquoise'];
 const STYLE_TAGS = ['Warm','Cold','Bright','Dark','Pastel','Vintage','Monochromatic','Gradient','Rainbow'];
 const TOPIC_TAGS = ['Christmas','Halloween','Pride','Sunset','Spring','Winter','Summer','Autumn','Gold','Wedding','Party','Space','Nature','City','Food','Happy'];
@@ -33,14 +44,17 @@ function PaletteCard({
   onApply,
   onLike,
   likedIds,
+  highlighted,
 }: {
   palette: SupabasePalette;
   onApply: (p: SupabasePalette) => void;
   onLike: (id: string) => void;
   likedIds: Set<string>;
+  highlighted?: boolean;
 }) {
   const { toast } = useToast();
   const liked = likedIds.has(palette.id);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const copyCSS = () => {
     const vars = palette.colors.map((c, i) => `  --color-${i + 1}: ${c};`).join('\n');
@@ -48,18 +62,36 @@ function PaletteCard({
     toast({ title: 'CSS copied!' });
   };
 
-  const share = async () => {
-    const url = `${window.location.origin}/explore?palette=${palette.id}`;
-    if (navigator.share) {
-      await navigator.share({ title: palette.name, url }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(url).catch(() => {});
-      toast({ title: 'Link copied!' });
-    }
+  const sharePinterest = () => {
+    setShareOpen(false);
+    openPopup(
+      `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
+      `&media=${encodeURIComponent('https://www.coolors.in/og-image.png')}` +
+      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
+    );
+  };
+
+  const shareX = () => {
+    setShareOpen(false);
+    openPopup(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(paletteCaption(palette))}` +
+      `&url=${encodeURIComponent(paletteUrl(palette.id))}` +
+      `&hashtags=${encodeURIComponent('colorpalette,design')}`,
+    );
+  };
+
+  const copyLink = () => {
+    setShareOpen(false);
+    navigator.clipboard.writeText(paletteUrl(palette.id)).catch(() => {});
+    toast({ title: 'Link copied!' });
   };
 
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all duration-200">
+    <div
+      id={`palette-${palette.id}`}
+      className={`group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md border transition-all duration-200 ${
+        highlighted ? 'border-violet-400 ring-2 ring-violet-400' : 'border-gray-100 dark:border-gray-700'
+      }`}>
       <div className="flex h-24 relative">
         {palette.colors.map((color, i) => (
           <div
@@ -92,9 +124,27 @@ function PaletteCard({
           <button onClick={copyCSS} className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
             <Copy size={12} />CSS
           </button>
-          <button onClick={share} className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
-            <Share2 size={12} />Share
-          </button>
+          <div className="relative">
+            <button onClick={() => setShareOpen(v => !v)} className={`flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors ${shareOpen ? 'text-green-600 bg-green-50 dark:bg-green-900/20' : 'text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20'}`}>
+              <Share2 size={12} />Share
+            </button>
+            {shareOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShareOpen(false)} />
+                <div className="absolute bottom-full left-0 mb-1.5 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[160px]">
+                  <button onClick={sharePinterest} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                    <FaPinterestP size={13} className="text-[#E60023]" /> Pin to Pinterest
+                  </button>
+                  <button onClick={shareX} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <FaXTwitter size={13} /> Post on X
+                  </button>
+                  <button onClick={copyLink} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 transition-colors">
+                    <Copy size={13} /> Copy link
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           <button
             onClick={() => onApply(palette)}
             className="ml-auto flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-violet-500 text-white hover:bg-violet-600 transition-colors font-medium"
@@ -181,6 +231,19 @@ export default function ExplorePage() {
     setFiltered(result);
   }, [search, activeTags, palettes, sortBy]);
 
+  // Shared links (?palette=<id>) scroll to and highlight the target palette,
+  // so clicks arriving from Pinterest/X land on the exact palette shared
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('palette');
+    if (id) setHighlightId(id);
+  }, []);
+  useEffect(() => {
+    if (!highlightId || loading) return;
+    const el = document.getElementById(`palette-${highlightId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightId, loading, filtered]);
+
   const handleApply = (palette: SupabasePalette) => {
     const colors = palette.colors.map(hex => ({
       hex,
@@ -236,9 +299,9 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="Explore Color Palettes | Coolors"
-        description="Browse thousands of curated color palettes. Discover trending combinations, save favorites and get inspired. Free palette library."
-        keywords="color palette ideas, explore color palettes, colour palette ideas, color scheme examples, color inspiration, popular color combinations, color scheme library, colour combinations, design color inspiration, palette collection"
+        title="Explore Trending Color Palettes | Coolors"
+        description="Browse trending color palettes for designers and artists — pastel, vintage, retro, neon, dark and more. Save favorites and apply any palette to the generator, free."
+        keywords="trending color palettes, color palettes for designers, color palette ideas, explore color palettes, pastel color palette, vintage color palette, retro color palette, color scheme examples, color inspiration, popular color combinations"
         canonicalPath="/explore"
         structuredData={{
           "@context": "https://schema.org",
@@ -268,6 +331,13 @@ export default function ExplorePage() {
             Browse hand-curated color palettes — from warm earth tones to cool modern monochromes.
             Click any palette to apply it to the generator instantly. Filter by color, style or mood.
             Free to use, sign-up to save unlimited color palettes.
+          </p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
+            <span className="flex items-center gap-1 text-violet-500 dark:text-violet-400 font-medium">
+              <Share2 size={12} /> Love a palette?
+            </span>
+            Share it to <FaPinterestP size={11} className="text-[#E60023] inline" /> Pinterest or
+            <FaXTwitter size={11} className="inline" /> X from any card — every share helps other designers find it.
           </p>
 
           {/* Search bar */}
@@ -377,6 +447,7 @@ export default function ExplorePage() {
                 onApply={handleApply}
                 onLike={handleLike}
                 likedIds={likedIds}
+                highlighted={palette.id === highlightId}
               />
             ))}
           </div>

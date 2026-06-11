@@ -354,8 +354,8 @@ function PaletteApp() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <SEOHead
-        title="Color Palette Generator | Coolors"
-        description="Create perfect color palettes using color theory — complementary, analogous, triadic schemes. Free palette maker for designers worldwide."
+        title="Color Palette Generator — Fast & Free | Coolors"
+        description="Press spacebar to generate color schemes fast. Lock colors you love, pick complementary, analogous or triadic modes, export CSS & Tailwind. Free, no sign-up."
         keywords="color palette generator, random color generator, colour palette generator, color scheme maker, complementary colors, analogous colors, triadic colors, CSS color variables, hex color generator, palette maker online, color theory tool, design color picker, color harmony generator"
         canonicalPath="/generator"
         structuredData={{
