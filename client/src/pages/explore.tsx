@@ -31,6 +31,8 @@ const STATIC_PALETTES: SupabasePalette[] = POPULAR_PALETTES.map((p, i) => ({
 const SHARE_ORIGIN = 'https://www.coolors.in';
 const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
 const paletteCaption = (p: SupabasePalette) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+// Hexes without '#', '-'-joined — the format /api/palette-image and /api/palette-share expect.
+const colorsParam = (p: SupabasePalette) => p.colors.map(c => c.replace('#', '')).join('-');
 
 const openPopup = (url: string) =>
   window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
@@ -66,16 +68,20 @@ function PaletteCard({
     setShareOpen(false);
     openPopup(
       `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
-      `&media=${encodeURIComponent('https://www.coolors.in/og-image.png')}` +
+      `&media=${encodeURIComponent(`${SHARE_ORIGIN}/api/palette-image?c=${colorsParam(palette)}&layout=tall`)}` +
       `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
     );
   };
 
   const shareX = () => {
     setShareOpen(false);
+    // Share the landing page, not /explore directly — X scrapes its og:image,
+    // which is the rendered palette PNG, so the card shows this exact palette.
+    const shareUrl = `${SHARE_ORIGIN}/api/palette-share?id=${encodeURIComponent(palette.id)}` +
+      `&n=${encodeURIComponent(palette.name)}&c=${colorsParam(palette)}`;
     openPopup(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(paletteCaption(palette))}` +
-      `&url=${encodeURIComponent(paletteUrl(palette.id))}` +
+      `&url=${encodeURIComponent(shareUrl)}` +
       `&hashtags=${encodeURIComponent('colorpalette,design')}`,
     );
   };
