@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, ArrowRight, Heart, User, Star, Globe, Users, Sparkles, Share2, Copy } from 'lucide-react';
 import { FaPinterestP, FaXTwitter } from 'react-icons/fa6';
 import { Color } from '../types/Color';
@@ -57,6 +58,39 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
   const [loading, setLoading] = useState(false);
   const [showCount, setShowCount] = useState(16);
   const [shareOpenId, setShareOpenId] = useState<string | null>(null);
+  const [sharePos, setSharePos] = useState<{ top: number; left: number; openUp: boolean } | null>(null);
+
+  // Close the share menu on Escape, scroll, or resize — and reposition is moot once closed.
+  useEffect(() => {
+    if (!shareOpenId) return;
+    const close = () => setShareOpenId(null);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [shareOpenId]);
+
+  // Menu is rendered in a portal at the document root with a max z-index — ad
+  // slots on this page use near-max z-index and clip in-place absolute menus.
+  const MENU_W = 150;
+  const MENU_H = 116;
+  const toggleShare = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (shareOpenId === id) { setShareOpenId(null); return; }
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const openUp = rect.bottom + MENU_H + 8 > window.innerHeight;
+    setSharePos({
+      top: openUp ? rect.top - MENU_H - 4 : rect.bottom + 4,
+      left: Math.min(rect.right - MENU_W, window.innerWidth - MENU_W - 8),
+      openUp,
+    });
+    setShareOpenId(id);
+  };
 
   // Fetch public community palettes on mount
   useEffect(() => {
@@ -325,7 +359,7 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
                 {/* Share — overlay button on the color strips */}
                 <div className="absolute top-1.5 right-1.5">
                   <button
-                    onClick={e => { e.stopPropagation(); setShareOpenId(v => v === p.id ? null : p.id); }}
+                    onClick={e => toggleShare(e, p.id)}
                     className={`p-1.5 rounded-full backdrop-blur-sm transition-colors ${
                       shareOpenId === p.id
                         ? 'bg-white text-violet-600'
@@ -335,27 +369,37 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
                   >
                     <Share2 size={11} />
                   </button>
-                  {shareOpenId === p.id && (
-                    <>
-                      <div className="fixed inset-0 z-20" onClick={e => { e.stopPropagation(); setShareOpenId(null); }} />
-                      <div className="absolute top-full right-0 mt-1 z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[150px]">
-                        <button onClick={e => sharePinterest(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
-                          <FaPinterestP size={13} className="text-[#E60023]" /> Pin to Pinterest
-                        </button>
-                        <button onClick={e => shareX(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                          <FaXTwitter size={13} /> Post on X
-                        </button>
-                        <button onClick={e => copyShareLink(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 transition-colors">
-                          <Copy size={13} /> Copy link
-                        </button>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        {/* Share menu — rendered in a portal so it can sit above third-party ad overlays (z-index ~2147483535) */}
+        {shareOpenId && sharePos && (() => {
+          const p = displayPalettes.find(pl => pl.id === shareOpenId);
+          if (!p) return null;
+          return createPortal(
+            <>
+              <div className="fixed inset-0" style={{ zIndex: 2147483646 }} onClick={() => setShareOpenId(null)} />
+              <div
+                className="fixed bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[150px]"
+                style={{ zIndex: 2147483647, top: sharePos.top, left: sharePos.left }}
+              >
+                <button onClick={e => sharePinterest(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                  <FaPinterestP size={13} className="text-[#E60023]" /> Pin to Pinterest
+                </button>
+                <button onClick={e => shareX(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <FaXTwitter size={13} /> Post on X
+                </button>
+                <button onClick={e => copyShareLink(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 transition-colors">
+                  <Copy size={13} /> Copy link
+                </button>
+              </div>
+            </>,
+            document.body,
+          );
+        })()}
 
         {displayPalettes.length > showCount && (
           <div className="mt-6 text-center">
