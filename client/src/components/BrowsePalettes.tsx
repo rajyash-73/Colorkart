@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, ArrowRight, Heart, User, Star, Globe, Users, Sparkles, Share2 } from 'lucide-react';
+import { Search, ArrowRight, Heart, User, Star, Globe, Users, Sparkles, Share2, Copy } from 'lucide-react';
+import { FaPinterestP, FaXTwitter } from 'react-icons/fa6';
 import { Color } from '../types/Color';
 import { getColorName } from '@/lib/colorUtils';
 import { POPULAR_PALETTES } from '@/lib/palettesData';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 interface BrowsePalettesProps {
   onSelectPalette: (colors: Color[]) => void;
@@ -36,13 +38,24 @@ const STATIC_PALETTES: PaletteItem[] = POPULAR_PALETTES.map(p => ({
 
 type Tab = 'all' | 'popular' | 'saved';
 
+// ─── Social sharing — same scheme as the explore page, every share links back ─
+const SHARE_ORIGIN = 'https://www.coolors.in';
+const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
+const paletteCaption = (p: PaletteItem) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+const colorsParam = (p: PaletteItem) => p.colors.map(c => c.replace('#', '')).join('-');
+
+const openPopup = (url: string) =>
+  window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
+
 export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalettesProps) {
+  const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [communityPalettes, setCommunityPalettes] = useState<PaletteItem[]>([]);
   const [savedPalettes, setSavedPalettes] = useState<PaletteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCount, setShowCount] = useState(16);
+  const [shareOpenId, setShareOpenId] = useState<string | null>(null);
 
   // Fetch public community palettes on mount
   useEffect(() => {
@@ -96,6 +109,35 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
       } catch {}
     })();
   }, [userId]);
+
+  const sharePinterest = (e: React.MouseEvent, palette: PaletteItem) => {
+    e.stopPropagation();
+    setShareOpenId(null);
+    openPopup(
+      `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
+      `&media=${encodeURIComponent(`${SHARE_ORIGIN}/api/palette-image?c=${colorsParam(palette)}&layout=tall`)}` +
+      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
+    );
+  };
+
+  const shareX = (e: React.MouseEvent, palette: PaletteItem) => {
+    e.stopPropagation();
+    setShareOpenId(null);
+    const shareUrl = `${SHARE_ORIGIN}/api/palette-share?id=${encodeURIComponent(palette.id)}` +
+      `&n=${encodeURIComponent(palette.name)}&c=${colorsParam(palette)}`;
+    openPopup(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(paletteCaption(palette))}` +
+      `&url=${encodeURIComponent(shareUrl)}` +
+      `&hashtags=${encodeURIComponent('colorpalette,design')}`,
+    );
+  };
+
+  const copyShareLink = (e: React.MouseEvent, palette: PaletteItem) => {
+    e.stopPropagation();
+    setShareOpenId(null);
+    navigator.clipboard.writeText(paletteUrl(palette.id)).catch(() => {});
+    toast({ title: 'Link copied!' });
+  };
 
   const togglePublic = async (e: React.MouseEvent, palette: PaletteItem) => {
     e.stopPropagation();
@@ -233,48 +275,80 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
             {displayPalettes.slice(0, showCount).map(p => (
               <div
                 key={p.id}
-                onClick={() => onSelectPalette(p.colors.map(hexToColor))}
-                className="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 cursor-pointer group"
+                className="relative rounded-xl border border-gray-100 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 group"
               >
-                {/* Color strips */}
-                <div className="flex h-14">
-                  {p.colors.map((c, i) => (
-                    <div key={i} className="flex-1" style={{ backgroundColor: c }} />
-                  ))}
-                </div>
-                {/* Footer */}
-                <div className="px-3 py-2 bg-white dark:bg-gray-800">
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">{p.name}</p>
-                      <p className="text-[10px] text-gray-400 leading-tight">{p.colors.length} colors</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
-                      {p.likes > 0 && (
-                        <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
-                          <Heart size={10} className="text-pink-400" />{p.likes}
-                        </span>
-                      )}
-                      {p.source === 'saved' && <User size={11} className="text-violet-400" />}
-                      {p.source === 'static' && p.likes >= 1500 && <Star size={11} className="text-amber-400" />}
-                      <span className="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:bg-violet-100 dark:group-hover:bg-violet-900 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
-                        <ArrowRight size={11} />
-                      </span>
-                    </div>
+                <div onClick={() => onSelectPalette(p.colors.map(hexToColor))} className="rounded-xl overflow-hidden cursor-pointer">
+                  {/* Color strips */}
+                  <div className="flex h-14">
+                    {p.colors.map((c, i) => (
+                      <div key={i} className="flex-1" style={{ backgroundColor: c }} />
+                    ))}
                   </div>
-                  {/* Make Public / Make Private — only in My Saved tab */}
-                  {tab === 'saved' && p.source === 'saved' && (
-                    <button
-                      onClick={e => togglePublic(e, p)}
-                      className={`mt-2 w-full flex items-center justify-center gap-1 py-1 rounded-lg text-[10px] font-medium transition-colors ${
-                        p.is_public
-                          ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40'
-                          : 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400'
-                      }`}
-                    >
-                      <Share2 size={9} />
-                      {p.is_public ? 'Make Private' : 'Make Public'}
-                    </button>
+                  {/* Footer */}
+                  <div className="px-3 py-2 bg-white dark:bg-gray-800">
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate leading-tight">{p.name}</p>
+                        <p className="text-[10px] text-gray-400 leading-tight">{p.colors.length} colors</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                        {p.likes > 0 && (
+                          <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
+                            <Heart size={10} className="text-pink-400" />{p.likes}
+                          </span>
+                        )}
+                        {p.source === 'saved' && <User size={11} className="text-violet-400" />}
+                        {p.source === 'static' && p.likes >= 1500 && <Star size={11} className="text-amber-400" />}
+                        <span className="p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 group-hover:bg-violet-100 dark:group-hover:bg-violet-900 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
+                          <ArrowRight size={11} />
+                        </span>
+                      </div>
+                    </div>
+                    {/* Make Public / Make Private — only in My Saved tab */}
+                    {tab === 'saved' && p.source === 'saved' && (
+                      <button
+                        onClick={e => togglePublic(e, p)}
+                        className={`mt-2 w-full flex items-center justify-center gap-1 py-1 rounded-lg text-[10px] font-medium transition-colors ${
+                          p.is_public
+                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40'
+                            : 'bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400'
+                        }`}
+                      >
+                        <Share2 size={9} />
+                        {p.is_public ? 'Make Private' : 'Make Public'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Share — overlay button on the color strips */}
+                <div className="absolute top-1.5 right-1.5">
+                  <button
+                    onClick={e => { e.stopPropagation(); setShareOpenId(v => v === p.id ? null : p.id); }}
+                    className={`p-1.5 rounded-full backdrop-blur-sm transition-colors ${
+                      shareOpenId === p.id
+                        ? 'bg-white text-violet-600'
+                        : 'bg-black/25 text-white opacity-0 group-hover:opacity-100 hover:bg-black/40'
+                    }`}
+                    title="Share palette"
+                  >
+                    <Share2 size={11} />
+                  </button>
+                  {shareOpenId === p.id && (
+                    <>
+                      <div className="fixed inset-0 z-20" onClick={e => { e.stopPropagation(); setShareOpenId(null); }} />
+                      <div className="absolute top-full right-0 mt-1 z-30 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[150px]">
+                        <button onClick={e => sharePinterest(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                          <FaPinterestP size={13} className="text-[#E60023]" /> Pin to Pinterest
+                        </button>
+                        <button onClick={e => shareX(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                          <FaXTwitter size={13} /> Post on X
+                        </button>
+                        <button onClick={e => copyShareLink(e, p)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 transition-colors">
+                          <Copy size={13} /> Copy link
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </div>

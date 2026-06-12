@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Loader2, Plus, Share2, Copy, Check, Globe, Users, Sparkles } from "lucide-react";
+import { FaPinterestP, FaXTwitter } from "react-icons/fa6";
 import { supabase } from "@/lib/supabase";
 import { getColorName } from "@/lib/colorUtils";
 import SEOHead from '@/components/SEOHead';
@@ -15,6 +16,15 @@ type SavedPalette = {
   created_at: string;
   is_public: boolean;
 };
+
+// ─── Social sharing — same scheme as the explore page, every share links back ─
+const SHARE_ORIGIN = 'https://www.coolors.in';
+const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
+const paletteCaption = (p: SavedPalette) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+const colorsParam = (p: SavedPalette) => p.colors.map(c => c.replace('#', '')).join('-');
+
+const openPopup = (url: string) =>
+  window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -33,6 +43,7 @@ export default function SavedPalettes() {
   const [palettes, setPalettes] = useState<SavedPalette[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [shareOpenId, setShareOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPalettes = async () => {
@@ -76,6 +87,32 @@ export default function SavedPalettes() {
     }));
     localStorage.setItem('pendingPalette', JSON.stringify(colors));
     window.location.href = '/generator';
+  };
+
+  const sharePinterest = (palette: SavedPalette) => {
+    setShareOpenId(null);
+    openPopup(
+      `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
+      `&media=${encodeURIComponent(`${SHARE_ORIGIN}/api/palette-image?c=${colorsParam(palette)}&layout=tall`)}` +
+      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
+    );
+  };
+
+  const shareX = (palette: SavedPalette) => {
+    setShareOpenId(null);
+    const shareUrl = `${SHARE_ORIGIN}/api/palette-share?id=${encodeURIComponent(palette.id)}` +
+      `&n=${encodeURIComponent(palette.name)}&c=${colorsParam(palette)}`;
+    openPopup(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(paletteCaption(palette))}` +
+      `&url=${encodeURIComponent(shareUrl)}` +
+      `&hashtags=${encodeURIComponent('colorpalette,design')}`,
+    );
+  };
+
+  const copyShareLink = (palette: SavedPalette) => {
+    setShareOpenId(null);
+    navigator.clipboard.writeText(paletteUrl(palette.id)).catch(() => {});
+    toast({ title: 'Link copied!' });
   };
 
   const togglePublic = async (palette: SavedPalette) => {
@@ -183,6 +220,30 @@ export default function SavedPalettes() {
                     <button onClick={() => togglePublic(palette)} className="flex items-center gap-1 px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-green-400 transition-colors">
                       <Share2 size={11} />{palette.is_public ? 'Make Private' : 'Make Public'}
                     </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShareOpenId(v => v === palette.id ? null : palette.id)}
+                        className={`flex items-center gap-1 px-3 py-1.5 text-xs border rounded-lg transition-colors ${shareOpenId === palette.id ? 'border-violet-400 text-violet-600' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-violet-400'}`}
+                      >
+                        <FaXTwitter size={11} />Share
+                      </button>
+                      {shareOpenId === palette.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setShareOpenId(null)} />
+                          <div className="absolute bottom-full left-0 mb-1.5 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-1.5 min-w-[160px]">
+                            <button onClick={() => sharePinterest(palette)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors">
+                              <FaPinterestP size={13} className="text-[#E60023]" /> Pin to Pinterest
+                            </button>
+                            <button onClick={() => shareX(palette)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                              <FaXTwitter size={13} /> Post on X
+                            </button>
+                            <button onClick={() => copyShareLink(palette)} className="flex items-center gap-2 w-full text-left text-xs px-2.5 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-600 transition-colors">
+                              <Copy size={13} /> Copy link
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                     <button
                       onClick={() => handleDelete(palette.id)}
                       disabled={deletingId === palette.id}
