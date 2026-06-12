@@ -1,6 +1,7 @@
 // Zero-dependency palette PNG renderer for social share images.
 // Files prefixed with "_" in /api are shared modules, not deployed as functions.
 import zlib from 'zlib';
+import { getColorName } from './_color-names.js';
 
 // ─── Minimal PNG encoder (color type 2 = RGB, bit depth 8) ───────────────────
 const CRC_TABLE = (() => {
@@ -68,6 +69,27 @@ const FONT = {
   'D': ['11110','10001','10001','10001','10001','10001','11110'],
   'E': ['11111','10000','10000','11110','10000','10000','11111'],
   'F': ['11111','10000','10000','11110','10000','10000','10000'],
+  'G': ['01110','10001','10000','10110','10001','10001','01111'],
+  'H': ['10001','10001','10001','11111','10001','10001','10001'],
+  'I': ['01110','00100','00100','00100','00100','00100','01110'],
+  'J': ['00111','00001','00001','00001','10001','10001','01110'],
+  'K': ['10001','10010','10100','11000','10100','10010','10001'],
+  'L': ['10000','10000','10000','10000','10000','10000','11111'],
+  'M': ['10001','11011','10101','10101','10101','10001','10001'],
+  'N': ['10001','11001','10101','10101','10011','10001','10001'],
+  'O': ['01110','10001','10001','10001','10001','10001','01110'],
+  'P': ['11110','10001','10001','11110','10000','10000','10000'],
+  'Q': ['01110','10001','10001','10001','10101','10010','01101'],
+  'R': ['11110','10001','10001','11110','10100','10010','10001'],
+  'S': ['01111','10000','10000','01110','00001','00001','11110'],
+  'T': ['11111','00100','00100','00100','00100','00100','00100'],
+  'U': ['10001','10001','10001','10001','10001','10001','01110'],
+  'V': ['10001','10001','10001','10001','10001','01010','00100'],
+  'W': ['10001','10001','10001','10101','10101','10101','01010'],
+  'X': ['10001','10001','01010','00100','01010','10001','10001'],
+  'Y': ['10001','10001','01010','00100','00100','00100','00100'],
+  'Z': ['11111','00001','00010','00100','01000','10000','11111'],
+  ' ': ['00000','00000','00000','00000','00000','00000','00000'],
 };
 
 const GLYPH_W = 6; // 5px glyph + 1px gap, in font units
@@ -95,6 +117,14 @@ function drawText(rgb, W, text, x0, y0, scale, [r, g, b]) {
 
 const textWidth = (text, scale) => text.length * GLYPH_W * scale - scale;
 
+// Largest scale (within [minScale, maxScale]) at which every label fits maxWidth.
+function fitScale(labels, maxWidth, maxScale = 5, minScale = 2) {
+  for (let s = maxScale; s >= minScale; s--) {
+    if (labels.every(l => textWidth(l, s) <= maxWidth)) return s;
+  }
+  return minScale;
+}
+
 function parseHex(hex) {
   return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
 }
@@ -115,7 +145,8 @@ export function palettePng(colors, layout = 'wide') {
 
   colors.forEach((hex, i) => {
     const [r, g, b] = parseHex(hex);
-    const label = `#${hex.toUpperCase()}`;
+    const hexLabel = `#${hex.toUpperCase()}`;
+    const nameLabel = getColorName(hex).toUpperCase();
     const ink = isLight([r, g, b]) ? [20, 24, 31] : [255, 255, 255];
 
     if (layout === 'tall') {
@@ -127,7 +158,9 @@ export function palettePng(colors, layout = 'wide') {
           rgb[p] = r; rgb[p + 1] = g; rgb[p + 2] = b;
         }
       }
-      drawText(rgb, W, label, 48, y1 - 7 * scale - 36, scale, ink);
+      const hexY = y1 - 7 * scale - 36;
+      drawText(rgb, W, nameLabel, 48, hexY - 7 * scale - 10, scale, ink);
+      drawText(rgb, W, hexLabel, 48, hexY, scale, ink);
     } else {
       const x0 = Math.floor((i * W) / n);
       const x1 = Math.floor(((i + 1) * W) / n);
@@ -137,8 +170,19 @@ export function palettePng(colors, layout = 'wide') {
           rgb[p] = r; rgb[p + 1] = g; rgb[p + 2] = b;
         }
       }
-      const tw = textWidth(label, scale);
-      drawText(rgb, W, label, x0 + Math.max(8, Math.floor((x1 - x0 - tw) / 2)), H - 7 * scale - 44, scale, ink);
+      const segW = x1 - x0;
+      const avail = segW - 16;
+      let s = fitScale([hexLabel, nameLabel], avail, 5, 2);
+      const showName = textWidth(nameLabel, s) <= avail;
+      if (!showName) s = fitScale([hexLabel], avail, 5, 2);
+
+      const hexY = H - 7 * s - 44;
+      const hexX = x0 + Math.max(8, Math.floor((segW - textWidth(hexLabel, s)) / 2));
+      drawText(rgb, W, hexLabel, hexX, hexY, s, ink);
+      if (showName) {
+        const nameX = x0 + Math.max(8, Math.floor((segW - textWidth(nameLabel, s)) / 2));
+        drawText(rgb, W, nameLabel, nameX, hexY - 7 * s - 8, s, ink);
+      }
     }
   });
 
