@@ -2,6 +2,7 @@
 // Share-landing page: serves per-palette OG/Twitter meta for scrapers,
 // then redirects humans to /explore?palette=<id>.
 import { COLORS_RE } from './_palette-png.js';
+import { getColorName } from './_color-names.js';
 
 const ORIGIN = 'https://www.coolors.in';
 
@@ -17,11 +18,12 @@ export default function handler(req, res) {
   }
 
   const name = escapeHtml(String(n).slice(0, 80)) || 'Color Palette';
-  const hexes = c.split('-').map((h) => `#${h.toUpperCase()}`).join(' · ');
+  // Names alongside hexes so the page surfaces in searches for that color (e.g. "Tiffany Blue palette").
+  const named = c.split('-').map((h) => `${getColorName(h)} #${h.toUpperCase()}`).join(' · ');
   const target = `${ORIGIN}/explore?palette=${encodeURIComponent(id)}`;
   const image = `${ORIGIN}/api/palette-image?c=${encodeURIComponent(c)}`;
   const title = `${name} — Color Palette | Coolors`;
-  const description = `${hexes} — explore and copy this free color palette on Coolors.`;
+  const description = `${named} — explore and copy this free color palette on Coolors.`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">

@@ -41,7 +41,8 @@ type Tab = 'all' | 'popular' | 'saved';
 // ─── Social sharing — same scheme as the explore page, every share links back ─
 const SHARE_ORIGIN = 'https://www.coolors.in';
 const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
-const paletteCaption = (p: PaletteItem) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+// Color names included so the post surfaces in searches for that color (e.g. "Tiffany Blue palette").
+const paletteCaption = (p: PaletteItem) => `"${p.name}" color palette 🎨 ${p.colors.map(c => `${getColorName(c)} ${c.toUpperCase()}`).join(' · ')}`;
 const colorsParam = (p: PaletteItem) => p.colors.map(c => c.replace('#', '')).join('-');
 
 const openPopup = (url: string) =>

@@ -30,7 +30,8 @@ const STATIC_PALETTES: SupabasePalette[] = POPULAR_PALETTES.map((p, i) => ({
 // localhost/preview hosts, and backlinks must point at the www domain anyway.
 const SHARE_ORIGIN = 'https://www.coolors.in';
 const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
-const paletteCaption = (p: SupabasePalette) => `"${p.name}" color palette 🎨 ${p.colors.map(c => c.toUpperCase()).join(' · ')}`;
+// Color names included so the post surfaces in searches for that color (e.g. "Tiffany Blue palette").
+const paletteCaption = (p: SupabasePalette) => `"${p.name}" color palette 🎨 ${p.colors.map(c => `${getColorName(c)} ${c.toUpperCase()}`).join(' · ')}`;
 // Hexes without '#', '-'-joined — the format /api/palette-image and /api/palette-share expect.
 const colorsParam = (p: SupabasePalette) => p.colors.map(c => c.replace('#', '')).join('-');
 
