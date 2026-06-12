@@ -218,14 +218,14 @@ export default function SavedPalettes() {
                       Use in Generator
                     </button>
                     <button onClick={() => togglePublic(palette)} className="flex items-center gap-1 px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-lg hover:border-green-400 transition-colors">
-                      <Share2 size={11} />{palette.is_public ? 'Make Private' : 'Make Public'}
+                      {palette.is_public ? 'Make Private' : 'Make Public'}
                     </button>
                     <div className="relative">
                       <button
                         onClick={() => setShareOpenId(v => v === palette.id ? null : palette.id)}
                         className={`flex items-center gap-1 px-3 py-1.5 text-xs border rounded-lg transition-colors ${shareOpenId === palette.id ? 'border-violet-400 text-violet-600' : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-violet-400'}`}
                       >
-                        <FaXTwitter size={11} />Share
+                        <Share2 size={11} />Share
                       </button>
                       {shareOpenId === palette.id && (
                         <>
