@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import { useToast } from '../client/src/hooks/use-toast';
@@ -167,12 +167,12 @@ const HomePage: NextPage = () => {
           title="Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes"
           description="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools."
           keywords="color palette generator, color scheme, color combinations, design tools, color inspiration"
-          canonical="https://coolors.in/"
+          canonical="https://www.coolors.in/"
           structuredData={{
             '@context': 'https://schema.org',
             '@type': 'WebApplication',
             'name': 'Coolors.in Color Palette Generator',
-            'url': 'https://coolors.in/',
+            'url': 'https://www.coolors.in/',
             'description': 'Create beautiful color combinations with our intuitive color generator',
             'applicationCategory': 'DesignApplication',
             'operatingSystem': 'Any',
@@ -207,12 +207,12 @@ const HomePage: NextPage = () => {
         title="Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes"
         description="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools."
         keywords="color palette generator, color scheme, color combinations, design tools, color inspiration"
-        canonical="https://coolors.in/"
+        canonical="https://www.coolors.in/"
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
           'name': 'Coolors.in Color Palette Generator',
-          'url': 'https://coolors.in/',
+          'url': 'https://www.coolors.in/',
           'description': 'Create beautiful color combinations with our intuitive color generator',
           'applicationCategory': 'DesignApplication',
           'operatingSystem': 'Any',

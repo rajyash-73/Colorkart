@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { usePalette } from '../client/src/contexts/PaletteContext';
@@ -62,7 +62,7 @@ const PaletteVisualizer: NextPage = () => {
           <title>Palette Visualizer - Coolors.in | See Your Colors in Action</title>
           <meta name="description" content="See your color palettes in realistic UI templates. Visualize your colors applied to dashboards, landing pages, charts, and more." />
           <meta name="keywords" content="color palette visualizer, UI color template, design preview" />
-          <link rel="canonical" href="https://coolors.in/visualizer" />
+          <link rel="canonical" href="https://www.coolors.in/visualizer" />
         </Head>
         
         <Header 
@@ -87,7 +87,7 @@ const PaletteVisualizer: NextPage = () => {
         <title>Palette Visualizer - Coolors.in | See Your Colors in Action</title>
         <meta name="description" content="See your color palettes in realistic UI templates. Visualize your colors applied to dashboards, landing pages, charts, and more." />
         <meta name="keywords" content="color palette visualizer, UI color template, design preview" />
-        <link rel="canonical" href="https://coolors.in/visualizer" />
+        <link rel="canonical" href="https://www.coolors.in/visualizer" />
       </Head>
       
       <Header 

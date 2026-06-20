@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -111,12 +111,12 @@ const VisualizerPage: NextPage<{ initialPalette: Color[] }> = ({ initialPalette 
         title="Palette Visualizer | See Your Colors in Real UI Templates - Coolors.in"
         description="Visualize your color palette in real UI templates. See how your colors work together in dashboards, landing pages, and app interfaces."
         keywords="palette visualizer, color combinations, UI templates, color schemes in action"
-        canonicalUrl="https://coolors.in/visualizer"
+        canonicalUrl="https://www.coolors.in/visualizer"
         structuredData={{
           "@context": "https://schema.org",
           "@type": "WebPage",
           "name": "Palette Visualizer | Coolors.in",
-          "url": "https://coolors.in/visualizer",
+          "url": "https://www.coolors.in/visualizer",
           "description": "Visualize your color palette in real UI templates with Coolors.in's Palette Visualizer",
           "isPartOf": {
             "@type": "WebApplication",

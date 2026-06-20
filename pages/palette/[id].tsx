@@ -72,7 +72,7 @@ const SharedPalettePage: NextPage<SharedPalettePageProps> = ({ colors, notFound 
         <Head>
           <title>Palette Not Found - Coolors.in</title>
           <meta name="description" content="This color palette could not be found." />
-          <link rel="canonical" href={`https://coolors.in/palette/${router.query.id}`} />
+          <link rel="canonical" href={`https://www.coolors.in/palette/${router.query.id}`} />
         </Head>
         
         <div className="text-3xl font-bold text-gray-800 mb-6">Palette Not Found</div>
@@ -88,7 +88,7 @@ const SharedPalettePage: NextPage<SharedPalettePageProps> = ({ colors, notFound 
   
   // Format colors as a string for sharing
   const colorString = colors.map(c => c.hex.replace('#', '')).join('-');
-  const shareUrl = `https://coolors.in/palette/${colorString}`;
+  const shareUrl = `https://www.coolors.in/palette/${colorString}`;
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -99,16 +99,16 @@ const SharedPalettePage: NextPage<SharedPalettePageProps> = ({ colors, notFound 
               <title>Shared Color Palette - Coolors.in</title>
               <meta name="description" content="View and explore this shared color palette from Coolors.in" />
               <meta name="keywords" content="shared palette, color scheme, coolors" />
-              <link rel="canonical" href={`https://coolors.in/palette/${router.query.id}`} />
+              <link rel="canonical" href={`https://www.coolors.in/palette/${router.query.id}`} />
               <meta property="og:type" content="website" />
               <meta property="og:title" content="Color Palette from Coolors.in" />
               <meta property="og:description" content="Check out this beautiful color palette I created with Coolors.in" />
-              <meta property="og:image" content={`https://coolors.in/api/palette-og-image?colors=${colorString}`} />
+              <meta property="og:image" content={`https://www.coolors.in/api/palette-og-image?colors=${colorString}`} />
               <meta property="og:url" content={shareUrl} />
               <meta name="twitter:card" content="summary_large_image" />
               <meta name="twitter:title" content="Color Palette from Coolors.in" />
               <meta name="twitter:description" content="Check out this beautiful color palette I created with Coolors.in" />
-              <meta name="twitter:image" content={`https://coolors.in/api/palette-og-image?colors=${colorString}`} />
+              <meta name="twitter:image" content={`https://www.coolors.in/api/palette-og-image?colors=${colorString}`} />
             </Head>
             
             <header className="bg-white border-b border-gray-200">

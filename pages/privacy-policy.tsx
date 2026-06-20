@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ const PrivacyPolicyPage: NextPage = () => {
         <title>Privacy Policy - Coolors.in | Color Palette Generator</title>
         <meta name="description" content="Learn about how Coolors.in handles your data and privacy. We're committed to transparency and protecting your personal information." />
         <meta name="keywords" content="privacy policy, data protection, Coolors.in privacy" />
-        <link rel="canonical" href="https://coolors.in/privacy-policy" />
+        <link rel="canonical" href="https://www.coolors.in/privacy-policy" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -30,7 +30,7 @@ const PrivacyPolicyPage: NextPage = () => {
                 'name': 'Coolors.in',
                 'logo': {
                   '@type': 'ImageObject',
-                  'url': 'https://coolors.in/logo.svg'
+                  'url': 'https://www.coolors.in/logo.svg'
                 }
               }
             })

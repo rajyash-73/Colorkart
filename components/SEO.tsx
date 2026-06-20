@@ -28,7 +28,7 @@ export default function SEO({
   children,
 }: SEOProps) {
   const router = useRouter();
-  const siteUrl = "https://coolors.in"; // Update with your actual domain
+  const siteUrl = "https://www.coolors.in";
   const currentUrl = canonical || `${siteUrl}${router.asPath}`;
   const fullTitle = title.includes("Coolors.in") ? title : `${title} | Coolors.in`;
 

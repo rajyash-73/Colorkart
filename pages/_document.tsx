@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
 
 class MyDocument extends Document {
@@ -48,7 +48,7 @@ class MyDocument extends Document {
                 '@context': 'https://schema.org',
                 '@type': 'WebApplication',
                 'name': 'Coolors.in Color Palette Generator',
-                'url': 'https://coolors.in/',
+                'url': 'https://www.coolors.in/',
                 'description': 'Create beautiful color combinations with our intuitive color generator',
                 'applicationCategory': 'DesignApplication',
                 'operatingSystem': 'Any',

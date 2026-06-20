@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Header from '../client/src/components/Header';
@@ -140,7 +140,7 @@ const FAQPage: NextPage = () => {
         title="FAQ - Coolors.in | Color Palette Generator"
         description="Find answers to frequently asked questions about Coolors.in's color palette generator, features, and how to make the most of our tools."
         keywords="color palette FAQ, color generator help, Coolors.in tutorial, color scheme questions, palette creator help"
-        canonical="https://coolors.in/faq"
+        canonical="https://www.coolors.in/faq"
         structuredData={generateFAQSchema(plainTextFaqs)}
       >
         <script

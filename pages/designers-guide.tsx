@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -15,7 +15,7 @@ const DesignersGuide: NextPage = () => {
         <title>Designer's Guide to Color Theory - Coolors.in</title>
         <meta name="description" content="Learn the fundamentals of color theory, color harmonies, and how to create stunning color palettes for your designs with our comprehensive guide." />
         <meta name="keywords" content="color theory, color harmonies, design guide, palette creation, color psychology" />
-        <link rel="canonical" href="https://coolors.in/designers-guide" />
+        <link rel="canonical" href="https://www.coolors.in/designers-guide" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -23,7 +23,7 @@ const DesignersGuide: NextPage = () => {
               '@context': 'https://schema.org',
               '@type': 'Article',
               'headline': 'Designer\'s Guide to Color Theory',
-              'image': 'https://coolors.in/designers-guide-banner.jpg',
+              'image': 'https://www.coolors.in/designers-guide-banner.jpg',
               'author': {
                 '@type': 'Organization',
                 'name': 'Coolors.in'
@@ -33,7 +33,7 @@ const DesignersGuide: NextPage = () => {
                 'name': 'Coolors.in',
                 'logo': {
                   '@type': 'ImageObject',
-                  'url': 'https://coolors.in/logo.svg'
+                  'url': 'https://www.coolors.in/logo.svg'
                 }
               },
               'datePublished': '2023-01-15',
