@@ -13,7 +13,10 @@ import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
-const BASE_DATE = Date.now();
+// among themselves. Anchored to a fixed past date (not Date.now()) so they
+// always sort *behind* real community palettes under "Newest" — otherwise
+// every curated palette would look freshly created on every page load.
+const BASE_DATE = new Date('2024-01-01T00:00:00Z').getTime();
 const STATIC_PALETTES: SupabasePalette[] = POPULAR_PALETTES.map((p, i) => ({
   id: p.id,
   user_id: null,
@@ -170,6 +173,7 @@ export default function ExplorePage() {
   const { toast } = useToast();
   const [palettes, setPalettes] = useState<SupabasePalette[]>(STATIC_PALETTES);
   const [filtered, setFiltered] = useState<SupabasePalette[]>(STATIC_PALETTES);
+  const [publicCount, setPublicCount] = useState(0);
   const [search, setSearch] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
@@ -181,15 +185,19 @@ export default function ExplorePage() {
   useEffect(() => {
     const loadPalettes = async () => {
       try {
-        const { data, error } = await supabase
+        // count: 'exact' returns the true total of public palettes alongside
+        // the capped page of data — the grid only needs the top 100, but the
+        // "N palettes" stat must reflect every public palette, not just those.
+        const { data, error, count } = await supabase
           .from('public_palettes')
-          .select('*')
+          .select('*', { count: 'exact' })
           .eq('is_public', true)
           .order(sortBy === 'popular' ? 'likes' : 'created_at', { ascending: false })
           .limit(100);
         if (!error && data && data.length > 0) {
           setPalettes([...data, ...STATIC_PALETTES]);
         }
+        if (!error) setPublicCount(count ?? data?.length ?? 0);
       } catch {
         // use static palettes
       } finally {
@@ -425,7 +433,11 @@ export default function ExplorePage() {
 
       {/* Sort + count */}
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <p className="text-sm text-gray-500 dark:text-gray-400">{filtered.length} palettes</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {search.trim() || activeTags.length > 0
+            ? `${filtered.length} palettes`
+            : `${STATIC_PALETTES.length + publicCount} palettes`}
+        </p>
         <div className="flex items-center gap-2">
           <a href="/generator" className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 font-medium">
             <Plus size={14} />Generate a palette

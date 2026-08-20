@@ -54,6 +54,7 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [communityPalettes, setCommunityPalettes] = useState<PaletteItem[]>([]);
+  const [publicCount, setPublicCount] = useState(0);
   const [savedPalettes, setSavedPalettes] = useState<PaletteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCount, setShowCount] = useState(16);
@@ -97,9 +98,12 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
     (async () => {
       setLoading(true);
       try {
-        const { data } = await supabase
+        // count: 'exact' returns the true total of public palettes alongside
+        // the capped page of data — the grid only needs the top 200, but the
+        // "N palettes" stat must reflect every public palette, not just those.
+        const { data, count } = await supabase
           .from('public_palettes')
-          .select('id, name, colors, likes')
+          .select('id, name, colors, likes', { count: 'exact' })
           .eq('is_public', true)
           .order('likes', { ascending: false })
           .limit(200);
@@ -114,6 +118,7 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
             })).filter(p => p.colors.length >= 2)
           );
         }
+        setPublicCount(count ?? data?.length ?? 0);
       } catch {}
       setLoading(false);
     })();
@@ -203,7 +208,10 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
     return list;
   }, [tab, allPalettes, savedPalettes, search]);
 
-  const totalCount = allPalettes.length + (savedPalettes.length > 0 ? savedPalettes.length : 0);
+  // Static curated palettes + every public community palette (not just the
+  // capped page fetched for the grid) — the current user's own saved palettes
+  // are already reflected here when public, so they aren't added separately.
+  const totalCount = STATIC_PALETTES.length + publicCount;
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all',     label: 'All' },
