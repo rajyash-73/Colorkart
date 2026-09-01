@@ -41,10 +41,15 @@ const ICON_SET: Record<string, LucideIcon> = {
   Trophy, Users, Volume2,
 };
 
+/** Keys of PairingContent whose value is a plain string — the ones the rail lists. */
+export type TextField = { [K in keyof PairingContent]: PairingContent[K] extends string ? K : never }[keyof PairingContent];
+
 export interface PairingContent {
   brand: string; tagline: string; headline: string; subhead: string; body: string;
   personName: string; jobTitle: string; email: string; phone: string; website: string;
-  cta: string;
+  cta: string; ctaSecondary: string;
+  navLinks: string[];
+  features: { title: string; body: string }[];
 }
 
 const DEFAULT_CONTENT: PairingContent = {
@@ -59,6 +64,13 @@ const DEFAULT_CONTENT: PairingContent = {
   phone: '+1 (555) 012-8890',
   website: 'northwind.studio',
   cta: 'Start a project',
+  ctaSecondary: 'See our work',
+  navLinks: ['Work', 'Studio', 'Journal'],
+  features: [
+    { title: 'Strategy', body: 'Positioning, naming and the story that holds a brand together.' },
+    { title: 'Identity', body: 'Type, colour and marks that stay recognisable at any size.' },
+    { title: 'Interface', body: 'Design systems and screens built to survive real content.' },
+  ],
 };
 
 const fontList = (cat: string) => cat === 'All' ? GOOGLE_FONTS : GOOGLE_FONTS.filter(f => f.category === cat);
@@ -86,6 +98,48 @@ function FontPicker({ label, value, onChange, cat, onCat }: {
     </p>
   </div>
   );
+}
+
+/**
+ * Click-to-edit text inside a mockup.
+ *
+ * React never renders the text as children — the value is written to the node
+ * imperatively and only while it is not focused. That keeps the caret from
+ * jumping mid-typing, which is the usual failure mode of contentEditable in
+ * React. Edits commit on blur.
+ */
+function Editable({ value, onChange, inline, multiline, placeholder, style, className }: {
+  value: string;
+  onChange: (v: string) => void;
+  inline?: boolean;
+  multiline?: boolean;
+  placeholder?: string;
+  style?: React.CSSProperties;
+  className?: string;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (el && document.activeElement !== el && el.textContent !== value) el.textContent = value;
+  }, [value]);
+
+  const commit = (e: React.FocusEvent<HTMLElement>) => onChange(e.currentTarget.textContent ?? '');
+  const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Escape') { e.preventDefault(); e.currentTarget.blur(); }
+    if (e.key === 'Enter' && !multiline) { e.preventDefault(); e.currentTarget.blur(); }
+  };
+  const props = {
+    ref: ref as React.Ref<never>,
+    contentEditable: true,
+    suppressContentEditableWarning: true,
+    spellCheck: false,
+    'data-ph': placeholder ?? 'Type here',
+    onBlur: commit,
+    onKeyDown,
+    className: `ed ${className ?? ''}`,
+    style: multiline ? { whiteSpace: 'pre-wrap' as const, ...style } : style,
+  };
+  return inline ? <span {...props} /> : <div {...props} />;
 }
 
 interface Props {
@@ -176,6 +230,10 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
 
   // ── Export ─────────────────────────────────────────────────────────────────
   const shoot = async (opaque: boolean) => {
+    // Commit whatever the user was typing and drop the focus ring, so the
+    // export captures finished content rather than a mid-edit caret outline.
+    const active = document.activeElement as HTMLElement | null;
+    if (active?.isContentEditable) { active.blur(); await new Promise(r => setTimeout(r, 60)); }
     // getElementById as a fallback: the ref is the normal path, but a null ref
     // must not silently no-op an export the user explicitly asked for.
     const el = canvasRef.current ?? document.getElementById('pairing-canvas');
@@ -237,11 +295,17 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
 
   if (!open) return null;
 
-  const set = (k: keyof PairingContent) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (k: TextField) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setContent(c => ({ ...c, [k]: e.target.value }));
 
   return (
     <div className="fixed inset-0 z-[60] bg-gray-950/70 backdrop-blur-sm flex flex-col">
+      <style>{`
+        .ed { outline: none; border-radius: 3px; transition: box-shadow .12s, background-color .12s; cursor: text; }
+        .ed:hover { box-shadow: 0 0 0 1px currentColor; opacity: .999; }
+        .ed:focus { box-shadow: 0 0 0 2px #7c6cff; background: rgba(124,108,255,.08); }
+        .ed:empty::before { content: attr(data-ph); opacity: .35; }
+      `}</style>
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <Type size={18} className="text-violet-600" />
@@ -254,6 +318,7 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
               }`}>{m.label}</button>
           ))}
         </div>
+        <span className="hidden lg:inline text-[11px] text-gray-400 ml-3">Click any text in the design to edit it</span>
         <div className="ml-auto flex items-center gap-2">
           <button onClick={() => exportImage('png')} disabled={exporting}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors">
@@ -362,12 +427,13 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
             <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
               <FileText size={12} />Your content
             </label>
+            <p className="text-[11px] text-gray-400 mt-0.5">Or click the text directly in the design.</p>
             <div className="mt-1.5 space-y-1.5">
               {([
                 ['brand', 'Brand name'], ['tagline', 'Tagline'], ['headline', 'Headline'],
                 ['subhead', 'Subheading'], ['personName', 'Person name'], ['jobTitle', 'Job title'],
                 ['email', 'Email'], ['phone', 'Phone'], ['website', 'Website'], ['cta', 'Button label'],
-              ] as [keyof PairingContent, string][]).map(([k, label]) => (
+              ] as [TextField, string][]).map(([k, label]) => (
                 <input key={k} value={content[k]} onChange={set(k)} placeholder={label} aria-label={label}
                   className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-violet-400" />
               ))}
@@ -382,7 +448,7 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
           <div className="mx-auto" style={{ maxWidth: mockup === 'card' ? 640 : 900 }}>
             <div ref={canvasRef} id="pairing-canvas">
               <Mockups
-                mockup={mockup} theme={theme} content={content}
+                mockup={mockup} theme={theme} content={content} setContent={setContent}
                 headingStack={headingStack} bodyStack={bodyStack} baseSize={baseSize}
                 Icon={Icon} customSvg={customSvg}
                 headingFont={headingFont} bodyFont={bodyFont}
@@ -414,6 +480,7 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
 
 interface MockProps {
   mockup: Mockup; theme: Theme; content: PairingContent;
+  setContent: React.Dispatch<React.SetStateAction<PairingContent>>;
   headingStack: string; bodyStack: string; baseSize: number;
   Icon: LucideIcon;
   customSvg: string | null;
@@ -425,8 +492,14 @@ function Brandmark({ Icon, customSvg, size, color }: { Icon: LucideIcon; customS
   return <Icon size={size} color={color} strokeWidth={1.75} />;
 }
 
-function Mockups({ mockup, theme, content, headingStack, bodyStack, baseSize, Icon, customSvg, headingFont, bodyFont }: MockProps) {
+function Mockups({ mockup, theme, content, setContent, headingStack, bodyStack, baseSize, Icon, customSvg, headingFont, bodyFont }: MockProps) {
   const s = (mult: number) => `${Math.round(baseSize * mult)}px`;
+  // Field writers, so every string the mockups show is editable in place.
+  const f = (k: TextField) => (v: string) => setContent(c => ({ ...c, [k]: v }));
+  const fNav = (i: number) => (v: string) =>
+    setContent(c => ({ ...c, navLinks: c.navLinks.map((n, j) => j === i ? v : n) }));
+  const fFeat = (i: number, key: 'title' | 'body') => (v: string) =>
+    setContent(c => ({ ...c, features: c.features.map((ft, j) => j === i ? { ...ft, [key]: v } : ft) }));
 
   if (mockup === 'card') {
     return (
@@ -436,19 +509,25 @@ function Mockups({ mockup, theme, content, headingStack, bodyStack, baseSize, Ic
           style={{ background: theme.background, border: `1px solid ${theme.border}`, aspectRatio: '1.75 / 1' }}>
           <Brandmark Icon={Icon} customSvg={customSvg} size={Math.round(baseSize * 1.9)} color={theme.primary} />
           <div>
-            <div style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1.35), fontWeight: 700, lineHeight: 1.15 }}>{content.brand}</div>
-            <div style={{ fontFamily: bodyStack, color: theme.primary, fontSize: s(0.62), letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 4 }}>{content.tagline}</div>
+            <Editable value={content.brand} onChange={f('brand')} placeholder="Brand name"
+              style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1.35), fontWeight: 700, lineHeight: 1.15 }} />
+            <Editable value={content.tagline} onChange={f('tagline')} placeholder="Tagline"
+              style={{ fontFamily: bodyStack, color: theme.primary, fontSize: s(0.62), letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 4 }} />
           </div>
         </div>
         {/* Back */}
         <div className="rounded-xl p-6 flex flex-col justify-between shadow-lg"
           style={{ background: theme.primary, aspectRatio: '1.75 / 1' }}>
           <div>
-            <div style={{ fontFamily: headingStack, color: onColor(theme.primary), fontSize: s(1.05), fontWeight: 700 }}>{content.personName}</div>
-            <div style={{ fontFamily: bodyStack, color: onColor(theme.primary), opacity: 0.75, fontSize: s(0.68), marginTop: 2 }}>{content.jobTitle}</div>
+            <Editable value={content.personName} onChange={f('personName')} placeholder="Full name"
+              style={{ fontFamily: headingStack, color: onColor(theme.primary), fontSize: s(1.05), fontWeight: 700 }} />
+            <Editable value={content.jobTitle} onChange={f('jobTitle')} placeholder="Job title"
+              style={{ fontFamily: bodyStack, color: onColor(theme.primary), opacity: 0.75, fontSize: s(0.68), marginTop: 2 }} />
           </div>
           <div style={{ fontFamily: bodyStack, color: onColor(theme.primary), opacity: 0.9, fontSize: s(0.62), lineHeight: 1.7 }}>
-            <div>{content.email}</div><div>{content.phone}</div><div>{content.website}</div>
+            <Editable value={content.email} onChange={f('email')} placeholder="Email" />
+            <Editable value={content.phone} onChange={f('phone')} placeholder="Phone" />
+            <Editable value={content.website} onChange={f('website')} placeholder="Website" />
           </div>
         </div>
       </div>
@@ -460,30 +539,37 @@ function Mockups({ mockup, theme, content, headingStack, bodyStack, baseSize, Ic
       <div className="rounded-xl overflow-hidden shadow-lg" style={{ background: theme.background, border: `1px solid ${theme.border}` }}>
         <nav className="flex items-center gap-3 px-6 py-4" style={{ borderBottom: `1px solid ${theme.border}` }}>
           <Brandmark Icon={Icon} customSvg={customSvg} size={Math.round(baseSize * 1.2)} color={theme.primary} />
-          <span style={{ fontFamily: headingStack, color: theme.text, fontSize: s(0.95), fontWeight: 700 }}>{content.brand}</span>
+          <Editable inline value={content.brand} onChange={f('brand')} placeholder="Brand"
+            style={{ fontFamily: headingStack, color: theme.text, fontSize: s(0.95), fontWeight: 700 }} />
           <div className="ml-auto hidden sm:flex gap-5">
-            {['Work', 'Studio', 'Journal'].map(l => (
-              <span key={l} style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.65, fontSize: s(0.8) }}>{l}</span>
+            {content.navLinks.map((l, i) => (
+              <Editable key={i} inline value={l} onChange={fNav(i)} placeholder="Link"
+                style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.65, fontSize: s(0.8) }} />
             ))}
           </div>
         </nav>
         <div className="px-6 sm:px-10 py-12" style={{ background: theme.surface }}>
-          <div style={{ fontFamily: bodyStack, color: theme.accent, fontSize: s(0.7), letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{content.tagline}</div>
-          <h2 style={{ fontFamily: headingStack, color: theme.text, fontSize: s(2.9), fontWeight: 700, lineHeight: 1.08, margin: '10px 0 0', maxWidth: '18ch' }}>{content.headline}</h2>
-          <p style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.72, fontSize: s(1.02), lineHeight: 1.6, marginTop: 14, maxWidth: '46ch' }}>{content.subhead}</p>
+          <Editable value={content.tagline} onChange={f('tagline')} placeholder="Eyebrow"
+            style={{ fontFamily: bodyStack, color: theme.accent, fontSize: s(0.7), letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }} />
+          <Editable multiline value={content.headline} onChange={f('headline')} placeholder="Headline"
+            style={{ fontFamily: headingStack, color: theme.text, fontSize: s(2.9), fontWeight: 700, lineHeight: 1.08, margin: '10px 0 0', maxWidth: '18ch' }} />
+          <Editable multiline value={content.subhead} onChange={f('subhead')} placeholder="Supporting line"
+            style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.72, fontSize: s(1.02), lineHeight: 1.6, marginTop: 14, maxWidth: '46ch' }} />
           <div className="flex flex-wrap gap-3" style={{ marginTop: 22 }}>
-            <span style={{ fontFamily: bodyStack, background: theme.primary, color: onColor(theme.primary), fontSize: s(0.82), fontWeight: 600, padding: '10px 20px', borderRadius: 8 }}>{content.cta}</span>
-            <span style={{ fontFamily: bodyStack, color: theme.text, border: `1px solid ${theme.border}`, fontSize: s(0.82), fontWeight: 600, padding: '10px 20px', borderRadius: 8 }}>See our work</span>
+            <Editable inline value={content.cta} onChange={f('cta')} placeholder="Button"
+              style={{ fontFamily: bodyStack, background: theme.primary, color: onColor(theme.primary), fontSize: s(0.82), fontWeight: 600, padding: '10px 20px', borderRadius: 8 }} />
+            <Editable inline value={content.ctaSecondary} onChange={f('ctaSecondary')} placeholder="Button"
+              style={{ fontFamily: bodyStack, color: theme.text, border: `1px solid ${theme.border}`, fontSize: s(0.82), fontWeight: 600, padding: '10px 20px', borderRadius: 8 }} />
           </div>
         </div>
         <div className="grid sm:grid-cols-3 gap-4 px-6 sm:px-10 py-8">
-          {['Strategy', 'Identity', 'Interface'].map(t => (
-            <div key={t}>
+          {content.features.map((ft, i) => (
+            <div key={i}>
               <Icon size={Math.round(baseSize * 1.1)} color={theme.accent} strokeWidth={1.75} />
-              <div style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1), fontWeight: 700, marginTop: 8 }}>{t}</div>
-              <p style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.65, fontSize: s(0.8), lineHeight: 1.55, marginTop: 4 }}>
-                {content.body.split('. ')[0]}.
-              </p>
+              <Editable value={ft.title} onChange={fFeat(i, 'title')} placeholder="Feature"
+                style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1), fontWeight: 700, marginTop: 8 }} />
+              <Editable multiline value={ft.body} onChange={fFeat(i, 'body')} placeholder="Description"
+                style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.65, fontSize: s(0.8), lineHeight: 1.55, marginTop: 4 }} />
             </div>
           ))}
         </div>
@@ -494,17 +580,21 @@ function Mockups({ mockup, theme, content, headingStack, bodyStack, baseSize, Ic
   if (mockup === 'article') {
     return (
       <div className="rounded-xl shadow-lg px-6 sm:px-12 py-10" style={{ background: theme.background, border: `1px solid ${theme.border}` }}>
-        <div style={{ fontFamily: bodyStack, color: theme.accent, fontSize: s(0.72), letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{content.tagline}</div>
-        <h2 style={{ fontFamily: headingStack, color: theme.text, fontSize: s(2.5), fontWeight: 700, lineHeight: 1.12, margin: '10px 0 0' }}>{content.headline}</h2>
-        <p style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.6, fontSize: s(0.85), marginTop: 12 }}>
-          By {content.personName} · {content.jobTitle}
-        </p>
+        <Editable value={content.tagline} onChange={f('tagline')} placeholder="Category"
+          style={{ fontFamily: bodyStack, color: theme.accent, fontSize: s(0.72), letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }} />
+        <Editable multiline value={content.headline} onChange={f('headline')} placeholder="Article title"
+          style={{ fontFamily: headingStack, color: theme.text, fontSize: s(2.5), fontWeight: 700, lineHeight: 1.12, margin: '10px 0 0' }} />
+        <div className="flex items-center gap-1.5" style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.6, fontSize: s(0.85), marginTop: 12 }}>
+          <span>By</span>
+          <Editable inline value={content.personName} onChange={f('personName')} placeholder="Author" />
+          <span>&middot;</span>
+          <Editable inline value={content.jobTitle} onChange={f('jobTitle')} placeholder="Role" />
+        </div>
         <div style={{ height: 1, background: theme.border, margin: '20px 0' }} />
-        <p style={{ fontFamily: bodyStack, color: theme.text, fontSize: s(1.06), lineHeight: 1.75, maxWidth: '68ch' }}>{content.body}</p>
-        <blockquote style={{ fontFamily: headingStack, color: theme.primary, fontSize: s(1.5), lineHeight: 1.35, fontStyle: 'italic', borderLeft: `3px solid ${theme.primary}`, paddingLeft: 20, margin: '24px 0' }}>
-          {content.subhead}
-        </blockquote>
-        <p style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.85, fontSize: s(1.06), lineHeight: 1.75, maxWidth: '68ch' }}>{content.body}</p>
+        <Editable multiline value={content.body} onChange={f('body')} placeholder="Body copy"
+          style={{ fontFamily: bodyStack, color: theme.text, fontSize: s(1.06), lineHeight: 1.75, maxWidth: '68ch' }} />
+        <Editable multiline value={content.subhead} onChange={f('subhead')} placeholder="Pull quote"
+          style={{ fontFamily: headingStack, color: theme.primary, fontSize: s(1.5), lineHeight: 1.35, fontStyle: 'italic', borderLeft: `3px solid ${theme.primary}`, paddingLeft: 20, margin: '24px 0' }} />
       </div>
     );
   }
@@ -515,8 +605,10 @@ function Mockups({ mockup, theme, content, headingStack, bodyStack, baseSize, Ic
       <div className="flex items-center gap-3" style={{ marginBottom: 24 }}>
         <Brandmark Icon={Icon} customSvg={customSvg} size={Math.round(baseSize * 1.6)} color={theme.primary} />
         <div>
-          <div style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1.3), fontWeight: 700 }}>{content.brand}</div>
-          <div style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.6, fontSize: s(0.72) }}>Brand style guide</div>
+          <Editable value={content.brand} onChange={f('brand')} placeholder="Brand name"
+            style={{ fontFamily: headingStack, color: theme.text, fontSize: s(1.3), fontWeight: 700 }} />
+          <Editable value={content.tagline} onChange={f('tagline')} placeholder="Subtitle"
+            style={{ fontFamily: bodyStack, color: theme.text, opacity: 0.6, fontSize: s(0.72) }} />
         </div>
       </div>
 
