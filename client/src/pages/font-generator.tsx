@@ -1,65 +1,11 @@
 import React, { useState, useRef } from 'react';
 import SEOHead from '@/components/SEOHead';
-import { Copy, Check, Download, RefreshCw, ChevronLeft, Type } from 'lucide-react';
+import { Copy, Check, Download, RefreshCw, ChevronLeft, Type, Layout } from 'lucide-react';
 import { Link } from 'wouter';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-const GOOGLE_FONTS = [
-  { name: 'Inter', category: 'sans-serif' },
-  { name: 'Roboto', category: 'sans-serif' },
-  { name: 'Open Sans', category: 'sans-serif' },
-  { name: 'Lato', category: 'sans-serif' },
-  { name: 'Montserrat', category: 'sans-serif' },
-  { name: 'Poppins', category: 'sans-serif' },
-  { name: 'Nunito', category: 'sans-serif' },
-  { name: 'Raleway', category: 'sans-serif' },
-  { name: 'Ubuntu', category: 'sans-serif' },
-  { name: 'Source Sans 3', category: 'sans-serif' },
-  { name: 'Playfair Display', category: 'serif' },
-  { name: 'Merriweather', category: 'serif' },
-  { name: 'Lora', category: 'serif' },
-  { name: 'PT Serif', category: 'serif' },
-  { name: 'Libre Baskerville', category: 'serif' },
-  { name: 'Bitter', category: 'serif' },
-  { name: 'Crimson Text', category: 'serif' },
-  { name: 'EB Garamond', category: 'serif' },
-  { name: 'Space Mono', category: 'monospace' },
-  { name: 'JetBrains Mono', category: 'monospace' },
-  { name: 'Fira Code', category: 'monospace' },
-  { name: 'Source Code Pro', category: 'monospace' },
-  { name: 'IBM Plex Mono', category: 'monospace' },
-  { name: 'Pacifico', category: 'display' },
-  { name: 'Lobster', category: 'display' },
-  { name: 'Dancing Script', category: 'handwriting' },
-  { name: 'Caveat', category: 'handwriting' },
-  { name: 'Satisfy', category: 'handwriting' },
-  { name: 'Comfortaa', category: 'display' },
-  { name: 'Righteous', category: 'display' },
-];
-
-const SAMPLE_TEXTS = [
-  'The quick brown fox jumps over the lazy dog',
-  'Pack my box with five dozen liquor jugs',
-  'How vexingly quick daft zebras jump!',
-  'The five boxing wizards jump quickly',
-  'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
-  '0 1 2 3 4 5 6 7 8 9 ! @ # $ % ^ & * ( )',
-];
-
-const FONT_CATEGORIES = ['All', 'sans-serif', 'serif', 'monospace', 'display', 'handwriting'];
-
-const WEIGHTS = [
-  { value: '100', label: 'Thin' },
-  { value: '200', label: 'Extra Light' },
-  { value: '300', label: 'Light' },
-  { value: '400', label: 'Regular' },
-  { value: '500', label: 'Medium' },
-  { value: '600', label: 'Semi Bold' },
-  { value: '700', label: 'Bold' },
-  { value: '800', label: 'Extra Bold' },
-  { value: '900', label: 'Black' },
-];
+import FontPairingSimulator from '@/components/FontPairingSimulator';
+import { GOOGLE_FONTS, SAMPLE_TEXTS, FONT_CATEGORIES, WEIGHTS, ALL_WEIGHTS, loadFont } from '@/lib/fonts';
 
 function CopyBtn({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -87,6 +33,7 @@ export default function FontGeneratorPage() {
   const [sampleIndex, setSampleIndex] = useState(0);
   const [search, setSearch] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [simulatorOpen, setSimulatorOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const sampleText = customText || SAMPLE_TEXTS[sampleIndex];
@@ -98,23 +45,14 @@ export default function FontGeneratorPage() {
   });
 
   // Load Google Font dynamically
-  const loadedFonts = useRef<Set<string>>(new Set());
-  const loadFont = (fontName: string) => {
-    if (loadedFonts.current.has(fontName)) return;
-    loadedFonts.current.add(fontName);
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@100;200;300;400;500;600;700;800;900&display=swap`;
-    document.head.appendChild(link);
-  };
 
   const handleFontSelect = (fontName: string) => {
-    loadFont(fontName);
+    loadFont(fontName, ALL_WEIGHTS);
     setSelectedFont(fontName);
   };
 
   // Pre-load selected font
-  React.useEffect(() => { loadFont(selectedFont); }, []);
+  React.useEffect(() => { loadFont(selectedFont, ALL_WEIGHTS); }, []);
 
   const cssCode = `font-family: '${selectedFont}', ${GOOGLE_FONTS.find(f => f.name === selectedFont)?.category ?? 'sans-serif'};
 font-size: ${size}px;
@@ -161,6 +99,14 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">Font Generator</h1>
           <p className="text-gray-500 dark:text-gray-400">Preview, customize, and export typography with Google Fonts</p>
+          <button
+            onClick={() => setSimulatorOpen(true)}
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
+          >
+            <Layout size={16} />
+            Simulate font &amp; colour pairing
+          </button>
+          <p className="text-xs text-gray-400 mt-1.5">See this font paired with another on a name card, website or article &mdash; themed with any palette.</p>
         </div>
 
         <div className="flex gap-6 flex-col lg:flex-row">
@@ -333,6 +279,13 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
           </div>
         </div>
       </div>
+
+      <FontPairingSimulator
+        open={simulatorOpen}
+        onClose={() => setSimulatorOpen(false)}
+        initialHeadingFont={selectedFont}
+        initialBaseSize={16}
+      />
 
       <Footer />
     </div>

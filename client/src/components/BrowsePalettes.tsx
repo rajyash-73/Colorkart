@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 interface BrowsePalettesProps {
   onSelectPalette: (colors: Color[]) => void;
   userId?: string;
+  /** Trailing half of the count line. Defaults to the generator's wording. */
+  subtitle?: string;
 }
 
 interface PaletteItem {
@@ -49,7 +51,7 @@ const colorsParam = (p: PaletteItem) => p.colors.map(c => c.replace('#', '')).jo
 const openPopup = (url: string) =>
   window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
 
-export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalettesProps) {
+export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: BrowsePalettesProps) {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
@@ -235,7 +237,7 @@ export default function BrowsePalettes({ onSelectPalette, userId }: BrowsePalett
             </button>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {loading ? 'Loading…' : `${totalCount} palettes — click any to apply to generator`}
+            {loading ? 'Loading…' : `${totalCount} palettes — ${subtitle ?? 'click any to apply to generator'}`}
           </p>
         </div>
         <div className="sm:ml-auto relative">
