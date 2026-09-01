@@ -55,3 +55,15 @@ else
     echo "Build failed with error code: $?"
     exit 1
 fi
+
+# Bake per-route <head> metadata into dist so crawlers get the right title and
+# canonical without running JS. Must come after vite build — emptyOutDir wipes
+# dist. Non-fatal by design: a prerender failure costs SEO, never the deploy.
+# PLAYWRIGHT_BROWSERS_PATH=0 puts Chromium in node_modules, which Vercel caches.
+echo "Prerendering per-route metadata..."
+if PLAYWRIGHT_BROWSERS_PATH=0 npx --yes playwright install chromium \
+   && PLAYWRIGHT_BROWSERS_PATH=0 node ../scripts/prerender.mjs; then
+    echo "Prerender completed successfully!"
+else
+    echo "WARNING: prerender skipped or incomplete — deploying SPA shell only"
+fi
