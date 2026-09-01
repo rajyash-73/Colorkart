@@ -114,7 +114,7 @@ export default function ColorPickerPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Color Picker & Inspector</h2>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Color Picker &amp; HSL Converter</h1>
           <p className="text-gray-500 dark:text-gray-400">Explore shades, tints, and tones. Get every color format instantly.</p>
         </div>
 

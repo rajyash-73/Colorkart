@@ -120,7 +120,7 @@ function PaletteCard({
 
       <div className="px-4 py-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">{palette.name}</h3>
+          <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">{palette.name}</p>
           {palette.user_name && <span className="text-xs text-gray-400 truncate ml-2">by {palette.user_name}</span>}
         </div>
         <div className="flex items-center gap-2 mt-2">

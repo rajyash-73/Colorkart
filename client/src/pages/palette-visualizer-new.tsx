@@ -284,7 +284,7 @@ function DashboardTemplate({ palette, getTextColor, showIndicators }: {
       {/* Main */}
       <div className="flex-1 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold" style={{ color: getTextColor(c(4, '#f8fafc')) }}>Dashboard</h1>
+          <div className="text-xl font-bold" style={{ color: getTextColor(c(4, '#f8fafc')) }}>Dashboard</div>
           <div className="px-4 py-2 rounded-lg text-sm font-medium relative"
             style={{ backgroundColor: c(2, '#3b82f6'), color: getTextColor(c(2, '#3b82f6')) }}>
             <ColorIndicator color={c(2, '#3b82f6')} index={2} showIndicators={showIndicators} />
@@ -346,7 +346,7 @@ function LandingTemplate({ palette, getTextColor, showIndicators }: {
         style={{ backgroundColor: c(1, '#334155'), color: getTextColor(c(1, '#334155')) }}>
         <ColorIndicator color={c(1, '#334155')} index={1} showIndicators={showIndicators} />
         <div className="max-w-md">
-          <h1 className="text-4xl font-bold mb-4 leading-tight">Build something remarkable</h1>
+          <div className="text-4xl font-bold mb-4 leading-tight">Build something remarkable</div>
           <p className="mb-6 opacity-80 leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisi vel consectetur interdum.</p>
           <div className="flex gap-3">
             <span className="px-5 py-2.5 rounded-lg font-semibold text-sm relative"
@@ -396,7 +396,7 @@ function AnalyticsTemplate({ palette, getTextColor, showIndicators }: {
   return (
     <div className="min-h-[560px] overflow-auto" style={{ backgroundColor: c(4, '#f8fafc'), color: getTextColor(c(4, '#f8fafc')) }}>
       <header className="px-5 py-3.5 flex justify-between items-center border-b border-black/5">
-        <h1 className="font-bold">Analytics Dashboard</h1>
+        <div className="font-bold">Analytics Dashboard</div>
         <div className="flex items-center gap-3">
           <span className="text-sm opacity-60">Last 7 days ▾</span>
           <span className="px-3 py-1.5 rounded-lg text-sm font-medium relative"
