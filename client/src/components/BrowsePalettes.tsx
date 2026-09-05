@@ -22,6 +22,7 @@ interface PaletteItem {
   likes: number;
   source: 'static' | 'community' | 'saved';
   is_public?: boolean;
+  created_at?: string;
 }
 
 function hexToColor(hex: string): Color {
@@ -39,7 +40,7 @@ const STATIC_PALETTES: PaletteItem[] = POPULAR_PALETTES.map(p => ({
   source: 'static',
 }));
 
-type Tab = 'all' | 'popular' | 'saved';
+type Tab = 'all' | 'popular' | 'newest' | 'saved';
 
 // ─── Social sharing — same scheme as the explore page, every share links back ─
 const SHARE_ORIGIN = 'https://www.coolors.in';
@@ -56,6 +57,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [communityPalettes, setCommunityPalettes] = useState<PaletteItem[]>([]);
+  const [newestPalettes, setNewestPalettes] = useState<PaletteItem[]>([]);
   const [publicCount, setPublicCount] = useState(0);
   const [savedPalettes, setSavedPalettes] = useState<PaletteItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -123,6 +125,34 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
         setPublicCount(count ?? data?.length ?? 0);
       } catch {}
       setLoading(false);
+    })();
+  }, []);
+
+  // Newest needs its own query. The fetch above is ordered by likes and capped
+  // at 200, so a palette published moments ago with no likes yet would not be
+  // in that set at all — sorting it client-side would silently miss new work.
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('public_palettes')
+          .select('id, name, colors, likes, created_at')
+          .eq('is_public', true)
+          .order('created_at', { ascending: false })
+          .limit(200);
+        if (data) {
+          setNewestPalettes(
+            data.map(p => ({
+              id: String(p.id),
+              name: p.name ?? 'Untitled',
+              colors: Array.isArray(p.colors) ? p.colors : [],
+              likes: p.likes ?? 0,
+              source: 'community' as const,
+              created_at: p.created_at ?? undefined,
+            })).filter(p => p.colors.length >= 2)
+          );
+        }
+      } catch {}
     })();
   }, []);
 
@@ -200,6 +230,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   const displayPalettes = useMemo<PaletteItem[]>(() => {
     let list: PaletteItem[] =
       tab === 'saved'   ? savedPalettes :
+      tab === 'newest'  ? newestPalettes :
       tab === 'popular' ? [...allPalettes].sort((a, b) => b.likes - a.likes) :
                           allPalettes;
 
@@ -208,7 +239,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
       list = list.filter(p => p.name.toLowerCase().includes(q));
     }
     return list;
-  }, [tab, allPalettes, savedPalettes, search]);
+  }, [tab, allPalettes, savedPalettes, newestPalettes, search]);
 
   // Static curated palettes + every public community palette (not just the
   // capped page fetched for the grid) — the current user's own saved palettes
@@ -218,6 +249,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all',     label: 'All' },
     { key: 'popular', label: 'Popular' },
+    { key: 'newest',  label: 'Newest' },
     ...(userId ? [{ key: 'saved' as Tab, label: 'My Saved' }] : []),
   ];
 
