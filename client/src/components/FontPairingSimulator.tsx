@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  X, Download, Type, Palette as PaletteIcon, FileText, Upload, Trash2, Image as ImageIcon,
+  X, Download, Type, Palette as PaletteIcon, Upload, Trash2, Image as ImageIcon,
   Star, Heart, Zap, Award, Bell, Camera, Clock, Cloud, Coffee, Compass, Feather, Flag,
   Gift, Globe, Home, Key, Leaf, Lock, Mail, MapPin, Moon, Music, Phone, Send, Shield,
   Smile, Sun, Tag, Target, Truck, Umbrella, User, Video, Wallet, Watch, Wifi, Anchor,
@@ -295,9 +295,6 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
 
   if (!open) return null;
 
-  const set = (k: TextField) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setContent(c => ({ ...c, [k]: e.target.value }));
-
   return (
     <div className="fixed inset-0 z-[60] bg-gray-950/70 backdrop-blur-sm flex flex-col">
       <style>{`
@@ -318,7 +315,6 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
               }`}>{m.label}</button>
           ))}
         </div>
-        <span className="hidden lg:inline text-[11px] text-gray-400 ml-3">Click any text in the design to edit it</span>
         <div className="ml-auto flex items-center gap-2">
           <button onClick={() => exportImage('png')} disabled={exporting}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors">
@@ -422,30 +418,14 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
             {customSvg && <p className="mt-1 text-[11px] text-green-600 flex items-center gap-1"><ImageIcon size={10} />Custom vector in use</p>}
           </div>
 
-          {/* Content */}
-          <div>
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-              <FileText size={12} />Your content
-            </label>
-            <p className="text-[11px] text-gray-400 mt-0.5">Or click the text directly in the design.</p>
-            <div className="mt-1.5 space-y-1.5">
-              {([
-                ['brand', 'Brand name'], ['tagline', 'Tagline'], ['headline', 'Headline'],
-                ['subhead', 'Subheading'], ['personName', 'Person name'], ['jobTitle', 'Job title'],
-                ['email', 'Email'], ['phone', 'Phone'], ['website', 'Website'], ['cta', 'Button label'],
-              ] as [TextField, string][]).map(([k, label]) => (
-                <input key={k} value={content[k]} onChange={set(k)} placeholder={label} aria-label={label}
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-violet-400" />
-              ))}
-              <textarea value={content.body} onChange={set('body')} rows={3} placeholder="Body copy" aria-label="Body copy"
-                className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-violet-400 resize-y" />
-            </div>
-          </div>
         </aside>
 
         {/* ── Canvas ───────────────────────────────────────────────────────── */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-8">
           <div className="mx-auto" style={{ maxWidth: mockup === 'card' ? 640 : 900 }}>
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] text-gray-400">
+              <Edit size={11} />Click any text below to edit it
+            </p>
             <div ref={canvasRef} id="pairing-canvas">
               <Mockups
                 mockup={mockup} theme={theme} content={content} setContent={setContent}
