@@ -96,17 +96,22 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">Font Generator</h1>
-          <p className="text-gray-500 dark:text-gray-400">Preview, customize, and export typography with Google Fonts</p>
-          <button
-            onClick={() => setSimulatorOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
-          >
-            <Layout size={16} />
-            Simulate font &amp; colour pairing
-          </button>
-          <p className="text-xs text-gray-400 mt-1.5">See this font paired with another on a name card, website or article &mdash; themed with any palette.</p>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">Font Generator</h1>
+            <p className="text-gray-500 dark:text-gray-400">Preview, customize, and export typography with Google Fonts</p>
+          </div>
+
+          <div className="sm:text-right sm:pl-6">
+            <button
+              onClick={() => setSimulatorOpen(true)}
+              className="group inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-900/20 transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-md hover:shadow-violet-900/30 active:translate-y-0 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            >
+              <Layout size={16} className="transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none" />
+              Simulate font &amp; colour pairing
+            </button>
+            <p className="mt-1.5 max-w-xs text-xs text-gray-400 sm:ml-auto">See this font paired with another on a name card, website or article &mdash; themed with any palette.</p>
+          </div>
         </div>
 
         <div className="flex gap-6 flex-col lg:flex-row">
