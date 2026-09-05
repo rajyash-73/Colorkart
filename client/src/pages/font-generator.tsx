@@ -1,10 +1,13 @@
 import React, { useState, useRef } from 'react';
 import SEOHead from '@/components/SEOHead';
-import { Copy, Check, Download, RefreshCw, ChevronLeft, Type, Layout } from 'lucide-react';
+import { Copy, Check, Download, RefreshCw, ChevronLeft, Type, Layout, Lock } from 'lucide-react';
 import { Link } from 'wouter';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FontPairingSimulator from '@/components/FontPairingSimulator';
+import ProUpgradeModal from '@/components/ProUpgradeModal';
+import { usePro } from '@/hooks/use-pro';
+import { useAuth } from '@/hooks/use-auth';
 import { GOOGLE_FONTS, SAMPLE_TEXTS, FONT_CATEGORIES, WEIGHTS, ALL_WEIGHTS, loadFont } from '@/lib/fonts';
 
 function CopyBtn({ text, label }: { text: string; label?: string }) {
@@ -34,6 +37,15 @@ export default function FontGeneratorPage() {
   const [search, setSearch] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [simulatorOpen, setSimulatorOpen] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { isPro } = usePro();
+  const { user } = useAuth();
+  // Pro-only. The single-font generator below stays free.
+  const openSimulator = () => {
+    if (isPro) { setSimulatorOpen(true); return; }
+    if (!user) { window.location.href = '/auth'; return; }
+    setShowUpgrade(true);
+  };
   const previewRef = useRef<HTMLDivElement>(null);
 
   const sampleText = customText || SAMPLE_TEXTS[sampleIndex];
@@ -104,10 +116,12 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
 
           <div className="sm:text-right sm:pl-6">
             <button
-              onClick={() => setSimulatorOpen(true)}
+              onClick={openSimulator}
               className="group inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-900/20 transition duration-200 ease-out hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-md hover:shadow-violet-900/30 active:translate-y-0 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
-              <Layout size={16} className="transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none" />
+              {isPro
+                ? <Layout size={16} className="transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none" />
+                : <Lock size={16} className="transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transform-none" />}
               Simulate font &amp; colour pairing
             </button>
             <p className="mt-1.5 max-w-xs text-xs text-gray-400 sm:ml-auto">See this font paired with another on a name card, website or article &mdash; themed with any palette.</p>
@@ -284,6 +298,12 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
           </div>
         </div>
       </div>
+
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="The pairing simulator is a Pro feature"
+      />
 
       <FontPairingSimulator
         open={simulatorOpen}

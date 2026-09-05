@@ -17,6 +17,8 @@ import { usePalette, colorTheoryOptions, ColorTheory } from '@/contexts/PaletteC
 import { Link } from 'wouter';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/use-auth';
+import { usePro, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
+import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 const CB_MODES: { key: ColorBlindnessType; label: string }[] = [
   { key: 'normal',        label: 'Normal' },
@@ -76,6 +78,7 @@ function PaletteApp() {
   } = usePalette();
   
   const { user } = useAuth();
+  const { canSaveMore, refreshSavedCount } = usePro();
 
   // Load palette passed from Explore page (survives full page reload via localStorage)
   useEffect(() => {
@@ -158,9 +161,18 @@ function PaletteApp() {
   const [simulationMode, setSimulationMode] = useState<ColorBlindnessType>('normal');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saving, setSaving] = useState(false);
   const paletteRef = useRef<HTMLDivElement>(null);
+
+  // The database is the real gate (RLS + can_save_palette). This just avoids
+  // walking the user through a modal that is going to fail.
+  const handleSaveClick = () => {
+    if (!user) { window.location.href = '/auth'; return; }
+    if (!canSaveMore) { setShowUpgrade(true); return; }
+    setShowSaveModal(true);
+  };
 
   const handleSavePalette = async () => {
     if (!user) { window.location.href = '/auth'; return; }
@@ -178,11 +190,20 @@ function PaletteApp() {
       });
       if (error) throw new Error(error.message);
       localStorage.removeItem(COMMUNITY_POOL_KEY); // invalidate cache so next load picks up new palette
+      refreshSavedCount();
       setToast(`Saved "${saveName}"`);
       setShowSaveModal(false);
       setSaveName('');
     } catch (err: any) {
-      setToast('Failed to save: ' + (err?.message ?? 'Unknown error'));
+      // RLS rejects the insert once a free account is at the cap. Surface that
+      // as the upgrade prompt rather than a raw policy error.
+      const msg = err?.message ?? 'Unknown error';
+      if (/row-level security|policy/i.test(msg)) {
+        setShowSaveModal(false);
+        setShowUpgrade(true);
+      } else {
+        setToast('Failed to save: ' + msg);
+      }
     } finally {
       setSaving(false);
     }
@@ -366,7 +387,7 @@ function PaletteApp() {
             { "@type": "Question", "name": "What color theory modes are available?", "acceptedAnswer": { "@type": "Answer", "text": "Five modes: Complementary (opposite hues, high contrast), Analogous (adjacent hues, harmonious), Triadic (3 equidistant hues, vibrant), Tetradic (4 hues, rich), and Monochromatic (one hue at varying lightness)." } },
             { "@type": "Question", "name": "Can I save my color palettes for free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create a free Coolors account to save unlimited palettes, share them publicly with the community and access them from any device." } },
             { "@type": "Question", "name": "How do I export a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Click Export in the generator toolbar. Choose from PNG image, CSS custom properties, SCSS variables, Tailwind config or JSON format." } },
-            { "@type": "Question", "name": "Is the color palette generator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Coolors is completely free to use — no subscription or sign-up required to generate, export and share color palettes." } }
+            { "@type": "Question", "name": "Is the color palette generator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Generating, exporting and sharing colour palettes is free with no sign-up. A one-time Coolors Pro purchase unlocks the visualizer, image-to-palette, font pairing, unlimited saves and an ad-free site." } }
           ]
         }}
       />
@@ -447,7 +468,7 @@ function PaletteApp() {
 
         <button
           className="h-10 w-28 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all flex items-center justify-center gap-1.5 text-sm font-medium"
-          onClick={() => user ? setShowSaveModal(true) : window.location.href = '/auth'}
+          onClick={handleSaveClick}
         >
           <Save size={15} /><span>Save</span>
         </button>
@@ -696,6 +717,12 @@ function PaletteApp() {
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
       {/* Save Palette Modal */}
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason={`Free accounts can save ${FREE_SAVE_LIMIT} palettes — you've used all of them.`}
+      />
+
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm">

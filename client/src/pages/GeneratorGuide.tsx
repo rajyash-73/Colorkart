@@ -152,7 +152,7 @@ export default function GeneratorGuide() {
                 },
                 {
                   q: "Is the color palette generator free?",
-                  a: "Yes. Coolors is completely free — no subscription or sign-up required to generate, export and share color palettes. Create an account only if you want to save palettes to your library.",
+                  a: "Yes. Generating, exporting and sharing colour palettes is free and needs no sign-up. Create an account to save palettes — free accounts keep 5. A one-time Pro purchase adds the visualizer, image-to-palette, font pairing, unlimited saves and removes ads.",
                 },
                 {
                   q: "Can I add or remove colors from a palette?",

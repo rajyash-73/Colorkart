@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Heart, Share2, Download, Copy, ArrowRight, Plus, X, Palette, Filter } from 'lucide-react';
+import { Search, Heart, Share2, Download, Copy, ArrowRight, Plus, X, Palette, Filter, Sparkles } from 'lucide-react';
 import { FaPinterestP, FaXTwitter } from 'react-icons/fa6';
 import { Link } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
+import ProUpgradeModal from '@/components/ProUpgradeModal';
+import { usePro } from '@/hooks/use-pro';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
 // among themselves. Anchored to a fixed past date (not Date.now()) so they
@@ -40,6 +42,29 @@ const colorsParam = (p: SupabasePalette) => p.colors.map(c => c.replace('#', '')
 
 const openPopup = (url: string) =>
   window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
+
+/** Cards per row at each Tailwind breakpoint, matching the grid's column classes. */
+function columnsForWidth(w: number): number {
+  if (w >= 1280) return 4;  // xl
+  if (w >= 1024) return 3;  // lg
+  if (w >= 640) return 2;   // sm
+  return 1;
+}
+
+/** Free accounts see this many rows of Explore. */
+const FREE_ROWS = 3;
+
+function useFreeVisibleCount(): number {
+  const [cols, setCols] = useState(() =>
+    columnsForWidth(typeof window === 'undefined' ? 1280 : window.innerWidth));
+  useEffect(() => {
+    const update = () => setCols(columnsForWidth(window.innerWidth));
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  return cols * FREE_ROWS;
+}
 
 const COLOR_TAGS = ['Red','Orange','Yellow','Green','Blue','Violet','Pink','Brown','Black','White','Gray','Turquoise'];
 const STYLE_TAGS = ['Warm','Cold','Bright','Dark','Pastel','Vintage','Monochromatic','Gradient','Rainbow'];
@@ -181,6 +206,9 @@ export default function ExplorePage() {
   const [showFilter, setShowFilter] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'popular' | 'newest'>('popular');
+  const { isPro } = usePro();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const freeVisible = useFreeVisibleCount();
 
   useEffect(() => {
     const loadPalettes = async () => {
@@ -458,20 +486,52 @@ export default function ExplorePage() {
             <p className="text-sm mt-1">Try different search terms or clear filters</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map(palette => (
-              <PaletteCard
-                key={palette.id}
-                palette={palette}
-                onApply={handleApply}
-                onLike={handleLike}
-                likedIds={likedIds}
-                highlighted={palette.id === highlightId}
-              />
-            ))}
-          </div>
+          <>
+            <div className="relative">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {(isPro ? filtered : filtered.slice(0, freeVisible)).map(palette => (
+                  <PaletteCard
+                    key={palette.id}
+                    palette={palette}
+                    onApply={handleApply}
+                    onLike={handleLike}
+                    likedIds={likedIds}
+                    highlighted={palette.id === highlightId}
+                  />
+                ))}
+              </div>
+              {!isPro && filtered.length > freeVisible && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent" />
+              )}
+            </div>
+
+            {!isPro && filtered.length > freeVisible && (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">
+                    {filtered.length - freeVisible} more palettes
+                  </span>{' '}
+                  are available with Pro.
+                </p>
+                <button
+                  onClick={() => (user ? setShowUpgrade(true) : (window.location.href = '/auth'))}
+                  className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-violet-700 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
+                >
+                  <Sparkles size={15} />
+                  {user ? 'Unlock all palettes — ₹100' : 'Sign in to unlock'}
+                </button>
+                <p className="mt-2 text-[11px] text-gray-400">One payment, lifetime access.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="See every palette on Explore"
+      />
 
       <Footer />
     </div>

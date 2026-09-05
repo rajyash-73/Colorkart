@@ -105,8 +105,8 @@ export default function About() {
               {[
                 {
                   icon: <Heart className="w-7 h-7 text-pink-500" />,
-                  title: "Always Free",
-                  desc: "Every tool on Coolors.in is completely free. No paywalls, no subscription tiers, no sign-up required to generate and export.",
+                  title: "Free to Start",
+                  desc: "Generating, exporting and sharing palettes is free with no sign-up. A single one-time payment unlocks the Pro tools — no subscription, ever.",
                 },
                 {
                   icon: <Users className="w-7 h-7 text-violet-500" />,

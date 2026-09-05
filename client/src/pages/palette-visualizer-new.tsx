@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { isLightColor } from '@/lib/colorUtils';
 import SEOHead from '@/components/SEOHead';
+import ProGate from '@/components/ProGate';
 import html2canvas from 'html2canvas';
 
 type TemplateType = 'dashboard' | 'landing' | 'analytics' | 'chat' | 'calendar';
@@ -80,10 +81,14 @@ export default function PaletteVisualizer() {
           "url": "https://coolors.in/visualize",
           "applicationCategory": "DesignApplication",
           "description": "Preview your color palette in real UI templates including dashboards, landing pages and chat apps.",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+          "offers": { "@type": "Offer", "price": "100", "priceCurrency": "INR" }
         }}
       />
 
+      <ProGate
+        title="Palette Visualizer is a Pro feature"
+        description="See any palette applied to real dashboard, landing page and app mockups — and export the result."
+      >
       <div className="flex-1 max-w-screen-xl mx-auto w-full px-4 md:px-8 py-6 flex flex-col gap-5">
 
         {/* Page header */}
@@ -222,6 +227,7 @@ export default function PaletteVisualizer() {
         </div>{/* end flex row */}
 
       </div>
+      </ProGate>
 
       {/* Export success toast */}
       {showExportToast && (

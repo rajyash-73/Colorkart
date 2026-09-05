@@ -6,6 +6,7 @@ import { hexToRgb, getColorName, rgbToHex, isLightColor } from '@/lib/colorUtils
 import { useToast } from '@/hooks/use-toast';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
+import ProGate from '@/components/ProGate';
 import Header from '@/components/Header';
 
 type ExtractionPoint = { x: number; y: number; color: string };
@@ -221,12 +222,16 @@ export default function ImagePalette() {
           "url": "https://coolors.in/image-palette",
           "applicationCategory": "DesignApplication",
           "description": "Extract dominant colors from any image to create beautiful color palettes instantly.",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+          "offers": { "@type": "Offer", "price": "100", "priceCurrency": "INR" }
         }}
       />
 
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
+      <ProGate
+        title="Image to Palette is a Pro feature"
+        description="Upload any photo and pull its dominant colours straight into a palette you can edit and export."
+      >
       <div className="max-w-5xl mx-auto w-full px-4 py-8 flex-1">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Extract Color Palette from Image</h1>
@@ -387,6 +392,7 @@ export default function ImagePalette() {
           </div>
         )}
       </div>
+      </ProGate>
 
       <canvas ref={canvasRef} className="hidden" />
       <Footer />

@@ -56,3 +56,57 @@ CREATE INDEX IF NOT EXISTS idx_public_palettes_likes ON public_palettes(likes DE
 -- Authentication > Providers > Google
 -- Add your Google OAuth credentials (Client ID & Secret)
 -- Set authorized redirect URI: https://cjfasrvjmhkvrmcgrrnw.supabase.co/auth/v1/callback
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Pro (lifetime) entitlements
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS pro_users (
+  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  razorpay_order_id TEXT,
+  razorpay_payment_id TEXT,
+  amount INTEGER NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'INR',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE pro_users ENABLE ROW LEVEL SECURITY;
+
+-- Users may read their own entitlement so the app can unlock features.
+CREATE POLICY "Users read own pro status"
+  ON pro_users FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Deliberately NO insert/update/delete policy. Only the service role writes
+-- here, and only after a Razorpay signature has been verified server-side,
+-- so a client cannot make itself Pro.
+
+-- ─── Save cap: 5 palettes for free accounts, unlimited for Pro ──────────────
+-- SECURITY DEFINER is required: a policy on public_palettes that counts rows
+-- in public_palettes would recurse through its own RLS. Running the count in a
+-- definer function bypasses RLS inside the function and breaks that cycle.
+CREATE OR REPLACE FUNCTION can_save_palette(uid uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+AS $$
+  SELECT EXISTS (SELECT 1 FROM pro_users WHERE user_id = uid)
+      OR (SELECT count(*) FROM public_palettes WHERE user_id = uid) < 5;
+$$;
+
+REVOKE ALL ON FUNCTION can_save_palette(uuid) FROM public;
+GRANT EXECUTE ON FUNCTION can_save_palette(uuid) TO anon, authenticated;
+
+-- Replace the insert policy so the cap is enforced by the database, not the UI.
+DROP POLICY IF EXISTS "Users can insert their own palettes" ON public_palettes;
+CREATE POLICY "Users can insert their own palettes"
+  ON public_palettes FOR INSERT
+  WITH CHECK (
+    (auth.uid() = user_id OR user_id IS NULL)
+    AND (user_id IS NULL OR can_save_palette(auth.uid()))
+  );
+
+-- SELECT and DELETE policies are intentionally left alone: a user who already
+-- has more than 5 saved palettes keeps full access to every one of them and can
+-- still delete them. Only adding new ones is capped.
