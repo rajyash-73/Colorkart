@@ -343,7 +343,7 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* ── Rail ─────────────────────────────────────────────────────────── */}
-        <aside className="w-full lg:w-80 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 overflow-y-auto p-4 space-y-5 max-h-[38vh] lg:max-h-none">
+        <aside className="w-full lg:w-80 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 overflow-y-auto p-4 pb-32 space-y-5 max-h-[38vh] lg:max-h-none">
           <FontPicker label="Heading font" value={headingFont} onChange={setHeadingFont} cat={headingCat} onCat={setHeadingCat} />
           <FontPicker label="Body font" value={bodyFont} onChange={setBodyFont} cat={bodyCat} onCat={setBodyCat} />
 
@@ -421,7 +421,7 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
         </aside>
 
         {/* ── Canvas ───────────────────────────────────────────────────────── */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <main className="flex-1 overflow-y-auto p-4 pb-32 sm:p-8 sm:pb-32">
           <div className="mx-auto" style={{ maxWidth: mockup === 'card' ? 640 : 900 }}>
             <p className="mb-2 flex items-center gap-1.5 text-[11px] text-gray-400">
               <Edit size={11} />Click any text below to edit it
