@@ -118,7 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: {
+        redirectTo: window.location.origin,
+        // Without this Google resolves the account from the browser's existing
+        // session (authuser=0). When several accounts are signed in, or that
+        // session is stale, its consent endpoint can 401 before Supabase is
+        // ever reached. Asking for the chooser makes the account explicit.
+        queryParams: { prompt: 'select_account' },
+      },
     });
     if (error) {
       toast({ title: "Google sign in failed", description: error.message, variant: "destructive" });
