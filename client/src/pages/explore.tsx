@@ -221,7 +221,11 @@ export default function ExplorePage() {
           .select('*', { count: 'exact' })
           .eq('is_public', true)
           .order(sortBy === 'popular' ? 'likes' : 'created_at', { ascending: false })
-          .limit(100);
+          // Must stay at or above the public palette count, otherwise the
+          // "All N palettes are available with Pro" line promises more than the
+          // page can load. 1000 is Supabase's default per-request ceiling; past
+          // that this needs real pagination rather than a bigger number.
+          .limit(1000);
         if (!error && data && data.length > 0) {
           setPalettes([...data, ...STATIC_PALETTES]);
         }
@@ -508,8 +512,12 @@ export default function ExplorePage() {
             {!isPro && filtered.length > freeVisible && (
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  All{' '}
                   <span className="font-semibold text-gray-800 dark:text-gray-200">
-                    {filtered.length - freeVisible} more palettes
+                    {(search.trim() || activeTags.length > 0
+                      ? filtered.length
+                      : STATIC_PALETTES.length + publicCount
+                    ).toLocaleString()} palettes
                   </span>{' '}
                   are available with Pro.
                 </p>
