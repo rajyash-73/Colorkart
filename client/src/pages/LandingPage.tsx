@@ -1,18 +1,41 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from '@/components/SEOHead';
-import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Copy, Check, X, BookmarkCheck } from "lucide-react";
+import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Copy, Check, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
 import { useAuth } from "@/hooks/use-auth";
+import { usePro } from "@/hooks/use-pro";
+import ProUpgradeModal from "@/components/ProUpgradeModal";
 import { isLightColor } from "@/lib/colorUtils";
+
+// Survives the trip to /auth and, for Google, the round-trip through
+// accounts.google.com -- both land back on this page in the same tab.
+const PRO_INTENT_KEY = 'coolors_pro_intent';
 
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { user } = useAuth();
+  const { isPro, loading: proLoading } = usePro();
+
+  // Someone who clicked "Get Pro" while signed out gets sent to /auth, and
+  // auth-page redirects back here on success. Pick the checkout back up so
+  // signing in does not quietly drop what they were actually trying to do.
+  useEffect(() => {
+    if (!user || proLoading) return;
+    if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
+    sessionStorage.removeItem(PRO_INTENT_KEY);
+    if (!isPro) setShowUpgrade(true);
+  }, [user, proLoading, isPro]);
+
+  const startProSignIn = () => {
+    sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    window.location.href = '/auth';
+  };
 
   useEffect(() => {
     if (user) return;
@@ -288,26 +311,42 @@ export default function LandingPage() {
 
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)} />
 
-      {/* Sign-in prompt */}
+      {/* Pro prompt */}
       {!user && (
         <div className={`fixed top-16 right-4 z-40 transition-all duration-500 ${showSignInPrompt ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-          <div className="flex items-center gap-3 bg-gray-900 dark:bg-gray-800 text-white pl-4 pr-3 py-3 rounded-2xl shadow-2xl border border-white/10 max-w-sm sm:max-w-md">
-            <BookmarkCheck size={20} className="text-violet-400 flex-shrink-0" />
-            <p className="text-sm leading-snug">
-              <span className="font-semibold">Sign in</span> to save unlimited palettes and access them anywhere.
-            </p>
-            <button
-              onClick={() => window.location.href = '/auth'}
-              className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
-            >
-              Sign In
-            </button>
-            <button onClick={dismissPrompt} className="flex-shrink-0 p-1 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10">
+          <div className="relative flex items-start gap-3 bg-gray-900 dark:bg-gray-800 text-white pl-4 pr-9 py-3 rounded-2xl shadow-2xl border border-white/10 max-w-sm sm:max-w-md">
+            <Sparkles size={20} className="text-violet-400 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-sm leading-snug">
+                <span className="font-semibold">Go Pro for ₹100</span> — paid once, yours for life.
+              </p>
+              <p className="text-xs leading-snug text-gray-400 mt-1">
+                Unlocks every palette plus the visualizer, image-to-palette, font &amp; colour
+                pairing, unlimited saves and an ad-free site.
+              </p>
+              <div className="flex items-center gap-3 mt-2.5">
+                <button
+                  onClick={startProSignIn}
+                  className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 active:scale-95 text-white text-xs font-semibold transition-all duration-150 whitespace-nowrap"
+                >
+                  Get Pro — ₹100
+                </button>
+                <button
+                  onClick={() => window.location.href = '/auth'}
+                  className="text-xs text-gray-400 hover:text-white transition-colors whitespace-nowrap"
+                >
+                  Just sign in
+                </button>
+              </div>
+            </div>
+            <button onClick={dismissPrompt} aria-label="Dismiss" className="absolute top-2 right-2 p-1 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10">
               <X size={15} />
             </button>
           </div>
         </div>
       )}
+
+      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
@@ -331,7 +370,7 @@ export default function LandingPage() {
             Create the perfect palette or get inspired by thousands of beautiful color schemes.
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
-            Free to use — sign-up to save unlimited color palettes.
+            Free to use — sign-up to save your color palettes.
           </p>
           </div>
           

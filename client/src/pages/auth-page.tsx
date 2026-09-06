@@ -108,7 +108,7 @@ export default function AuthPage() {
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
         title="Sign In or Create Account | Coolors"
-        description="Sign in or create a free Coolors account to save unlimited color palettes, share with the community and export in multiple formats."
+        description="Sign in or create a free Coolors account to save color palettes, share with the community and export in multiple formats."
         canonicalPath="/auth"
         noIndex={true}
       />
@@ -130,7 +130,7 @@ export default function AuthPage() {
             <h1 className="text-4xl font-bold mb-4">Your Colors, Your Story</h1>
             <p className="text-violet-200 text-lg mb-8">Create, save, and share beautiful color palettes. Join thousands of designers using Coolors.</p>
             <div className="space-y-3">
-              {['Save unlimited palettes', 'Share with the community', 'Export in CSS, SCSS, Tailwind'].map(f => (
+              {['Save up to 5 palettes free', 'Share with the community', 'Export in CSS, SCSS, Tailwind'].map(f => (
                 <div key={f} className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-violet-400 flex items-center justify-center text-xs">✓</div>
                   <span className="text-violet-100">{f}</span>

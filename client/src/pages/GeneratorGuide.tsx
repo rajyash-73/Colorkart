@@ -144,7 +144,7 @@ export default function GeneratorGuide() {
                 },
                 {
                   q: "Can I save my color palettes for free?",
-                  a: "Yes. Create a free Coolors account to save unlimited palettes to your library. Saved palettes sync across all devices and can be shared publicly with the community on the Explore page.",
+                  a: "Yes. Create a free Coolors account to save up to 5 palettes to your library. Saved palettes sync across all devices and can be shared publicly with the community on the Explore page. A one-time Coolors Pro purchase lifts the limit.",
                 },
                 {
                   q: "How do I export a color palette?",

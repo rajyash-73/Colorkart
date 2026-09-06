@@ -377,7 +377,7 @@ export default function ExplorePage() {
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl text-sm leading-relaxed mb-6">
             Browse hand-curated color palettes — from warm earth tones to cool modern monochromes.
             Click any palette to apply it to the generator instantly. Filter by color, style or mood.
-            Free to use, sign-up to save unlimited color palettes.
+            Free to use, sign-up to save your color palettes.
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mb-6 flex items-center gap-2 flex-wrap">
             <span className="flex items-center gap-1 text-violet-500 dark:text-violet-400 font-medium">
