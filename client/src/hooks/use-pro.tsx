@@ -37,12 +37,17 @@ type ProContextType = {
 const ProContext = createContext<ProContextType | null>(null);
 
 export function ProProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [isPro, setIsPro] = useState(false);
   const [loading, setLoading] = useState(true);
   const [savedCount, setSavedCount] = useState(0);
 
   const refresh = useCallback(async () => {
+    // Auth resolves asynchronously. Until it settles, `user` is null even for a
+    // signed-in Pro user — reporting "not Pro" here would let AdGate inject ads
+    // before we ever learn who this is, and a third-party ad script cannot be
+    // un-injected once it runs.
+    if (authLoading) { setLoading(true); return; }
     if (!user) { setIsPro(false); setLoading(false); writeHint(undefined, false); return; }
     // Show the cached answer immediately, then confirm against the database.
     setIsPro(readHint(user.id));
@@ -59,7 +64,7 @@ export function ProProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const refreshSavedCount = useCallback(async () => {
     if (!user) { setSavedCount(0); return; }

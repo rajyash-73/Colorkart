@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePro } from '@/hooks/use-pro';
 import { loadAdScripts } from '@/lib/adScripts';
 
@@ -13,11 +13,20 @@ import { loadAdScripts } from '@/lib/adScripts';
  */
 export default function AdGate() {
   const { isPro, loading } = usePro();
+  const [waitedLongEnough, setWaitedLongEnough] = useState(false);
+
+  // Safety net: if auth or the entitlement lookup ever hangs, free users would
+  // otherwise never see an ad. Cap the wait rather than block revenue forever.
+  // Returning Pro users resolve from the localStorage hint well inside this.
+  useEffect(() => {
+    const t = setTimeout(() => setWaitedLongEnough(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
-    if (loading) return;
+    if (loading && !waitedLongEnough) return;
     if (!isPro) loadAdScripts();
-  }, [isPro, loading]);
+  }, [isPro, loading, waitedLongEnough]);
 
   return null;
 }
