@@ -13,6 +13,8 @@ import {
 import html2canvas from 'html2canvas';
 import BrowsePalettes from '@/components/BrowsePalettes';
 import { useAuth } from '@/hooks/use-auth';
+import { usePro } from '@/hooks/use-pro';
+import ProGate from '@/components/ProGate';
 import { useToast } from '@/hooks/use-toast';
 import { Color } from '@/types/Color';
 import { GOOGLE_FONTS, FONT_CATEGORIES, loadFont, fontStack, TEXT_WEIGHTS } from '@/lib/fonts';
@@ -151,6 +153,7 @@ interface Props {
 
 export default function FontPairingSimulator({ open, onClose, initialHeadingFont, initialBaseSize }: Props) {
   const { user } = useAuth();
+  const { isPro } = usePro();
   const { toast } = useToast();
 
   const [headingFont, setHeadingFont] = useState(initialHeadingFont || 'Playfair Display');
@@ -303,6 +306,12 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
         .ed:focus { box-shadow: 0 0 0 2px #7c6cff; background: rgba(124,108,255,.08); }
         .ed:empty::before { content: attr(data-ph); opacity: .35; }
       `}</style>
+
+      <ProGate
+        preview
+        title="Font &amp; colour pairing is a Pro feature"
+        description="Pair any two fonts, theme them with any palette, edit the copy in place and export the result."
+      >
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <Type size={18} className="text-violet-600" />
@@ -452,6 +461,19 @@ export default function FontPairingSimulator({ open, onClose, initialHeadingFont
           </div>
         </main>
       </div>
+      </ProGate>
+
+      {/* The top bar's close button is inert behind the paywall, so a locked
+          visitor needs their own way out. Escape works too. */}
+      {!isPro && (
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-3 right-3 z-10 p-2 rounded-lg bg-white/90 dark:bg-gray-800/90 text-gray-500 hover:text-gray-900 dark:hover:text-white shadow-sm transition-colors"
+        >
+          <X size={18} />
+        </button>
+      )}
     </div>
   );
 }

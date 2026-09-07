@@ -5,9 +5,7 @@ import { Link } from 'wouter';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FontPairingSimulator from '@/components/FontPairingSimulator';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
 import { usePro } from '@/hooks/use-pro';
-import { useAuth } from '@/hooks/use-auth';
 import { GOOGLE_FONTS, SAMPLE_TEXTS, FONT_CATEGORIES, WEIGHTS, ALL_WEIGHTS, loadFont } from '@/lib/fonts';
 
 function CopyBtn({ text, label }: { text: string; label?: string }) {
@@ -37,15 +35,11 @@ export default function FontGeneratorPage() {
   const [search, setSearch] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [simulatorOpen, setSimulatorOpen] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const { isPro } = usePro();
-  const { user } = useAuth();
-  // Pro-only. The single-font generator below stays free.
-  const openSimulator = () => {
-    if (isPro) { setSimulatorOpen(true); return; }
-    if (!user) { window.location.href = '/auth'; return; }
-    setShowUpgrade(true);
-  };
+  // Opens for everyone now -- ProGate inside the simulator shows free users a
+  // blurred preview with the upgrade panel, rather than refusing at the door.
+  // The single-font generator below stays free either way.
+  const openSimulator = () => setSimulatorOpen(true);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const sampleText = customText || SAMPLE_TEXTS[sampleIndex];
@@ -298,12 +292,6 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
           </div>
         </div>
       </div>
-
-      <ProUpgradeModal
-        open={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-        reason="The pairing simulator is a Pro feature"
-      />
 
       <FontPairingSimulator
         open={simulatorOpen}
