@@ -105,7 +105,7 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
                 onClick={startPro}
                 title={`Get Pro — lifetime access, ${PRO_PRICE_LABEL}`}
                 aria-label="Get Pro"
-                className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg bg-[#ccff00] hover:bg-[#dbff4d] text-gray-950 text-sm font-bold active:scale-95 shadow-[0_0_12px_rgba(204,255,0,0.45)] hover:shadow-[0_0_18px_rgba(204,255,0,0.7)] transition-all duration-150"
+                className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg bg-[#db1a72] hover:bg-[#c2155f] text-white text-sm font-semibold active:scale-95 transition-all duration-150"
               >
                 {/* The nav bar is already wider than a 1024px laptop; the label
                     only earns its width once there is room for it. */}
@@ -166,7 +166,7 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           {showGetPro && (
             <button
               onClick={startPro}
-              className="bg-[#ccff00] hover:bg-[#dbff4d] text-gray-950 flex items-center gap-2 py-2 px-3 rounded-lg text-xs whitespace-nowrap w-full transition-colors my-1"
+              className="bg-[#db1a72] hover:bg-[#c2155f] text-white flex items-center gap-2 py-2 px-3 rounded-lg text-xs whitespace-nowrap w-full transition-colors my-1"
             >
               <Sparkles size={15} /><span className="font-bold">Get Pro — {PRO_PRICE_LABEL}</span>
             </button>

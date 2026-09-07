@@ -312,7 +312,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-3 mt-2.5">
                 <button
                   onClick={startProSignIn}
-                  className="px-3 py-1.5 rounded-lg bg-[#ccff00] hover:bg-[#dbff4d] text-gray-950 text-xs font-bold active:scale-95 shadow-[0_0_12px_rgba(204,255,0,0.45)] hover:shadow-[0_0_18px_rgba(204,255,0,0.7)] transition-all duration-150 whitespace-nowrap"
+                  className="px-3 py-1.5 rounded-lg bg-[#db1a72] hover:bg-[#c2155f] text-white text-xs font-semibold active:scale-95 transition-all duration-150 whitespace-nowrap"
                 >
                   Get Pro — {PRO_PRICE_LABEL}
                 </button>
