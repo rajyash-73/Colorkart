@@ -75,6 +75,13 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
             <span className="font-bold text-md sm:text-lg md:text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Coolors
             </span>
+            {/* Only ever appears once entitlement has resolved, so a free
+                account cannot be shown the badge even momentarily. */}
+            {isPro && (
+              <span className="px-1.5 py-0.5 rounded-md bg-[#db1a72] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wide leading-none">
+                Pro
+              </span>
+            )}
           </div>
         </div>
 
