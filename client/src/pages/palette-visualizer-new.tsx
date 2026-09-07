@@ -86,6 +86,7 @@ export default function PaletteVisualizer() {
       />
 
       <ProGate
+        preview
         title="Palette Visualizer is a Pro feature"
         description="See any palette applied to real dashboard, landing page and app mockups — and export the result."
       >
