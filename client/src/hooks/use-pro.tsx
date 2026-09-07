@@ -5,6 +5,11 @@ import { useAuth } from '@/hooks/use-auth';
 /** Free accounts may save this many palettes. Pro is unlimited. */
 export const FREE_SAVE_LIMIT = 5;
 
+/** Quoted wherever we show the price. Billing is in INR -- Razorpay creates
+ *  the order in INR and Checkout charges in INR -- so the dollar figure is an
+ *  approximation for visitors who do not think in rupees, marked as one. */
+export const PRO_PRICE_LABEL = '₹100 (≈ $1)';
+
 /** Cached so a returning Pro user doesn't get a flash of ads or locked panels
  *  while the pro_users lookup is in flight. Advisory only — the database is
  *  what actually decides, this just avoids a visible flicker. */

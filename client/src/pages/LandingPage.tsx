@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
 import { useAuth } from "@/hooks/use-auth";
-import { usePro } from "@/hooks/use-pro";
+import { usePro, PRO_PRICE_LABEL } from "@/hooks/use-pro";
 import ProUpgradeModal from "@/components/ProUpgradeModal";
 import { isLightColor } from "@/lib/colorUtils";
 
@@ -318,7 +318,7 @@ export default function LandingPage() {
             <Sparkles size={20} className="text-violet-400 flex-shrink-0 mt-0.5" />
             <div className="min-w-0">
               <p className="text-sm leading-snug">
-                <span className="font-semibold">Go Pro for ₹100</span> — paid once, yours for life.
+                <span className="font-semibold">Go Pro for {PRO_PRICE_LABEL}</span> — paid once, yours for life.
               </p>
               <p className="text-xs leading-snug text-gray-400 mt-1">
                 Unlocks every palette plus the visualizer, image-to-palette, font &amp; colour
@@ -329,7 +329,7 @@ export default function LandingPage() {
                   onClick={startProSignIn}
                   className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 active:scale-95 text-white text-xs font-semibold transition-all duration-150 whitespace-nowrap"
                 >
-                  Get Pro — ₹100
+                  Get Pro — {PRO_PRICE_LABEL}
                 </button>
                 <button
                   onClick={() => window.location.href = '/auth'}

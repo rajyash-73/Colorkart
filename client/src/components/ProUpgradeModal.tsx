@@ -151,6 +151,7 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
 
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-3xl font-bold text-gray-900 dark:text-white">₹100</span>
+          <span className="text-base font-medium text-gray-500 dark:text-gray-400">(≈ $1)</span>
           <span className="text-sm text-gray-500 dark:text-gray-400">once — lifetime access</span>
         </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
-import { usePro } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 
@@ -51,7 +51,7 @@ export default function ProGate({
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-violet-700 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800"
         >
           <Sparkles size={15} />
-          {user ? 'Unlock with Pro — ₹100' : 'Sign in to unlock'}
+          {user ? `Unlock with Pro — ${PRO_PRICE_LABEL}` : 'Sign in to unlock'}
         </button>
         <p className="mt-3 text-[11px] text-gray-400">One payment, lifetime access.</p>
       </div>
