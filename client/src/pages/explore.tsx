@@ -13,6 +13,7 @@ import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
+import { useFreeVisibleCount } from '@/hooks/use-free-rows';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
 // among themselves. Anchored to a fixed past date (not Date.now()) so they
@@ -51,20 +52,6 @@ function columnsForWidth(w: number): number {
   return 1;
 }
 
-/** Free accounts see this many rows of Explore. */
-const FREE_ROWS = 3;
-
-function useFreeVisibleCount(): number {
-  const [cols, setCols] = useState(() =>
-    columnsForWidth(typeof window === 'undefined' ? 1280 : window.innerWidth));
-  useEffect(() => {
-    const update = () => setCols(columnsForWidth(window.innerWidth));
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-  return cols * FREE_ROWS;
-}
 
 const COLOR_TAGS = ['Red','Orange','Yellow','Green','Blue','Violet','Pink','Brown','Black','White','Gray','Turquoise'];
 const STYLE_TAGS = ['Warm','Cold','Bright','Dark','Pastel','Vintage','Monochromatic','Gradient','Rainbow'];
@@ -208,7 +195,7 @@ export default function ExplorePage() {
   const [sortBy, setSortBy] = useState<'popular' | 'newest'>('popular');
   const { isPro } = usePro();
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const freeVisible = useFreeVisibleCount();
+  const freeVisible = useFreeVisibleCount(columnsForWidth);
 
   useEffect(() => {
     const loadPalettes = async () => {

@@ -7,6 +7,9 @@ import { getColorName } from '@/lib/colorUtils';
 import { POPULAR_PALETTES } from '@/lib/palettesData';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
+import { useFreeVisibleCount } from '@/hooks/use-free-rows';
+import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 interface BrowsePalettesProps {
   onSelectPalette: (colors: Color[]) => void;
@@ -49,11 +52,21 @@ const paletteUrl = (id: string) => `${SHARE_ORIGIN}/explore?palette=${id}`;
 const paletteCaption = (p: PaletteItem) => `"${p.name}" color palette 🎨 ${p.colors.map(c => `${getColorName(c)} ${c.toUpperCase()}`).join(' · ')}`;
 const colorsParam = (p: PaletteItem) => p.colors.map(c => c.replace('#', '')).join('-');
 
+/** Mirrors the card grid below: grid-cols-2 sm:grid-cols-3 lg:grid-cols-4. */
+function columnsForWidth(w: number): number {
+  if (w >= 1024) return 4;  // lg
+  if (w >= 640) return 3;   // sm
+  return 2;
+}
+
 const openPopup = (url: string) =>
   window.open(url, '_blank', 'noopener,noreferrer,width=640,height=560');
 
 export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: BrowsePalettesProps) {
   const { toast } = useToast();
+  const { isPro } = usePro();
+  const freeVisible = useFreeVisibleCount(columnsForWidth);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [communityPalettes, setCommunityPalettes] = useState<PaletteItem[]>([]);
@@ -103,14 +116,18 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
       setLoading(true);
       try {
         // count: 'exact' returns the true total of public palettes alongside
-        // the capped page of data — the grid only needs the top 200, but the
-        // "N palettes" stat must reflect every public palette, not just those.
+        // the page of data, so the "N palettes" stat reflects every public
+        // palette. The limit has to be big enough to actually deliver that
+        // number too -- the Pro upsell below advertises the full library, and
+        // a Pro user paging through must be able to reach all of it. 1000 is
+        // Supabase's default per-request ceiling; past that this needs real
+        // pagination rather than a bigger number.
         const { data, count } = await supabase
           .from('public_palettes')
           .select('id, name, colors, likes', { count: 'exact' })
           .eq('is_public', true)
           .order('likes', { ascending: false })
-          .limit(200);
+          .limit(1000);
         if (data) {
           setCommunityPalettes(
             data.map(p => ({
@@ -139,7 +156,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
           .select('id, name, colors, likes, created_at')
           .eq('is_public', true)
           .order('created_at', { ascending: false })
-          .limit(200);
+          .limit(1000);
         if (data) {
           setNewestPalettes(
             data.map(p => ({
@@ -246,6 +263,21 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   // are already reflected here when public, so they aren't added separately.
   const totalCount = STATIC_PALETTES.length + publicCount;
 
+  // Gated on the library tabs only. "My Saved" is the user's own work and
+  // stays fully accessible -- the paywall caps new saves, it never hides
+  // palettes someone already made.
+  const gated = !isPro && tab !== 'saved';
+  const visiblePalettes = gated
+    ? displayPalettes.slice(0, freeVisible)
+    : displayPalettes.slice(0, showCount);
+  const hiddenByGate = gated ? displayPalettes.length - visiblePalettes.length : 0;
+
+  const startUpgrade = () => {
+    if (userId) { setShowUpgrade(true); return; }
+    sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    window.location.href = '/auth';
+  };
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all',     label: 'All' },
     { key: 'popular', label: 'Popular' },
@@ -348,8 +380,9 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
         )}
 
         {displayPalettes.length > 0 && (
+          <div className="relative">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
-            {displayPalettes.slice(0, showCount).map(p => (
+            {visiblePalettes.map(p => (
               <div
                 key={p.id}
                 className="relative rounded-xl border border-gray-100 dark:border-gray-700 hover:border-violet-300 dark:hover:border-violet-600 shadow-sm hover:shadow-lg transition-all duration-200 hover:-translate-y-1 group"
@@ -415,6 +448,10 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
               </div>
             ))}
           </div>
+          {hiddenByGate > 0 && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white dark:from-gray-800 to-transparent" />
+          )}
+          </div>
         )}
 
         {/* Share menu — rendered in a portal so it can sit above third-party ad overlays (z-index ~2147483535) */}
@@ -443,7 +480,25 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
           );
         })()}
 
-        {displayPalettes.length > showCount && (
+        {hiddenByGate > 0 ? (
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              All{' '}
+              <span className="font-semibold text-gray-800 dark:text-gray-200">
+                {(search.trim() ? displayPalettes.length : totalCount).toLocaleString()} palettes
+              </span>{' '}
+              are available with Pro.
+            </p>
+            <button
+              onClick={startUpgrade}
+              className="inline-flex items-center gap-2 rounded-full bg-[#db1a72] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c2155f]"
+            >
+              <Sparkles size={15} />
+              {userId ? `Unlock all palettes — ${PRO_PRICE_LABEL}` : 'Sign in to unlock'}
+            </button>
+            <p className="mt-2 text-[11px] text-gray-400">One payment, lifetime access.</p>
+          </div>
+        ) : displayPalettes.length > showCount ? (
           <div className="mt-6 text-center">
             <button
               onClick={() => setShowCount(c => c + 16)}
@@ -452,8 +507,14 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
               Show more ({displayPalettes.length - showCount} remaining)
             </button>
           </div>
-        )}
+        ) : null}
       </div>
+
+      <ProUpgradeModal
+        open={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="Browse every palette in the library"
+      />
     </div>
   );
 }
