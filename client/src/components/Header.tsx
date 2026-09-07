@@ -97,43 +97,47 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {showGetPro && (
-            <button
-              onClick={startPro}
-              title={`Get Pro — lifetime access, ${PRO_PRICE_LABEL}`}
-              aria-label="Get Pro"
-              className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 active:scale-95 text-white text-sm font-semibold transition-all duration-150 ml-1"
-            >
-              {/* The nav bar is already wider than a 1024px laptop; the label
-                  only earns its width once there is room for it. */}
-              <Sparkles size={14} /><span className="hidden xl:inline">Get Pro</span>
-            </button>
-          )}
+          {/* The container's space-x-0.5 outranks a plain ml-* here, so the
+              cluster gets its breathing room from padding and its own gap. */}
+          <div className="flex items-center gap-2 pl-2">
+            {showGetPro && (
+              <button
+                onClick={startPro}
+                title={`Get Pro — lifetime access, ${PRO_PRICE_LABEL}`}
+                aria-label="Get Pro"
+                className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg bg-[#ccff00] hover:bg-[#dbff4d] text-gray-950 text-sm font-bold active:scale-95 shadow-[0_0_12px_rgba(204,255,0,0.45)] hover:shadow-[0_0_18px_rgba(204,255,0,0.7)] transition-all duration-150"
+              >
+                {/* The nav bar is already wider than a 1024px laptop; the label
+                    only earns its width once there is room for it. */}
+                <Sparkles size={14} /><span className="hidden xl:inline">Get Pro</span>
+              </button>
+            )}
 
-          {user ? (
-            <div className="flex items-center gap-0.5 ml-1">
+            {user ? (
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={() => window.location.href = '/saved-palettes'}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <User size={15} /><span className="max-w-20 truncate">{user.name.split(' ')[0]}</span>
+                </button>
+                <button
+                  onClick={() => logoutMutation.mutate()}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  title="Sign out"
+                >
+                  <LogOut size={15} />
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => window.location.href = '/saved-palettes'}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                onClick={() => window.location.href = '/auth'}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity"
               >
-                <User size={15} /><span className="max-w-20 truncate">{user.name.split(' ')[0]}</span>
+                <LogIn size={14} />Sign In
               </button>
-              <button
-                onClick={() => logoutMutation.mutate()}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                title="Sign out"
-              >
-                <LogOut size={15} />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => window.location.href = '/auth'}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold hover:opacity-90 transition-opacity ml-1"
-            >
-              <LogIn size={14} />Sign In
-            </button>
-          )}
+            )}
+          </div>
         </div>
 
         <div className="md:hidden flex items-center gap-1">
@@ -162,9 +166,9 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           {showGetPro && (
             <button
               onClick={startPro}
-              className="text-violet-600 dark:text-violet-400 flex items-center gap-2 py-1.5 px-3 rounded-lg text-sm w-full hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+              className="bg-[#ccff00] hover:bg-[#dbff4d] text-gray-950 flex items-center gap-2 py-2 px-3 rounded-lg text-xs whitespace-nowrap w-full transition-colors my-1"
             >
-              <Sparkles size={15} /><span className="font-semibold">Get Pro — {PRO_PRICE_LABEL}</span>
+              <Sparkles size={15} /><span className="font-bold">Get Pro — {PRO_PRICE_LABEL}</span>
             </button>
           )}
           {user ? (
