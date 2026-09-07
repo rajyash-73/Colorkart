@@ -10,6 +10,11 @@ export const FREE_SAVE_LIMIT = 5;
  *  approximation for visitors who do not think in rupees, marked as one. */
 export const PRO_PRICE_LABEL = '₹100 (≈ $1)';
 
+/** Set when someone asks for Pro while signed out, so the checkout can be
+ *  reopened once they land back here signed in. Session-scoped: it must not
+ *  outlive the tab, or a later visit would pop the modal unprompted. */
+export const PRO_INTENT_KEY = 'coolors_pro_intent';
+
 /** Cached so a returning Pro user doesn't get a flash of ads or locked panels
  *  while the pro_users lookup is in flight. Advisory only — the database is
  *  what actually decides, this just avoids a visible flicker. */

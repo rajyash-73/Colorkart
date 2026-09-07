@@ -5,33 +5,18 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
 import { useAuth } from "@/hooks/use-auth";
-import { usePro, PRO_PRICE_LABEL } from "@/hooks/use-pro";
-import ProUpgradeModal from "@/components/ProUpgradeModal";
+import { PRO_PRICE_LABEL, PRO_INTENT_KEY } from "@/hooks/use-pro";
 import { isLightColor } from "@/lib/colorUtils";
-
-// Survives the trip to /auth and, for Google, the round-trip through
-// accounts.google.com -- both land back on this page in the same tab.
-const PRO_INTENT_KEY = 'coolors_pro_intent';
 
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const { user } = useAuth();
-  const { isPro, loading: proLoading } = usePro();
 
-  // Someone who clicked "Get Pro" while signed out gets sent to /auth, and
-  // auth-page redirects back here on success. Pick the checkout back up so
-  // signing in does not quietly drop what they were actually trying to do.
-  useEffect(() => {
-    if (!user || proLoading) return;
-    if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
-    sessionStorage.removeItem(PRO_INTENT_KEY);
-    if (!isPro) setShowUpgrade(true);
-  }, [user, proLoading, isPro]);
-
+  // Only the flag is set here; the Header owns the modal and reopens checkout
+  // once the visitor lands back signed in, so this works from any page.
   const startProSignIn = () => {
     sessionStorage.setItem(PRO_INTENT_KEY, '1');
     window.location.href = '/auth';
@@ -346,7 +331,6 @@ export default function LandingPage() {
         </div>
       )}
 
-      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">

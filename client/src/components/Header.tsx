@@ -1,7 +1,9 @@
-import React from "react";
-import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown, Home } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown, Home, Sparkles } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/use-auth";
+import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from "@/hooks/use-pro";
+import ProUpgradeModal from "@/components/ProUpgradeModal";
 
 interface HeaderProps {
   mobileMenuOpen: boolean;
@@ -38,6 +40,29 @@ function MobileBtn({ href, icon, label }: { href: string; icon: React.ReactNode;
 export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps) {
   const { isDark, toggleTheme } = useTheme();
   const { user, logoutMutation } = useAuth();
+  const { isPro, loading: proLoading } = usePro();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  // Hidden until entitlement resolves rather than defaulting to visible: a
+  // customer who has already paid should never be shown a buy button, not even
+  // for the moment the lookup is in flight.
+  const showGetPro = !isPro && !proLoading;
+
+  const startPro = () => {
+    if (user) { setShowUpgrade(true); return; }
+    // Signed out, so send them through /auth and pick the checkout back up on
+    // the way back. The Header is on every page, so this resume lives here
+    // rather than on whichever page they happen to return to.
+    sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    window.location.href = '/auth';
+  };
+
+  useEffect(() => {
+    if (!user || proLoading) return;
+    if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
+    sessionStorage.removeItem(PRO_INTENT_KEY);
+    if (!isPro) setShowUpgrade(true);
+  }, [user, proLoading, isPro]);
 
   return (
     <>
@@ -71,6 +96,19 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+
+          {showGetPro && (
+            <button
+              onClick={startPro}
+              title={`Get Pro — lifetime access, ${PRO_PRICE_LABEL}`}
+              aria-label="Get Pro"
+              className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 active:scale-95 text-white text-sm font-semibold transition-all duration-150 ml-1"
+            >
+              {/* The nav bar is already wider than a 1024px laptop; the label
+                  only earns its width once there is room for it. */}
+              <Sparkles size={14} /><span className="hidden xl:inline">Get Pro</span>
+            </button>
+          )}
 
           {user ? (
             <div className="flex items-center gap-0.5 ml-1">
@@ -121,6 +159,14 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           <MobileBtn href="/font-generator" icon={<Type size={15} />} label="Font Generator" />
           <MobileBtn href="/designers-guide" icon={<HelpCircle size={15} />} label="Help" />
           <div className="border-t border-gray-100 dark:border-gray-800 my-1 mx-3" />
+          {showGetPro && (
+            <button
+              onClick={startPro}
+              className="text-violet-600 dark:text-violet-400 flex items-center gap-2 py-1.5 px-3 rounded-lg text-sm w-full hover:bg-violet-50 dark:hover:bg-violet-900/30 transition-colors"
+            >
+              <Sparkles size={15} /><span className="font-semibold">Get Pro — {PRO_PRICE_LABEL}</span>
+            </button>
+          )}
           {user ? (
             <>
               <MobileBtn href="/saved-palettes" icon={<User size={15} />} label={user.name} />
@@ -133,6 +179,8 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           )}
         </div>
       </div>
+
+      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </>
   );
 }
