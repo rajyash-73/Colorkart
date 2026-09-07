@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
-import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 
@@ -35,6 +35,14 @@ export default function ProGate({
   const [showUpgrade, setShowUpgrade] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  // The button offers Pro, so signing in cannot be where it ends. Flagging
+  // intent means checkout reopens once they land back signed in.
+  const startUpgrade = () => {
+    if (user) { setShowUpgrade(true); return; }
+    sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    window.location.href = '/auth';
+  };
+
   // pointer-events-none stops the mouse but not the keyboard, and a blurred
   // teaser full of tab stops is a trap for anyone navigating that way. `inert`
   // takes the whole subtree out of the tab order and the accessibility tree.
@@ -65,11 +73,11 @@ export default function ProGate({
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{description}</p>
 
         <button
-          onClick={() => (user ? setShowUpgrade(true) : (window.location.href = '/auth'))}
+          onClick={startUpgrade}
           className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-violet-700 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800"
         >
           <Sparkles size={15} />
-          {user ? `Unlock with Pro — ${PRO_PRICE_LABEL}` : 'Sign in to unlock'}
+          {user ? `Unlock with Pro — ${PRO_PRICE_LABEL}` : 'Get Pro to unlock'}
         </button>
         <p className="mt-3 text-[11px] text-gray-400">One payment, lifetime access.</p>
       </div>

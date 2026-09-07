@@ -12,7 +12,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
-import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
 import { useFreeVisibleCount } from '@/hooks/use-free-rows';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
@@ -196,6 +196,12 @@ export default function ExplorePage() {
   const { isPro } = usePro();
   const [showUpgrade, setShowUpgrade] = useState(false);
   const freeVisible = useFreeVisibleCount(columnsForWidth);
+
+  const startUpgrade = () => {
+    if (user) { setShowUpgrade(true); return; }
+    sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    window.location.href = '/auth';
+  };
 
   useEffect(() => {
     const loadPalettes = async () => {
@@ -509,11 +515,11 @@ export default function ExplorePage() {
                   are available with Pro.
                 </p>
                 <button
-                  onClick={() => (user ? setShowUpgrade(true) : (window.location.href = '/auth'))}
+                  onClick={startUpgrade}
                   className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-violet-700 active:bg-violet-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                 >
                   <Sparkles size={15} />
-                  {user ? `Unlock all palettes — ${PRO_PRICE_LABEL}` : 'Sign in to unlock'}
+                  {user ? `Unlock all palettes — ${PRO_PRICE_LABEL}` : 'Get Pro to unlock'}
                 </button>
                 <p className="mt-2 text-[11px] text-gray-400">One payment, lifetime access.</p>
               </div>

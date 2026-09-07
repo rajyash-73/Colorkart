@@ -494,7 +494,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
               className="inline-flex items-center gap-2 rounded-full bg-[#db1a72] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c2155f]"
             >
               <Sparkles size={15} />
-              {userId ? `Unlock all palettes — ${PRO_PRICE_LABEL}` : 'Sign in to unlock'}
+              {userId ? `Unlock all palettes — ${PRO_PRICE_LABEL}` : 'Get Pro to unlock'}
             </button>
             <p className="mt-2 text-[11px] text-gray-400">One payment, lifetime access.</p>
           </div>
