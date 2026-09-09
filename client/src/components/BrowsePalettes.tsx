@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
 import { useFreeVisibleCount } from '@/hooks/use-free-rows';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
+import { rememberReturnPath } from '@/lib/postAuth';
 
 interface BrowsePalettesProps {
   onSelectPalette: (colors: Color[]) => void;
@@ -275,6 +276,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   const startUpgrade = () => {
     if (userId) { setShowUpgrade(true); return; }
     sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    rememberReturnPath();
     window.location.href = '/auth';
   };
 

@@ -14,6 +14,7 @@ import SEOHead from '@/components/SEOHead';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
 import { useFreeVisibleCount } from '@/hooks/use-free-rows';
+import { rememberReturnPath } from '@/lib/postAuth';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
 // among themselves. Anchored to a fixed past date (not Date.now()) so they
@@ -200,6 +201,7 @@ export default function ExplorePage() {
   const startUpgrade = () => {
     if (user) { setShowUpgrade(true); return; }
     sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    rememberReturnPath();
     window.location.href = '/auth';
   };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
+import { rememberReturnPath } from '@/lib/postAuth';
 import { useAuth } from '@/hooks/use-auth';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 
@@ -40,6 +41,7 @@ export default function ProGate({
   const startUpgrade = () => {
     if (user) { setShowUpgrade(true); return; }
     sessionStorage.setItem(PRO_INTENT_KEY, '1');
+    rememberReturnPath();
     window.location.href = '/auth';
   };
 

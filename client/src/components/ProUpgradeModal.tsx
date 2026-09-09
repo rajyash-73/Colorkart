@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, Check, Loader2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
-import { usePro } from '@/hooks/use-pro';
+import { usePro, PRO_INTENT_KEY } from '@/hooks/use-pro';
+import { rememberReturnPath } from '@/lib/postAuth';
 import { useToast } from '@/hooks/use-toast';
 
 declare global {
@@ -67,7 +68,15 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
   };
 
   const startCheckout = async () => {
-    if (!user) { window.location.href = '/auth'; return; }
+    if (!user) {
+      // Carry the purchase across sign-in: the flag reopens this modal once
+      // they are back, and the return path brings them to the page they were
+      // on rather than the homepage.
+      try { sessionStorage.setItem(PRO_INTENT_KEY, '1'); } catch {}
+      rememberReturnPath();
+      window.location.href = '/auth';
+      return;
+    }
     setBusy(true);
     try {
       await loadCheckout();
@@ -172,7 +181,13 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
                 : user ? 'Get lifetime access' : 'Sign in to continue'}
         </button>
 
-        <p className="mt-3 text-[11px] text-gray-400 text-center">
+        <p className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-[11px] leading-relaxed text-amber-800 dark:text-amber-200">
+          <span className="font-semibold">Paying from outside India?</span> Choose PayPal
+          at checkout. You don't need a PayPal account — a card works. More payment
+          options are on the way.
+        </p>
+
+        <p className="mt-2 text-[11px] text-gray-400 text-center">
           One payment, no renewals. Secured by Razorpay.
         </p>
       </div>

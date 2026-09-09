@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
 
 /**
  * A one-time note from the site's creator, shown to free accounts once per
@@ -27,6 +27,10 @@ export default function WelcomeNote() {
     // Never interrupt someone mid-sign-in.
     if (window.location.pathname.startsWith('/auth')) return;
     try {
+      // This note renders above the checkout modal. Someone returning from
+      // sign-in to buy is about to have that modal opened for them, so the
+      // note would land on top of it. Their purchase comes first.
+      if (sessionStorage.getItem(PRO_INTENT_KEY) === '1') return;
       if (sessionStorage.getItem(SEEN_KEY)) return;
       // Marked on show, not on dismiss, so navigating away does not bring it back.
       sessionStorage.setItem(SEEN_KEY, '1');
