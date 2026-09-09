@@ -4,6 +4,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/use-auth";
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from "@/hooks/use-pro";
 import ProUpgradeModal from "@/components/ProUpgradeModal";
+import { takeReturnPath } from "@/lib/postAuth";
 
 interface HeaderProps {
   mobileMenuOpen: boolean;
@@ -56,6 +57,14 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
     sessionStorage.setItem(PRO_INTENT_KEY, '1');
     window.location.href = '/auth';
   };
+
+  // Google OAuth returns to the origin, so auth-page never renders and never
+  // gets to redirect. Finish the trip from here instead.
+  useEffect(() => {
+    if (!user) return;
+    const target = takeReturnPath();
+    if (target && target !== window.location.pathname) window.location.href = target;
+  }, [user]);
 
   useEffect(() => {
     if (!user || proLoading) return;

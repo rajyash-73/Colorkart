@@ -19,6 +19,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/use-auth';
 import { usePro, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
+import { PENDING_SAVE_KEY, rememberReturnPath } from '@/lib/postAuth';
 
 const CB_MODES: { key: ColorBlindnessType; label: string }[] = [
   { key: 'normal',        label: 'Normal' },
@@ -78,7 +79,7 @@ function PaletteApp() {
   } = usePalette();
   
   const { user } = useAuth();
-  const { canSaveMore, refreshSavedCount } = usePro();
+  const { canSaveMore, refreshSavedCount, loading: proLoading } = usePro();
 
   // Load palette passed from Explore page (survives full page reload via localStorage)
   useEffect(() => {
@@ -166,16 +167,44 @@ function PaletteApp() {
   const [saving, setSaving] = useState(false);
   const paletteRef = useRef<HTMLDivElement>(null);
 
+  // Signing in reloads the page, which loses the palette -- PaletteContext
+  // keeps it in memory only. Park it alongside the return path so the visitor
+  // comes back to the same colours with the save dialog waiting, rather than
+  // to the homepage having lost their work.
+  const startSignInToSave = () => {
+    try { sessionStorage.setItem(PENDING_SAVE_KEY, JSON.stringify(palette)); } catch {}
+    rememberReturnPath('/generator');
+    window.location.href = '/auth';
+  };
+
+  // Resume that save once they are back and signed in.
+  useEffect(() => {
+    if (!user || proLoading) return;
+    let raw: string | null = null;
+    try {
+      raw = sessionStorage.getItem(PENDING_SAVE_KEY);
+      if (raw) sessionStorage.removeItem(PENDING_SAVE_KEY);
+    } catch { return; }
+    if (!raw) return;
+    try {
+      const colors = JSON.parse(raw);
+      if (Array.isArray(colors) && colors.length > 0) setPaletteColors(colors);
+    } catch { return; }
+    // They may have signed into an account that is already at the free cap.
+    if (!canSaveMore) { setShowUpgrade(true); return; }
+    setShowSaveModal(true);
+  }, [user, proLoading, canSaveMore, setPaletteColors]);
+
   // The database is the real gate (RLS + can_save_palette). This just avoids
   // walking the user through a modal that is going to fail.
   const handleSaveClick = () => {
-    if (!user) { window.location.href = '/auth'; return; }
+    if (!user) { startSignInToSave(); return; }
     if (!canSaveMore) { setShowUpgrade(true); return; }
     setShowSaveModal(true);
   };
 
   const handleSavePalette = async () => {
-    if (!user) { window.location.href = '/auth'; return; }
+    if (!user) { startSignInToSave(); return; }
     if (!saveName.trim()) { setToast('Please enter a palette name'); return; }
     setSaving(true);
     try {

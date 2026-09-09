@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { Loader2, ChevronLeft, Mail, Lock, User, CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { peekReturnPath } from "@/lib/postAuth";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation, signInWithGoogle, isLoading } = useAuth();
@@ -17,7 +18,9 @@ export default function AuthPage() {
   const [resending, setResending] = useState(false);
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-  if (user) return <Redirect to="/" />;
+  // Back to whatever they were doing, not the homepage. Google does not
+  // come through here -- it returns to "/" and the Header picks it up.
+  if (user) return <Redirect to={peekReturnPath() ?? "/"} />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
