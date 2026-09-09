@@ -25,7 +25,13 @@ export default function LandingPage() {
   useEffect(() => {
     if (user) return;
     if (sessionStorage.getItem('signin_prompt_dismissed')) return;
-    const t = setTimeout(() => setShowSignInPrompt(true), 2000);
+    // Re-checked when the timer fires, not only when it is set: WelcomeNote
+    // waits on the entitlement lookup before it can stand this prompt down,
+    // and that resolves after this effect has already scheduled.
+    const t = setTimeout(() => {
+      if (sessionStorage.getItem('signin_prompt_dismissed')) return;
+      setShowSignInPrompt(true);
+    }, 2000);
     return () => clearTimeout(t);
   }, [user]);
 
