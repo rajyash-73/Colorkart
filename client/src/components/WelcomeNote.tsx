@@ -56,7 +56,7 @@ export default function WelcomeNote() {
     >
       <div
         onClick={e => e.stopPropagation()}
-        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 max-h-[85vh] overflow-y-auto"
+        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-7 max-h-[85vh] overflow-y-auto"
       >
         <button
           onClick={() => setOpen(false)}
@@ -70,34 +70,27 @@ export default function WelcomeNote() {
 
         <div className="space-y-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
           <p>
-            I'm Yash, the creator of coolors.in. I built this site to democratize
-            color palette generation.
+            I'm Yash — I built coolors.in to democratize color palette generation.
+            Generate with color theory modes, or browse the Explore library: curated
+            palettes plus ones shared by the community. All free to use in your projects.
           </p>
           <p>
-            You can generate palettes using several color theory modes, or start from
-            one the community has shared. The Explore page holds an ever-growing
-            library — curated palettes alongside ones shared by other users — and
-            every one of them is free to use in your own projects.
-          </p>
-          <p>
-            To cover what the infrastructure costs to run, I've had to introduce a
-            one-time fee of{' '}
-            <span className="font-semibold text-gray-900 dark:text-white">{PRO_PRICE_LABEL}</span>.
-            One payment, no subscription: it removes ads for good and unlocks
-            unlimited saves, the visualizer, image-to-palette and font pairing.{' '}
+            Servers aren't free, so Pro is a one-time{' '}
+            <span className="font-semibold text-gray-900 dark:text-white">{PRO_PRICE_LABEL}</span>
+            {' '}— no subscription. It removes ads for good and unlocks unlimited saves,
+            the visualizer, image-to-palette and font pairing.{' '}
             <span className="font-semibold text-gray-900 dark:text-white">
-              Generating palettes stays free for everyone.
+              Generating always stays free.
             </span>
           </p>
           <p>
-            Any questions, reach me at{' '}
+            Questions?{' '}
             <a
               href="mailto:coolors.in@gmail.com"
               className="text-violet-600 dark:text-violet-400 hover:underline"
             >
               coolors.in@gmail.com
             </a>
-            .
           </p>
           <p className="text-gray-900 dark:text-white font-medium">Happy generating!</p>
         </div>
