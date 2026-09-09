@@ -54,45 +54,42 @@ export default function WelcomeNote() {
       aria-modal="true"
       aria-label="A note from the creator"
     >
+      {/* Deliberately light in both themes: this is a personal note, and it
+          reads as one on paper-white regardless of the site's theme. */}
       <div
         onClick={e => e.stopPropagation()}
-        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-7 max-h-[85vh] overflow-y-auto"
+        className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-7 max-h-[85vh] overflow-y-auto"
       >
         <button
           onClick={() => setOpen(false)}
           aria-label="Close"
-          className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <X size={18} />
         </button>
 
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Hey there!</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Hey there!</h2>
 
-        <div className="space-y-3 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+        <div className="space-y-3 text-sm leading-relaxed text-gray-600">
           <p>
             I'm Yash — I built coolors.in to democratize color palette generation.
-            Generate with color theory modes, or browse the Explore library: curated
-            palettes plus ones shared by the community. All free to use in your projects.
+            Generate unlimited color palettes, or browse the Explore library: curated
+            palettes plus ones shared by the community.
           </p>
           <p>
-            Servers aren't free, so Pro is a one-time{' '}
-            <span className="font-semibold text-gray-900 dark:text-white">{PRO_PRICE_LABEL}</span>
+            Pro is a one-time{' '}
+            <span className="font-semibold text-gray-900">{PRO_PRICE_LABEL}</span>
             {' '}— no subscription. It removes ads for good and unlocks unlimited saves,
             the visualizer, image-to-palette and font pairing.{' '}
-            <span className="font-semibold text-gray-900 dark:text-white">
-              Generating always stays free.
-            </span>
+            <span className="font-semibold text-gray-900">Generating always stays free.</span>
           </p>
           <p>
             Questions?{' '}
-            <a
-              href="mailto:coolors.in@gmail.com"
-              className="text-violet-600 dark:text-violet-400 hover:underline"
-            >
+            <a href="mailto:coolors.in@gmail.com" className="text-violet-600 hover:underline">
               coolors.in@gmail.com
             </a>
           </p>
-          <p className="text-gray-900 dark:text-white font-medium">Happy generating!</p>
+          <p className="text-gray-900 font-medium">Happy generating!</p>
         </div>
 
         <button
