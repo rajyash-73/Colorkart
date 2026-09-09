@@ -72,14 +72,14 @@ export default function WelcomeNote() {
 
         <div className="space-y-3 text-sm leading-relaxed text-gray-600">
           <p>
-            I'm Yash — I built coolors.in to democratize color palette generation.
+            I'm Yash, and I built coolors.in to democratize color palette generation.
             Generate unlimited color palettes, or browse the Explore library: curated
             palettes plus ones shared by the community.
           </p>
           <p>
             Pro is a one-time{' '}
             <span className="font-semibold text-gray-900">{PRO_PRICE_LABEL}</span>
-            {' '}— no subscription. It removes ads for good and unlocks unlimited saves,
+            , no subscription. It removes ads for good and unlocks unlimited saves,
             the visualizer, image-to-palette and font pairing.{' '}
             <span className="font-semibold text-gray-900">Generating always stays free.</span>
           </p>
