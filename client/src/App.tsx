@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./hooks/use-auth";
 import { ProProvider } from "./hooks/use-pro";
 import AdGate from "@/components/AdGate";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { PaletteProvider } from "./contexts/PaletteContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { HelmetProvider } from 'react-helmet-async';
@@ -93,6 +94,7 @@ function App() {
   }, []);
 
   return (
+    <ErrorBoundary>
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
@@ -108,6 +110,7 @@ function App() {
         </ThemeProvider>
       </QueryClientProvider>
     </HelmetProvider>
+    </ErrorBoundary>
   );
 }
 
