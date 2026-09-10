@@ -71,10 +71,6 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
     if (!user || proLoading) return;
     if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
     sessionStorage.removeItem(PRO_INTENT_KEY);
-    // WelcomeNote renders above this modal and checks the same flag. Its
-    // effect may run either side of this one, so stand it down explicitly
-    // rather than relying on the flag still being here when it looks.
-    try { sessionStorage.setItem('coolors_intro_seen', '1'); } catch {}
     if (!isPro) setShowUpgrade(true);
   }, [user, proLoading, isPro]);
 

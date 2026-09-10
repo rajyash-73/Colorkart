@@ -6,7 +6,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./hooks/use-auth";
 import { ProProvider } from "./hooks/use-pro";
 import AdGate from "@/components/AdGate";
-import WelcomeNote from "@/components/WelcomeNote";
 import { PaletteProvider } from "./contexts/PaletteContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { HelmetProvider } from 'react-helmet-async';
@@ -102,7 +101,6 @@ function App() {
               <PaletteProvider>
                 <PaletteRoutes />
                 <AdGate />
-                <WelcomeNote />
                 <Toaster />
               </PaletteProvider>
             </ProProvider>
