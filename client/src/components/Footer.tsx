@@ -27,9 +27,13 @@ const RESOURCE_LINKS = [
   { label: 'FAQ',                 href: '/faq' },
 ];
 
-const LEGAL_LINKS = [
-  { label: 'About',          href: '/about' },
-  { label: 'Privacy Policy', href: '/privacy-policy' },
+const COMPANY_LINKS = [
+  { label: 'About',                href: '/about' },
+  { label: 'Pricing',              href: '/pricing' },
+  { label: 'Contact Us',           href: '/contact' },
+  { label: 'Terms and Conditions', href: '/terms' },
+  { label: 'Refund Policy',        href: '/refund-policy' },
+  { label: 'Privacy Policy',       href: '/privacy-policy' },
 ];
 
 function FooterLink({ label, href }: { label: string; href: string }) {
@@ -72,15 +76,15 @@ export default function Footer({ className }: FooterProps) {
                 Created by <span className="font-semibold text-gray-900 dark:text-white">Yash</span>
               </p>
               <a
-                href="mailto:rajyash73@gmail.com"
+                href="mailto:coolors.in@gmail.com"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm transition-colors"
               >
-                rajyash73@gmail.com
+                coolors.in@gmail.com
               </a>
             </div>
             <div className="flex items-center mt-4 gap-2">
               <a
-                href="mailto:rajyash73@gmail.com"
+                href="mailto:coolors.in@gmail.com"
                 className="p-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-full border border-gray-200 dark:border-gray-700 transition-colors"
                 aria-label="Email"
               >
@@ -105,11 +109,11 @@ export default function Footer({ className }: FooterProps) {
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Company */}
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Legal</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Company</h4>
             <ul className="space-y-2.5">
-              {LEGAL_LINKS.map(l => <FooterLink key={l.href} {...l} />)}
+              {COMPANY_LINKS.map(l => <FooterLink key={l.href} {...l} />)}
             </ul>
           </div>
         </div>

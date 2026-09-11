@@ -253,7 +253,7 @@ export default function LandingPage() {
             "name": "Coolors",
             "url": "https://www.coolors.in",
             "logo": "https://www.coolors.in/logo_circles.svg",
-            "contactPoint": { "@type": "ContactPoint", "email": "rajyash73@gmail.com", "contactType": "customer support" }
+            "contactPoint": { "@type": "ContactPoint", "email": "coolors.in@gmail.com", "contactType": "customer support" }
           },
           {
             "@context": "https://schema.org",

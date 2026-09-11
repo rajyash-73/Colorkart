@@ -28,6 +28,10 @@ const FAQPage = React.lazy(() => import("@/pages/faq"));
 const DesignersGuide = React.lazy(() => import("@/pages/designers-guide"));
 const GeneratorGuide = React.lazy(() => import("@/pages/GeneratorGuide"));
 const AboutPage = React.lazy(() => import("@/pages/about"));
+const PricingPage = React.lazy(() => import("@/pages/pricing"));
+const ContactPage = React.lazy(() => import("@/pages/contact"));
+const TermsPage = React.lazy(() => import("@/pages/terms"));
+const RefundPolicyPage = React.lazy(() => import("@/pages/refund-policy"));
 const ContrastChecker = React.lazy(() => import("@/pages/contrast-checker"));
 const GradientGenerator = React.lazy(() => import("@/pages/gradient-generator"));
 const ColorPicker = React.lazy(() => import("@/pages/color-picker"));
@@ -69,6 +73,10 @@ const PaletteRoutes = () => (
     <Route path="/designers-guide"><LazyRoute component={DesignersGuide} /></Route>
     <Route path="/generator-guide"><LazyRoute component={GeneratorGuide} /></Route>
     <Route path="/about"><LazyRoute component={AboutPage} /></Route>
+    <Route path="/pricing"><LazyRoute component={PricingPage} /></Route>
+    <Route path="/contact"><LazyRoute component={ContactPage} /></Route>
+    <Route path="/terms"><LazyRoute component={TermsPage} /></Route>
+    <Route path="/refund-policy"><LazyRoute component={RefundPolicyPage} /></Route>
     <Route path="/korean-color-analysis-guide"><LazyRoute component={ClothingColorGuide} /></Route>
     <Route path="/clothing-color-guide"><Redirect to="/korean-color-analysis-guide" /></Route>
     <Route path="/visualizer-guide"><LazyRoute component={VisualizerGuide} /></Route>

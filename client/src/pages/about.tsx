@@ -66,7 +66,7 @@ export default function About() {
                 So we built a better way. Press the spacebar — get a new palette. Lock the colors you love. Tweak the rest. Export in the exact format your workflow needs. What used to take an hour now takes seconds.
               </p>
               <p>
-                The tool grew from a personal utility into something we wanted to share with everyone. Today Coolors.in offers a full suite of color tools — from a WCAG contrast checker to a Korean personal color analysis — all free, all in one place.
+                The tool grew from a personal utility into something we wanted to share with everyone. Today Coolors.in offers a full suite of color tools — from a WCAG contrast checker to a Korean personal color analysis — most of them free, all in one place.
               </p>
             </div>
           </div>
@@ -86,11 +86,11 @@ export default function About() {
                   Coolors.in is built and maintained by Yash — a developer with a passion for design tools. Every feature on this site comes from real-world design problems: the generator exists because picking harmonious colors is hard, the contrast checker exists because accessibility matters, and the Korean Color Analysis exists because personal color theory deserves a modern, free tool.
                 </p>
                 <a
-                  href="mailto:rajyash73@gmail.com"
+                  href="mailto:coolors.in@gmail.com"
                   className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-xl text-sm font-medium"
                 >
                   <Mail size={15} />
-                  rajyash73@gmail.com
+                  coolors.in@gmail.com
                 </a>
               </div>
             </div>
@@ -133,11 +133,11 @@ export default function About() {
         <section className="mb-12">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">What We Offer</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">Eight free tools — all in one place.</p>
+            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">Eight tools in one place. The Visualizer and Image to Palette are part of Pro; the rest are free.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 { label: "Color Palette Generator", href: "/generator", desc: "Generate palettes with color theory modes — complementary, analogous, triadic and more." },
-                { label: "Explore Palettes", href: "/explore", desc: "Browse 190+ curated palettes from the community. Filter by color, style or mood." },
+                { label: "Explore Palettes", href: "/explore", desc: "Browse hundreds of curated and community palettes. Filter by color, style or mood." },
                 { label: "Palette Visualizer", href: "/visualize", desc: "See how your colors look in real UI templates — dashboards, landing pages, chat apps." },
                 { label: "Image to Palette", href: "/image-palette", desc: "Extract dominant colors from any photo and apply them directly to the generator." },
                 { label: "Contrast Checker", href: "/contrast-checker", desc: "Verify WCAG 2.1 AA/AAA compliance for accessible, readable designs." },

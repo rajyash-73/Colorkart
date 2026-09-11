@@ -79,7 +79,7 @@ export default function FAQPage() {
           <div className="pb-5">
             <h2 className="text-xl font-semibold mb-2 text-gray-800">6. I have a suggestion or feedback. How can I reach you?</h2>
             <p className="text-gray-600 flex items-center">
-              Email us anytime at <a href="mailto:Coolors@gmail.com" className="text-blue-600 hover:underline mx-1 flex items-center"><Mail size={16} className="mr-1" /> Coolors@gmail.com</a> — we'd love to hear from you!
+              Email us anytime at <a href="mailto:coolors.in@gmail.com" className="text-blue-600 hover:underline mx-1 flex items-center"><Mail size={16} className="mr-1" /> coolors.in@gmail.com</a> — we'd love to hear from you!
             </p>
           </div>
         </div>
