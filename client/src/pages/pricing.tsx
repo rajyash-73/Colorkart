@@ -43,7 +43,7 @@ function Plan({
 }) {
   return (
     <div
-      className={`flex flex-col rounded-2xl border bg-white dark:bg-gray-900 p-6 ${
+      className={`flex h-full flex-col rounded-2xl border bg-white dark:bg-gray-900 p-5 ${
         highlight ? 'border-[#db1a72] shadow-md' : 'border-gray-200 dark:border-gray-800'
       }`}
     >
@@ -51,20 +51,20 @@ function Plan({
         {highlight && <Sparkles size={15} className="text-[#db1a72]" />}
         {name}
       </div>
-      <div className="mt-3 flex items-baseline gap-1.5">
+      <div className="mt-2 flex items-baseline gap-1.5">
         <span className="text-3xl font-bold text-gray-900 dark:text-white">{price}</span>
         {sub && <span className="text-sm text-gray-500 dark:text-gray-400">{sub}</span>}
       </div>
       <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{note}</div>
-      <div className="mt-5 flex-1 space-y-2.5">
+      <div className="mt-4 flex-1 space-y-2">
         {features.map(f => (
-          <div key={f} className="flex items-start gap-2 text-sm">
+          <div key={f} className="flex items-start gap-2 text-sm leading-snug text-gray-600 dark:text-gray-300">
             <Check size={15} className="mt-0.5 flex-shrink-0 text-green-500" />
             <span>{f}</span>
           </div>
         ))}
       </div>
-      {children && <div className="mt-6">{children}</div>}
+      {children && <div className="mt-5">{children}</div>}
     </div>
   );
 }
@@ -90,46 +90,51 @@ export default function Pricing() {
       description={`Coolors is free to use. Pro is a one-time ${PRO_PRICE_LABEL} payment that removes ads and unlocks the visualizer, image-to-palette, font pairing and unlimited saves.`}
       path="/pricing"
       showUpdated={false}
-      aside={<PaypalGuide />}
+      wide
+      hero={
+        <>
+          {/* Three equal tiles in one row from laptop width up, sized so the
+              whole row fits the first screen without scrolling. */}
+          <div className="grid gap-5 lg:grid-cols-3">
+            <Plan name="Free" price="₹0" note="Free forever, no card needed" features={FREE_FEATURES}>
+              <a
+                href="/generator"
+                className="block w-full rounded-xl border border-gray-200 dark:border-gray-700 py-2.5 text-center text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Start generating
+              </a>
+            </Plan>
+
+            <Plan
+              name="Pro"
+              price={PRICE_INR}
+              sub={PRICE_USD}
+              note="One-time payment. No subscription, no renewals."
+              features={PRO_FEATURES}
+              highlight
+            >
+              {loading ? null : isPro ? (
+                <div className="w-full rounded-xl bg-green-50 dark:bg-green-900/20 py-2.5 text-center text-sm font-semibold text-green-700 dark:text-green-300">
+                  You have Pro. Thank you!
+                </div>
+              ) : (
+                <button
+                  onClick={startUpgrade}
+                  className="w-full rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] py-2.5 text-sm font-semibold text-white transition"
+                >
+                  Get Pro for {PRICE_INR}
+                </button>
+              )}
+            </Plan>
+            <PaypalGuide />
+          </div>
+        </>
+      }
     >
       <p>
-        Coolors is built to make color palette generation open to everyone. Generating
-        palettes is free and always will be. Pro is a single one-time payment that
-        removes ads for good and unlocks the rest.
+        Generating palettes is free and always will be. Pro is a single one-time payment that removes ads for
+        good and unlocks the rest.
       </p>
-
-      <div className="my-8 grid gap-4 sm:grid-cols-2">
-        <Plan name="Free" price="₹0" note="Free forever, no card needed" features={FREE_FEATURES}>
-          <a
-            href="/generator"
-            className="block w-full rounded-xl border border-gray-200 dark:border-gray-700 py-2.5 text-center text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            Start generating
-          </a>
-        </Plan>
-
-        <Plan
-          name="Pro"
-          price={PRICE_INR}
-          sub={PRICE_USD}
-          note="One-time payment. No subscription, no renewals."
-          features={PRO_FEATURES}
-          highlight
-        >
-          {loading ? null : isPro ? (
-            <div className="w-full rounded-xl bg-green-50 dark:bg-green-900/20 py-2.5 text-center text-sm font-semibold text-green-700 dark:text-green-300">
-              You have Pro. Thank you!
-            </div>
-          ) : (
-            <button
-              onClick={startUpgrade}
-              className="w-full rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] py-2.5 text-sm font-semibold text-white transition"
-            >
-              Get Pro for {PRICE_INR}
-            </button>
-          )}
-        </Plan>
-      </div>
 
       <h2>How payment works</h2>
       <ul>
