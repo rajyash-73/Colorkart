@@ -94,10 +94,14 @@ const STEPS: Step[] = [
   },
 ];
 
+// break-words, not break-all: the email moves to the next line whole rather
+// than splitting mid-address, and only breaks if it cannot fit a line at all.
 const BODY_TEXT =
-  'text-sm leading-relaxed text-gray-600 dark:text-gray-300 [&_strong]:font-semibold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_a]:text-violet-600 dark:[&_a]:text-violet-400 [&_a]:underline [&_a]:break-all';
+  'text-sm leading-relaxed text-gray-600 dark:text-gray-300 [&_strong]:font-semibold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_a]:text-violet-600 dark:[&_a]:text-violet-400 [&_a]:underline [&_a]:break-words';
 const STEP_LABEL = 'text-[11px] font-semibold uppercase tracking-wider text-[#db1a72]';
 const BOX = 'rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800';
+// Shared by the text-only slide and its measuring copy, so both wrap alike.
+const TEXT_SLIDE = 'flex flex-col items-center gap-2 px-5 py-5 text-center';
 
 /** Each slide's content fades and slides in as it arrives. */
 const ENTER = 'animate-in fade-in-0 slide-in-from-right-3 motion-reduce:animate-none';
@@ -118,8 +122,9 @@ export default function PaypalGuide() {
   const count = STEPS.length;
   // Wraps both ways, since the slideshow loops.
   const go = (n: number) => setIndex(((n % count) + count) % count);
+  const shotFor = (s: Step) => (imageMissing ? undefined : s.shot);
   const step = STEPS[index];
-  const shot = imageMissing ? undefined : step.shot;
+  const shot = shotFor(step);
   const playing = !paused && !hovering && !keyboardFocus;
 
   // A timeout per step rather than an interval, so a manual move restarts
@@ -160,56 +165,83 @@ export default function PaypalGuide() {
       {/* Announced only while paused: a live region rotating this often would
           talk over a screen reader user without pause. */}
       <div className="relative mt-3" aria-live={playing ? 'off' : 'polite'}>
-        {/* The screenshot steps' layout: frame, then text. Always rendered so
-            the tile keeps one height; on text-only steps it is invisible and
-            the box below covers exactly the same area. */}
-        <div className={shot ? undefined : 'invisible'} aria-hidden={shot ? undefined : true}>
-          <div className={`relative aspect-[5/3] w-full overflow-hidden ${BOX}`}>
+        {/* Measuring layer: every step's layout stacked invisibly in one grid
+            cell. The stage is as tall as its tallest step however the text
+            wraps (fonts, zoom, width), so the tile never changes height as the
+            slides turn. The visible slide is laid over it. */}
+        <div className="invisible grid" aria-hidden="true">
+          {STEPS.map((s, n) =>
+            shotFor(s) ? (
+              <div key={s.title} className="col-start-1 row-start-1">
+                <div className="aspect-[5/3] w-full" />
+                <p className={`mt-3 ${STEP_LABEL}`}>Step {n + 1} of {count}</p>
+                <h3 className="mt-0.5 font-semibold">{s.title}</h3>
+                <p className={`mt-1 ${BODY_TEXT}`}>{s.body}</p>
+              </div>
+            ) : (
+              <div key={s.title} className={`col-start-1 row-start-1 ${TEXT_SLIDE}`}>
+                <span className="mb-2 flex items-center">{s.visual ?? <Globe size={28} />}</span>
+                <p className={STEP_LABEL}>Step {n + 1} of {count}</p>
+                <h3 className="font-semibold">{s.title}</h3>
+                <p className={BODY_TEXT}>{s.body}</p>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="absolute inset-0">
+          {/* Screenshot steps: the frame, then the step's text beneath it. */}
+          <div className={shot ? undefined : 'invisible'} aria-hidden={shot ? undefined : true}>
+            <div className={`relative aspect-[5/3] w-full overflow-hidden ${BOX}`}>
+              {shot && (
+                // Not keyed on the step, so between the two PayPal steps the
+                // same image and spotlight glide from the login form to the
+                // card button. It only fades in when arriving from a text step.
+                <div
+                  className={`absolute inset-x-0 top-0 transition-transform ease-out motion-reduce:transition-none ${ENTER}`}
+                  style={{ transform: `translateY(-${shot.scroll}%)`, ...moveStyle, ...enterStyle }}
+                >
+                  <img
+                    src={SCREENSHOT}
+                    alt="PayPal checkout window with a Log In form, and below it a Pay with Credit or Debit Card button"
+                    className="block w-full"
+                    onError={() => setImageMissing(true)}
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all ease-out motion-reduce:transition-none"
+                    style={{
+                      left: `${shot.box.left}%`,
+                      top: `${shot.box.top}%`,
+                      width: `${shot.box.width}%`,
+                      height: `${shot.box.height}%`,
+                      ...moveStyle,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
             {shot && (
-              // Not keyed on the step, so between the two PayPal steps the same
-              // image and spotlight glide from the login form to the card
-              // button. It only fades in when arriving from a text step.
-              <div
-                className={`absolute inset-x-0 top-0 transition-transform ease-out motion-reduce:transition-none ${ENTER}`}
-                style={{ transform: `translateY(-${shot.scroll}%)`, ...moveStyle, ...enterStyle }}
-              >
-                <img
-                  src={SCREENSHOT}
-                  alt="PayPal checkout window with a Log In form, and below it a Pay with Credit or Debit Card button"
-                  className="block w-full"
-                  onError={() => setImageMissing(true)}
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all ease-out motion-reduce:transition-none"
-                  style={{
-                    left: `${shot.box.left}%`,
-                    top: `${shot.box.top}%`,
-                    width: `${shot.box.width}%`,
-                    height: `${shot.box.height}%`,
-                    ...moveStyle,
-                  }}
-                />
+              <div key={index} className={ENTER} style={enterStyle}>
+                <p className={`mt-3 ${STEP_LABEL}`}>Step {index + 1} of {count}</p>
+                <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+                <p className={`mt-1 ${BODY_TEXT}`}>{step.body}</p>
               </div>
             )}
           </div>
-          <div key={index} className={ENTER} style={enterStyle}>
-            <p className={`mt-3 ${STEP_LABEL}`}>Step {index + 1} of {count}</p>
-            <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{shot ? step.title : ' '}</h3>
-            <p className={`mt-1 min-h-[4.5rem] ${BODY_TEXT}`}>{shot ? step.body : null}</p>
-          </div>
-        </div>
 
-        {!shot && (
-          <div className={`absolute inset-0 flex items-center justify-center overflow-hidden px-5 text-center ${BOX}`}>
-            <div key={index} className={`flex flex-col items-center gap-2 ${ENTER}`} style={enterStyle}>
-              <span className="mb-2 flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
-              <p className={STEP_LABEL}>Step {index + 1} of {count}</p>
-              <h3 className="font-semibold text-gray-900 dark:text-white">{step.title}</h3>
-              <p className={BODY_TEXT}>{step.body}</p>
+          {/* Text-only steps: the whole stage is one box with the text inside. */}
+          {!shot && (
+            <div className={`absolute inset-0 flex items-center justify-center overflow-hidden ${BOX}`}>
+              <div key={index} className={`${TEXT_SLIDE} ${ENTER}`} style={enterStyle}>
+                <span className="mb-2 flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
+                <p className={STEP_LABEL}>Step {index + 1} of {count}</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+                <p className={BODY_TEXT}>{step.body}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="mt-auto flex items-center justify-between pt-3">
