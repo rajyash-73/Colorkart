@@ -1,5 +1,5 @@
 import React from 'react';
-import LegalPage, { CONTACT_EMAIL } from '@/components/LegalPage';
+import LegalPage, { CONTACT_EMAIL, REFUND_DAYS } from '@/components/LegalPage';
 import { PRO_PRICE_LABEL, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 
 export default function RefundPolicy() {
@@ -7,7 +7,7 @@ export default function RefundPolicy() {
     <LegalPage
       title="Refund and Cancellation Policy | Coolors"
       heading="Refund and Cancellation Policy"
-      description="Coolors Pro comes with a 7-day full refund. Learn how to request a refund, how long it takes, and what happens to your account."
+      description={`Coolors Pro comes with a ${REFUND_DAYS}-day full refund. Learn how to request a refund, how long it takes, and what happens to your account.`}
       path="/refund-policy"
     >
       <p>
@@ -15,15 +15,15 @@ export default function RefundPolicy() {
         coolors.in. This policy explains when you can get your money back and how.
       </p>
 
-      <h2>7-day refund</h2>
+      <h2>{REFUND_DAYS}-day refund</h2>
       <p>
-        If Pro isn't right for you, email us within 7 days of your purchase and we'll refund you in full.
+        If Pro isn't right for you, email us within {REFUND_DAYS} days of your purchase and we'll refund you in full.
         No questions asked.
       </p>
 
       <h2>Charged but Pro didn't activate, or charged twice</h2>
       <p>
-        Contact us at any time, not only within 7 days. If Pro didn't activate, we'll either activate it
+        Contact us at any time, not only within {REFUND_DAYS} days. If Pro didn't activate, we'll either activate it
         on your account or refund the charge, whichever you prefer. Duplicate charges are always refunded.
       </p>
 
@@ -49,7 +49,7 @@ export default function RefundPolicy() {
       <h2>Cancellations</h2>
       <p>
         Pro is not a subscription, so there is nothing to cancel and you will never be charged again.
-        After 7 days, purchases are non-refundable except in the cases described above.
+        After {REFUND_DAYS} days, purchases are non-refundable except in the cases described above.
       </p>
 
       <h2>Contact</h2>

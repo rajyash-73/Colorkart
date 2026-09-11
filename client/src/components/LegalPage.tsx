@@ -9,6 +9,10 @@ export const CONTACT_EMAIL = 'coolors.in@gmail.com';
 /** Shown as "Last updated" on the policy pages. Bump it when their text changes. */
 export const LEGAL_UPDATED = 'September 11, 2026';
 
+/** Days after purchase in which Pro can be refunded on request. Quoted by the
+ *  Refund Policy and Pricing, so the two can never disagree. */
+export const REFUND_DAYS = 2;
+
 /**
  * Shared shell for Contact, Pricing and the policy pages. Deliberately plain:
  * these are read rather than browsed, and each is a page a payment reviewer

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
-import LegalPage, { CONTACT_EMAIL } from '@/components/LegalPage';
+import LegalPage, { CONTACT_EMAIL, REFUND_DAYS } from '@/components/LegalPage';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
@@ -155,7 +155,7 @@ export default function Pricing() {
 
       <h2>Refunds</h2>
       <p>
-        Not happy? You can get a full refund within 7 days of purchase. See our{' '}
+        Not happy? You can get a full refund within {REFUND_DAYS} days of purchase. See our{' '}
         <a href="/refund-policy">Refund Policy</a> for details.
       </p>
 
