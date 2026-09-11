@@ -14,8 +14,13 @@ import { CONTACT_EMAIL } from '@/components/LegalPage';
  * whole row fits the first screen, and it keeps one height across every step.
  */
 
-/** How long each step stays up while the slideshow is playing. */
-const AUTOPLAY_MS = 500;
+/** How long the move into each slide takes: the fade, and the screenshot
+ *  window and spotlight gliding between the two PayPal steps. */
+const TRANSITION_MS = 700;
+
+/** How long each slide then stays fully settled before the next begins. The
+ *  two are separate so a slide is never cut off while still moving. */
+const SHOW_MS = 500;
 
 const [PRICE_INR] = PRO_PRICE_LABEL.split(' ');
 
@@ -94,6 +99,11 @@ const BODY_TEXT =
 const STEP_LABEL = 'text-[11px] font-semibold uppercase tracking-wider text-[#db1a72]';
 const BOX = 'rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800';
 
+/** Each slide's content fades and slides in as it arrives. */
+const ENTER = 'animate-in fade-in-0 slide-in-from-right-3 motion-reduce:animate-none';
+const enterStyle = { animationDuration: `${TRANSITION_MS}ms` };
+const moveStyle = { transitionDuration: `${TRANSITION_MS}ms` };
+
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -113,10 +123,11 @@ export default function PaypalGuide() {
   const playing = !paused && !hovering && !keyboardFocus;
 
   // A timeout per step rather than an interval, so a manual move restarts
-  // the countdown instead of jumping again a moment later.
+  // the countdown instead of jumping again a moment later. Each step gets
+  // its transition plus SHOW_MS fully settled.
   useEffect(() => {
     if (!playing) return;
-    const t = setTimeout(() => setIndex(i => (i + 1) % count), AUTOPLAY_MS);
+    const t = setTimeout(() => setIndex(i => (i + 1) % count), TRANSITION_MS + SHOW_MS);
     return () => clearTimeout(t);
   }, [playing, index, count]);
 
@@ -146,8 +157,8 @@ export default function PaypalGuide() {
       <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Paying from outside India?</h2>
       <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">International payments go through PayPal.</p>
 
-      {/* Announced only while paused: a live region rotating every half second
-          would talk over a screen reader user without pause. */}
+      {/* Announced only while paused: a live region rotating this often would
+          talk over a screen reader user without pause. */}
       <div className="relative mt-3" aria-live={playing ? 'off' : 'polite'}>
         {/* The screenshot steps' layout: frame, then text. Always rendered so
             the tile keeps one height; on text-only steps it is invisible and
@@ -155,11 +166,12 @@ export default function PaypalGuide() {
         <div className={shot ? undefined : 'invisible'} aria-hidden={shot ? undefined : true}>
           <div className={`relative aspect-[5/3] w-full overflow-hidden ${BOX}`}>
             {shot && (
-              // Image and spotlight move together, so the window slides from
-              // the login form down to the card button between those steps.
+              // Not keyed on the step, so between the two PayPal steps the same
+              // image and spotlight glide from the login form to the card
+              // button. It only fades in when arriving from a text step.
               <div
-                className="absolute inset-x-0 top-0 transition-transform duration-300 ease-out"
-                style={{ transform: `translateY(-${shot.scroll}%)` }}
+                className={`absolute inset-x-0 top-0 transition-transform ease-out motion-reduce:transition-none ${ENTER}`}
+                style={{ transform: `translateY(-${shot.scroll}%)`, ...moveStyle, ...enterStyle }}
               >
                 <img
                   src={SCREENSHOT}
@@ -169,28 +181,33 @@ export default function PaypalGuide() {
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all duration-300 ease-out"
+                  className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all ease-out motion-reduce:transition-none"
                   style={{
                     left: `${shot.box.left}%`,
                     top: `${shot.box.top}%`,
                     width: `${shot.box.width}%`,
                     height: `${shot.box.height}%`,
+                    ...moveStyle,
                   }}
                 />
               </div>
             )}
           </div>
-          <p className={`mt-3 ${STEP_LABEL}`}>Step {index + 1} of {count}</p>
-          <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{shot ? step.title : ' '}</h3>
-          <p className={`mt-1 min-h-[4.5rem] ${BODY_TEXT}`}>{shot ? step.body : null}</p>
+          <div key={index} className={ENTER} style={enterStyle}>
+            <p className={`mt-3 ${STEP_LABEL}`}>Step {index + 1} of {count}</p>
+            <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{shot ? step.title : ' '}</h3>
+            <p className={`mt-1 min-h-[4.5rem] ${BODY_TEXT}`}>{shot ? step.body : null}</p>
+          </div>
         </div>
 
         {!shot && (
-          <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center ${BOX}`}>
-            <span className="mb-2 flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
-            <p className={STEP_LABEL}>Step {index + 1} of {count}</p>
-            <h3 className="font-semibold text-gray-900 dark:text-white">{step.title}</h3>
-            <p className={BODY_TEXT}>{step.body}</p>
+          <div className={`absolute inset-0 flex items-center justify-center overflow-hidden px-5 text-center ${BOX}`}>
+            <div key={index} className={`flex flex-col items-center gap-2 ${ENTER}`} style={enterStyle}>
+              <span className="mb-2 flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
+              <p className={STEP_LABEL}>Step {index + 1} of {count}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+              <p className={BODY_TEXT}>{step.body}</p>
+            </div>
           </div>
         )}
       </div>
