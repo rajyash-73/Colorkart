@@ -1,5 +1,6 @@
 import React from 'react';
 import LegalPage, { CONTACT_EMAIL } from '@/components/LegalPage';
+import MediavineNotice from '@/components/MediavineNotice';
 
 export default function PrivacyPolicy() {
   return (
@@ -51,6 +52,7 @@ export default function PrivacyPolicy() {
         identifiers to show relevant ads and measure how they perform. Pro members are not shown ads. You
         can limit personalized advertising through your browser settings or industry opt-out tools.
       </p>
+      <MediavineNotice />
 
       <h2>Who we share it with</h2>
       <p>
