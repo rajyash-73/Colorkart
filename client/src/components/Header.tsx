@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { HelpCircle, Eye, Menu, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Sun, Moon, LogIn, LogOut, User, ImageDown, Home, Sparkles } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/hooks/use-auth";
-import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from "@/hooks/use-pro";
-import ProUpgradeModal from "@/components/ProUpgradeModal";
-import { takeReturnPath, rememberReturnPath } from "@/lib/postAuth";
+import { usePro, PRO_PRICE_LABEL } from "@/hooks/use-pro";
+import { useCheckout } from "@/hooks/use-checkout";
+import { takeReturnPath } from "@/lib/postAuth";
 
 interface HeaderProps {
   mobileMenuOpen: boolean;
@@ -42,21 +42,21 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
   const { isDark, toggleTheme } = useTheme();
   const { user, logoutMutation } = useAuth();
   const { isPro, loading: proLoading } = usePro();
-  const [showUpgrade, setShowUpgrade] = useState(false);
 
   // Hidden until entitlement resolves rather than defaulting to visible: a
   // customer who has already paid should never be shown a buy button, not even
   // for the moment the lookup is in flight.
   const showGetPro = !isPro && !proLoading;
 
+  const { startCheckout } = useCheckout();
+
+  // Get Pro leads to the Pricing page, where checkout opens. On Pricing itself
+  // it opens checkout, so the button always does the next thing instead of
+  // reloading the page. A full load rather than in-app navigation: Pricing is
+  // ad-free, and ad scripts already running on this page cannot be removed.
   const startPro = () => {
-    if (user) { setShowUpgrade(true); return; }
-    // Signed out, so send them through /auth and pick the checkout back up on
-    // the way back. The Header is on every page, so this resume lives here
-    // rather than on whichever page they happen to return to.
-    sessionStorage.setItem(PRO_INTENT_KEY, '1');
-    rememberReturnPath();
-    window.location.href = '/auth';
+    if (window.location.pathname === '/pricing') { startCheckout(); return; }
+    window.location.href = '/pricing';
   };
 
   // Google OAuth returns to the origin, so auth-page never renders and never
@@ -67,12 +67,6 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
     if (target && target !== window.location.pathname) window.location.href = target;
   }, [user]);
 
-  useEffect(() => {
-    if (!user || proLoading) return;
-    if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
-    sessionStorage.removeItem(PRO_INTENT_KEY);
-    if (!isPro) setShowUpgrade(true);
-  }, [user, proLoading, isPro]);
 
   return (
     <>
@@ -200,8 +194,6 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
           )}
         </div>
       </div>
-
-      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </>
   );
 }

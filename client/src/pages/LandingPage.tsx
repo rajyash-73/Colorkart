@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
 import { useAuth } from "@/hooks/use-auth";
-import { PRO_PRICE_LABEL, PRO_INTENT_KEY } from "@/hooks/use-pro";
+import { PRO_PRICE_LABEL } from "@/hooks/use-pro";
 import { isLightColor } from "@/lib/colorUtils";
 
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
@@ -15,12 +15,8 @@ export default function LandingPage() {
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const { user } = useAuth();
 
-  // Only the flag is set here; the Header owns the modal and reopens checkout
-  // once the visitor lands back signed in, so this works from any page.
-  const startProSignIn = () => {
-    sessionStorage.setItem(PRO_INTENT_KEY, '1');
-    window.location.href = '/auth';
-  };
+  // Get Pro leads to the Pricing page; checkout opens from there.
+  const goToPricing = () => { window.location.href = '/pricing'; };
 
   useEffect(() => {
     if (user) return;
@@ -311,7 +307,7 @@ export default function LandingPage() {
               </p>
               <div className="flex items-center gap-3 mt-2.5">
                 <button
-                  onClick={startProSignIn}
+                  onClick={goToPricing}
                   className="px-3 py-1.5 rounded-lg bg-[#db1a72] hover:bg-[#c2155f] text-white text-xs font-semibold active:scale-95 transition-all duration-150 whitespace-nowrap"
                 >
                   Get Pro — {PRO_PRICE_LABEL}

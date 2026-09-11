@@ -11,10 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
-import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { useFreeVisibleCount } from '@/hooks/use-free-rows';
-import { rememberReturnPath } from '@/lib/postAuth';
 
 // Build fallback palettes — assign staggered dates so "Newest" sort works
 // among themselves. Anchored to a fixed past date (not Date.now()) so they
@@ -195,15 +193,11 @@ export default function ExplorePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'popular' | 'newest'>('popular');
   const { isPro } = usePro();
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const freeVisible = useFreeVisibleCount(columnsForWidth);
 
-  const startUpgrade = () => {
-    if (user) { setShowUpgrade(true); return; }
-    sessionStorage.setItem(PRO_INTENT_KEY, '1');
-    rememberReturnPath();
-    window.location.href = '/auth';
-  };
+  // Upgrading starts on the Pricing page, which lays out Free and Pro side by
+  // side and is the one place checkout opens from.
+  const startUpgrade = () => { window.location.href = '/pricing'; };
 
   useEffect(() => {
     const loadPalettes = async () => {
@@ -529,12 +523,6 @@ export default function ExplorePage() {
           </>
         )}
       </div>
-
-      <ProUpgradeModal
-        open={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-        reason="See every palette on Explore"
-      />
 
       <Footer />
     </div>

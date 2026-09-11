@@ -7,10 +7,8 @@ import { getColorName } from '@/lib/colorUtils';
 import { POPULAR_PALETTES } from '@/lib/palettesData';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
+import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { useFreeVisibleCount } from '@/hooks/use-free-rows';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
-import { rememberReturnPath } from '@/lib/postAuth';
 
 interface BrowsePalettesProps {
   onSelectPalette: (colors: Color[]) => void;
@@ -67,7 +65,6 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
   const { toast } = useToast();
   const { isPro } = usePro();
   const freeVisible = useFreeVisibleCount(columnsForWidth);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<Tab>('all');
   const [communityPalettes, setCommunityPalettes] = useState<PaletteItem[]>([]);
@@ -273,12 +270,9 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
     : displayPalettes.slice(0, showCount);
   const hiddenByGate = gated ? displayPalettes.length - visiblePalettes.length : 0;
 
-  const startUpgrade = () => {
-    if (userId) { setShowUpgrade(true); return; }
-    sessionStorage.setItem(PRO_INTENT_KEY, '1');
-    rememberReturnPath();
-    window.location.href = '/auth';
-  };
+  // Upgrading starts on the Pricing page, which lays out Free and Pro side by
+  // side and is the one place checkout opens from.
+  const startUpgrade = () => { window.location.href = '/pricing'; };
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all',     label: 'All' },
@@ -511,12 +505,6 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
           </div>
         ) : null}
       </div>
-
-      <ProUpgradeModal
-        open={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-        reason="Browse every palette in the library"
-      />
     </div>
   );
 }

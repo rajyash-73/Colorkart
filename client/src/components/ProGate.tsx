@@ -1,9 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Lock, Sparkles } from 'lucide-react';
-import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY } from '@/hooks/use-pro';
-import { rememberReturnPath } from '@/lib/postAuth';
+import { usePro, PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 /**
  * Wraps a Pro-only feature. Renders `children` for Pro users, otherwise a
@@ -33,17 +31,11 @@ export default function ProGate({
 }) {
   const { isPro, loading } = usePro();
   const { user } = useAuth();
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // The button offers Pro, so signing in cannot be where it ends. Flagging
-  // intent means checkout reopens once they land back signed in.
-  const startUpgrade = () => {
-    if (user) { setShowUpgrade(true); return; }
-    sessionStorage.setItem(PRO_INTENT_KEY, '1');
-    rememberReturnPath();
-    window.location.href = '/auth';
-  };
+  // Upgrading starts on the Pricing page, which lays out Free and Pro side by
+  // side and is the one place checkout opens from.
+  const startUpgrade = () => { window.location.href = '/pricing'; };
 
   // pointer-events-none stops the mouse but not the keyboard, and a blurred
   // teaser full of tab stops is a trap for anyone navigating that way. `inert`
@@ -83,8 +75,6 @@ export default function ProGate({
         </button>
         <p className="mt-3 text-[11px] text-gray-400">One payment, lifetime access.</p>
       </div>
-
-      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} reason={title} />
     </>
   );
 

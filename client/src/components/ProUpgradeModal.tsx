@@ -1,146 +1,31 @@
-import React, { useState } from 'react';
-import { X, Check, Loader2, Sparkles } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
-import { usePro, PRO_INTENT_KEY } from '@/hooks/use-pro';
-import { rememberReturnPath } from '@/lib/postAuth';
-import { useToast } from '@/hooks/use-toast';
-
-declare global {
-  interface Window { Razorpay?: any }
-}
-
-const CHECKOUT_SRC = 'https://checkout.razorpay.com/v1/checkout.js';
-
-/** Load Razorpay Checkout on demand — no reason to ship it to every visitor. */
-function loadCheckout(): Promise<void> {
-  if (window.Razorpay) return Promise.resolve();
-  const existing = document.querySelector<HTMLScriptElement>(`script[src="${CHECKOUT_SRC}"]`);
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('Could not load Razorpay Checkout')));
-    });
-  }
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = CHECKOUT_SRC;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error('Could not load Razorpay Checkout'));
-    document.body.appendChild(s);
-  });
-}
+import React from 'react';
+import { X, Check, Sparkles } from 'lucide-react';
+import { PRO_PRICE_LABEL } from '@/hooks/use-pro';
 
 const BENEFITS = [
   'Every palette on Explore, not just the first rows',
-  'No advertisements, anywhere on the site',
-  'Palette Visualizer — see colours in real UI mockups',
-  'Image to Palette — extract colours from any photo',
-  'Font & colour pairing simulator with exports',
+  'No ads, anywhere on the site',
+  'Palette Visualizer: see your colors in real UI mockups',
+  'Image to Palette: extract colors from any photo',
+  'Font and color pairing simulator with exports',
   'Unlimited saved palettes',
 ];
 
+const [PRICE_INR, ...rest] = PRO_PRICE_LABEL.split(' ');
+const PRICE_USD = rest.join(' ');
+
+/**
+ * Explains Pro where a free account runs into a limit, such as the
+ * five-palette save cap. Like every Get Pro button, its button leads to the
+ * Pricing page; the payment gateway itself only opens from there.
+ */
 export default function ProUpgradeModal({ open, onClose, reason }: {
   open: boolean;
   onClose: () => void;
   /** Optional line explaining what the user just tried to do. */
   reason?: string;
 }) {
-  const { user, session } = useAuth();
-  const { refresh } = usePro();
-  const { toast } = useToast();
-  const [busy, setBusy] = useState(false);
-
   if (!open) return null;
-
-  const post = async (path: string, body?: unknown) => {
-    const res = await fetch(path, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.access_token ?? ''}`,
-      },
-      body: JSON.stringify(body ?? {}),
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
-    return json;
-  };
-
-  const startCheckout = async () => {
-    if (!user) {
-      // Carry the purchase across sign-in: the flag reopens this modal once
-      // they are back, and the return path brings them to the page they were
-      // on rather than the homepage.
-      try { sessionStorage.setItem(PRO_INTENT_KEY, '1'); } catch {}
-      rememberReturnPath();
-      window.location.href = '/auth';
-      return;
-    }
-    setBusy(true);
-    try {
-      await loadCheckout();
-      const order = await post('/api/create-order');
-
-      if (order.alreadyPro) {
-        await refresh();
-        toast({ title: 'You already have Pro', description: 'Everything is unlocked.' });
-        onClose();
-        return;
-      }
-
-      const rzp = new window.Razorpay({
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        order_id: order.order_id,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Coolors',
-        description: 'Pro — lifetime access',
-        prefill: { email: user.email, name: user.name },
-        theme: { color: '#7c3aed' },
-        modal: {
-          ondismiss: () => {
-            setBusy(false);
-            toast({ title: 'Payment cancelled', description: 'Nothing was charged.' });
-          },
-        },
-        handler: async (resp: any) => {
-          try {
-            await post('/api/verify-payment', {
-              razorpay_order_id: resp.razorpay_order_id,
-              razorpay_payment_id: resp.razorpay_payment_id,
-              razorpay_signature: resp.razorpay_signature,
-            });
-            await refresh();
-            toast({ title: 'Welcome to Pro', description: 'Every feature is now unlocked.' });
-            onClose();
-          } catch (err: any) {
-            toast({
-              title: 'Could not activate Pro',
-              description: err?.message ?? 'Please contact support with your payment id.',
-              variant: 'destructive',
-            });
-          } finally {
-            setBusy(false);
-          }
-        },
-      });
-
-      rzp.on('payment.failed', (e: any) => {
-        setBusy(false);
-        toast({
-          title: 'Payment failed',
-          description: e?.error?.description ?? 'Your bank declined the payment.',
-          variant: 'destructive',
-        });
-      });
-
-      rzp.open();
-    } catch (err: any) {
-      setBusy(false);
-      toast({ title: 'Checkout failed', description: err?.message ?? 'Please try again.', variant: 'destructive' });
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
@@ -159,9 +44,9 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
         {reason && <p className="text-sm text-violet-600 dark:text-violet-400 mb-3">{reason}</p>}
 
         <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-3xl font-bold text-gray-900 dark:text-white">₹100</span>
-          <span className="text-base font-medium text-gray-500 dark:text-gray-400">(≈ $1)</span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">once — lifetime access</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-white">{PRICE_INR}</span>
+          <span className="text-base font-medium text-gray-500 dark:text-gray-400">{PRICE_USD}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">once, lifetime access</span>
         </div>
 
         <ul className="space-y-2 mb-5">
@@ -172,23 +57,17 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
           ))}
         </ul>
 
+        {/* A full load, not in-app navigation: Pricing is ad-free, and ad
+            scripts already running here cannot be removed. */}
         <button
-          onClick={startCheckout}
-          disabled={busy}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-violet-700 active:bg-violet-800 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800"
+          onClick={() => { window.location.href = '/pricing'; }}
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] px-5 py-3 text-sm font-semibold text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#db1a72] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-800"
         >
-          {busy ? <><Loader2 size={16} className="animate-spin" />Opening checkout…</>
-                : user ? 'Get lifetime access' : 'Sign in to continue'}
+          Get Pro
         </button>
 
-        <p className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2 text-[11px] leading-relaxed text-amber-800 dark:text-amber-200">
-          <span className="font-semibold">Paying from outside India?</span> Choose PayPal
-          at checkout. You don't need a PayPal account — a card works. More payment
-          options are on the way.
-        </p>
-
-        <p className="mt-2 text-[11px] text-gray-400 text-center">
-          One payment, no renewals. Secured by Razorpay.
+        <p className="mt-3 text-[11px] text-gray-400 text-center">
+          One payment, no renewals.
         </p>
       </div>
     </div>

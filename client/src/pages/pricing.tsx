@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import LegalPage, { CONTACT_EMAIL, REFUND_DAYS } from '@/components/LegalPage';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
 import PaypalGuide from '@/components/PaypalGuide';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
-import { rememberReturnPath } from '@/lib/postAuth';
+import { useCheckout } from '@/hooks/use-checkout';
 
 // "₹100 (≈ $1)" split so the rupee figure can be large and the dollar small,
 // while still coming from the one constant checkout is priced against.
@@ -72,16 +71,20 @@ function Plan({
 export default function Pricing() {
   const { isPro, loading } = usePro();
   const { user } = useAuth();
-  const [showUpgrade, setShowUpgrade] = useState(false);
+  // Get Pro here opens the payment gateway directly: this page already lays
+  // out what Pro includes, so there is no confirmation step in between.
+  const { startCheckout, busy } = useCheckout();
 
-  // Same round trip as every other Pro entry point: signed out, go through
-  // sign-in and come back here with checkout open.
-  const startUpgrade = () => {
-    if (user) { setShowUpgrade(true); return; }
-    try { sessionStorage.setItem(PRO_INTENT_KEY, '1'); } catch { /* private mode */ }
-    rememberReturnPath();
-    window.location.href = '/auth';
-  };
+  // Back from sign-in with a purchase pending: open checkout straight away,
+  // since that is what they clicked before being sent to sign in.
+  useEffect(() => {
+    if (!user || loading) return;
+    try {
+      if (sessionStorage.getItem(PRO_INTENT_KEY) !== '1') return;
+      sessionStorage.removeItem(PRO_INTENT_KEY);
+    } catch { return; }
+    if (!isPro) startCheckout();
+  }, [user, loading, isPro, startCheckout]);
 
   return (
     <LegalPage
@@ -119,10 +122,11 @@ export default function Pricing() {
                 </div>
               ) : (
                 <button
-                  onClick={startUpgrade}
-                  className="w-full rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] py-2.5 text-sm font-semibold text-white transition"
+                  onClick={startCheckout}
+                  disabled={busy}
+                  className="w-full rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] disabled:opacity-60 py-2.5 text-sm font-semibold text-white transition"
                 >
-                  Get Pro for {PRICE_INR}
+                  {busy ? 'Opening checkout…' : `Get Pro for ${PRICE_INR}`}
                 </button>
               )}
             </Plan>
@@ -170,8 +174,6 @@ export default function Pricing() {
       <p>
         Email us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
-
-      <ProUpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} reason="Unlock everything on Coolors" />
     </LegalPage>
   );
 }
