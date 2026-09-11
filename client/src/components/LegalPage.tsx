@@ -27,6 +27,7 @@ export default function LegalPage({
   description,
   path,
   showUpdated = true,
+  aside,
   children,
 }: {
   title: string;
@@ -34,6 +35,8 @@ export default function LegalPage({
   description: string;
   path: string;
   showUpdated?: boolean;
+  /** Optional right-hand column on wide screens; stacks below on narrow ones. */
+  aside?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,10 +46,11 @@ export default function LegalPage({
       <SEOHead title={title} description={description} canonicalPath={path} />
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
 
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <main className={`flex-1 w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 ${aside ? 'max-w-6xl' : 'max-w-3xl'}`}>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">{heading}</h1>
         {showUpdated && <p className="mt-2 text-sm text-gray-400">Last updated: {LEGAL_UPDATED}</p>}
 
+        <div className={aside ? 'lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-10' : undefined}>
         <div
           className="mt-8 text-[15px] leading-relaxed text-gray-600 dark:text-gray-300
             [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-gray-900 dark:[&_h2]:text-white
@@ -56,6 +60,9 @@ export default function LegalPage({
             [&_li_a]:text-violet-600 dark:[&_li_a]:text-violet-400 [&_li_a]:underline [&_li_a]:underline-offset-2"
         >
           {children}
+        </div>
+        {/* Outside the text wrapper, so none of the prose styling reaches it. */}
+        {aside && <aside className="mt-10 lg:sticky lg:top-24 lg:mt-8">{aside}</aside>}
         </div>
       </main>
 

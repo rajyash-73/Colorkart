@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import LegalPage, { CONTACT_EMAIL, REFUND_DAYS } from '@/components/LegalPage';
 import ProUpgradeModal from '@/components/ProUpgradeModal';
+import PaypalGuide from '@/components/PaypalGuide';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
 import { rememberReturnPath } from '@/lib/postAuth';
@@ -89,6 +90,7 @@ export default function Pricing() {
       description={`Coolors is free to use. Pro is a one-time ${PRO_PRICE_LABEL} payment that removes ads and unlocks the visualizer, image-to-palette, font pairing and unlimited saves.`}
       path="/pricing"
       showUpdated={false}
+      aside={<PaypalGuide />}
     >
       <p>
         Coolors is built to make color palette generation open to everyone. Generating
