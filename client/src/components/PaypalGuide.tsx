@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Globe, CheckCircle, Pause, Play } from 'lucide-react';
-import { PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { CONTACT_EMAIL } from '@/components/LegalPage';
 
 /**
@@ -16,13 +15,12 @@ import { CONTACT_EMAIL } from '@/components/LegalPage';
 
 /** How long the move into each slide takes: the fade, and the screenshot
  *  window and spotlight gliding between the two PayPal steps. */
-const TRANSITION_MS = 700;
+const TRANSITION_MS = 500;
 
 /** How long each slide then stays fully settled before the next begins. The
- *  two are separate so a slide is never cut off while still moving. */
+ *  two are separate so a slide is never cut off while still moving; together
+ *  they give a new slide every second. */
 const SHOW_MS = 500;
-
-const [PRICE_INR] = PRO_PRICE_LABEL.split(' ');
 
 /** The PayPal screenshot, cropped to the checkout form (no address bar). */
 const SCREENSHOT = '/paypal-checkout.png';
@@ -42,12 +40,12 @@ const STEPS: Step[] = [
     title: 'Start checkout',
     visual: (
       <span className="rounded-xl bg-[#db1a72] px-4 py-2 text-sm font-semibold text-white shadow-md">
-        Get Pro for {PRICE_INR}
+        Get Pro
       </span>
     ),
     body: (
       <>
-        Click <strong>Get Pro for {PRICE_INR}</strong>. If you're asked to sign in, do that first; checkout
+        Click <strong>Get Pro</strong> on the Pro plan. If you're asked to sign in, do that first; checkout
         opens by itself afterwards.
       </>
     ),

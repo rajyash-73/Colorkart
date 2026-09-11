@@ -126,7 +126,7 @@ export default function Pricing() {
                   disabled={busy}
                   className="w-full rounded-xl bg-[#db1a72] hover:bg-[#c2155f] active:scale-[0.98] disabled:opacity-60 py-2.5 text-sm font-semibold text-white transition"
                 >
-                  {busy ? 'Opening checkout…' : `Get Pro for ${PRICE_INR}`}
+                  {busy ? 'Opening checkout…' : 'Get Pro'}
                 </button>
               )}
             </Plan>
