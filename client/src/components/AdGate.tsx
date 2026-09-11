@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { usePro } from '@/hooks/use-pro';
-import { loadAdScripts } from '@/lib/adScripts';
+import { useLocation } from 'wouter';
+import { loadAdScripts, isAdFreePath } from '@/lib/adScripts';
 
 /**
  * Renderless. Loads the ad stack for everyone except Pro users.
@@ -13,6 +14,7 @@ import { loadAdScripts } from '@/lib/adScripts';
  */
 export default function AdGate() {
   const { isPro, loading } = usePro();
+  const [location] = useLocation();
   const [waitedLongEnough, setWaitedLongEnough] = useState(false);
 
   // Safety net: if auth or the entitlement lookup ever hangs, free users would
@@ -26,6 +28,10 @@ export default function AdGate() {
   useEffect(() => {
     if (loading && !waitedLongEnough) return;
     if (isPro) return;
+    // Watches the route, so leaving an ad-free page for any other still loads
+    // ads there. Once loaded they cannot be removed, so arriving at an ad-free
+    // page in-app is prevented where it happens (auth-page) rather than here.
+    if (isAdFreePath(location)) return;
 
     // The ad stack runs for roughly three seconds and holds the main thread
     // while it does. Injected before the browser has painted, it pushes first
@@ -79,7 +85,7 @@ export default function AdGate() {
       clearTimeout(fallback);
       observer?.disconnect();
     };
-  }, [isPro, loading, waitedLongEnough]);
+  }, [isPro, loading, waitedLongEnough, location]);
 
   return null;
 }

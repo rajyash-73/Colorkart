@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SEOHead from '@/components/SEOHead';
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { Loader2, ChevronLeft, Mail, Lock, User, CheckCircle, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { peekReturnPath } from "@/lib/postAuth";
+import { adScriptsLoaded, isAdFreePath } from "@/lib/adScripts";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation, signInWithGoogle, isLoading } = useAuth();
@@ -17,10 +18,23 @@ export default function AuthPage() {
   const [registered, setRegistered] = useState(false);
   const [resending, setResending] = useState(false);
 
+  // Where to go once signed in. If that page is ad-free but this one has
+  // already loaded the ad scripts, an in-app redirect would carry them along,
+  // and they cannot be unloaded. Leave with a full page load instead.
+  const returnTo = user ? (peekReturnPath() ?? "/") : null;
+  const leaveWithReload = !!returnTo && isAdFreePath(returnTo) && adScriptsLoaded();
+  useEffect(() => {
+    if (leaveWithReload && returnTo) window.location.replace(returnTo);
+  }, [leaveWithReload, returnTo]);
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   // Back to whatever they were doing, not the homepage. Google does not
   // come through here -- it returns to "/" and the Header picks it up.
-  if (user) return <Redirect to={peekReturnPath() ?? "/"} />;
+  if (user) {
+    return leaveWithReload
+      ? <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>
+      : <Redirect to={returnTo ?? "/"} />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

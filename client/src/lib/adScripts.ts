@@ -7,6 +7,13 @@
 const MEDIAVINE_SRC = '//scripts.scriptwrapper.com/tags/0f9cea06-925c-4a9c-b164-2ff2c7e1422f.js';
 const GROW_SITE_ID = 'U2l0ZTowZjljZWEwNi05MjVjLTRhOWMtYjE2NC0yZmYyYzdlMTQyMmY=';
 
+/** Pages served without ads. Pricing is where visitors decide whether to pay,
+ *  and ads there compete with the one thing the page is for. */
+const AD_FREE_PATHS = new Set(['/pricing']);
+
+export const isAdFreePath = (path: string): boolean =>
+  AD_FREE_PATHS.has(path.replace(/\/+$/, '') || '/');
+
 let injected = false;
 
 /** Inject the ad stack. Idempotent — safe to call from an effect that re-runs. */
