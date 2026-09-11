@@ -1,18 +1,21 @@
-import React, { useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Globe, CheckCircle } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Globe, CheckCircle, Pause, Play } from 'lucide-react';
 import { PRO_PRICE_LABEL } from '@/hooks/use-pro';
 import { CONTACT_EMAIL } from '@/components/LegalPage';
 
 /**
  * Step-by-step slideshow for paying from outside India, where checkout runs
- * through PayPal. Manual rather than auto-advancing: this is a set of
- * instructions people read and act on, and a timer would move the slide on
- * mid-sentence.
+ * through PayPal. Advances on its own in a loop, and pauses while the pointer
+ * is over it, while it has keyboard focus, or via its pause button, so the
+ * steps can actually be read. Starts paused for visitors who ask their system
+ * to reduce motion.
  *
  * Sized to sit as the third of three equal tiles on the Pricing page, so the
- * whole row fits the first screen: a short 5:3 frame, and fixed room for
- * each step's text so the tile does not change height between steps.
+ * whole row fits the first screen, and it keeps one height across every step.
  */
+
+/** How long each step stays up while the slideshow is playing. */
+const AUTOPLAY_MS = 500;
 
 const [PRICE_INR] = PRO_PRICE_LABEL.split(' ');
 
@@ -86,20 +89,47 @@ const STEPS: Step[] = [
   },
 ];
 
+const BODY_TEXT =
+  'text-sm leading-relaxed text-gray-600 dark:text-gray-300 [&_strong]:font-semibold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_a]:text-violet-600 dark:[&_a]:text-violet-400 [&_a]:underline [&_a]:break-all';
+const STEP_LABEL = 'text-[11px] font-semibold uppercase tracking-wider text-[#db1a72]';
+const BOX = 'rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800';
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 export default function PaypalGuide() {
   const [index, setIndex] = useState(0);
   const [imageMissing, setImageMissing] = useState(false);
+  const [paused, setPaused] = useState(prefersReducedMotion);
+  const [hovering, setHovering] = useState(false);
+  const [keyboardFocus, setKeyboardFocus] = useState(false);
   const touchX = useRef<number | null>(null);
 
-  const last = STEPS.length - 1;
-  const go = (n: number) => setIndex(Math.max(0, Math.min(last, n)));
+  const count = STEPS.length;
+  // Wraps both ways, since the slideshow loops.
+  const go = (n: number) => setIndex(((n % count) + count) % count);
   const step = STEPS[index];
   const shot = imageMissing ? undefined : step.shot;
+  const playing = !paused && !hovering && !keyboardFocus;
+
+  // A timeout per step rather than an interval, so a manual move restarts
+  // the countdown instead of jumping again a moment later.
+  useEffect(() => {
+    if (!playing) return;
+    const t = setTimeout(() => setIndex(i => (i + 1) % count), AUTOPLAY_MS);
+    return () => clearTimeout(t);
+  }, [playing, index, count]);
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="How to pay from outside India"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      // Only keyboard focus pauses it; a mouse click on a control should not
+      // leave the slideshow stuck until focus happens to move elsewhere.
+      onFocus={e => { if ((e.target as HTMLElement).matches(':focus-visible')) setKeyboardFocus(true); }}
+      onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setKeyboardFocus(false); }}
       onKeyDown={e => {
         if (e.key === 'ArrowRight') go(index + 1);
         if (e.key === 'ArrowLeft') go(index - 1);
@@ -116,79 +146,93 @@ export default function PaypalGuide() {
       <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Paying from outside India?</h2>
       <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">International payments go through PayPal.</p>
 
-      <div className="mt-3" aria-live="polite">
-        <div className="relative aspect-[5/3] w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          {shot ? (
-            // Image and spotlight move together, so the window slides from the
-            // login form down to the card button between the two PayPal steps.
-            <div
-              className="absolute inset-x-0 top-0 transition-transform duration-500 ease-out"
-              style={{ transform: `translateY(-${shot.scroll}%)` }}
-            >
-              <img
-                src={SCREENSHOT}
-                alt="PayPal checkout window with a Log In form, and below it a Pay with Credit or Debit Card button"
-                className="block w-full"
-                onError={() => setImageMissing(true)}
-              />
-              <span
-                aria-hidden="true"
-                className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all duration-500 ease-out"
-                style={{
-                  left: `${shot.box.left}%`,
-                  top: `${shot.box.top}%`,
-                  width: `${shot.box.width}%`,
-                  height: `${shot.box.height}%`,
-                }}
-              />
-            </div>
-          ) : (
-            <div className="flex h-full items-center justify-center gap-4 px-6">
-              <span className="text-4xl font-bold text-gray-200 dark:text-gray-700">{index + 1}</span>
-              <span className="flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
-            </div>
-          )}
+      {/* Announced only while paused: a live region rotating every half second
+          would talk over a screen reader user without pause. */}
+      <div className="relative mt-3" aria-live={playing ? 'off' : 'polite'}>
+        {/* The screenshot steps' layout: frame, then text. Always rendered so
+            the tile keeps one height; on text-only steps it is invisible and
+            the box below covers exactly the same area. */}
+        <div className={shot ? undefined : 'invisible'} aria-hidden={shot ? undefined : true}>
+          <div className={`relative aspect-[5/3] w-full overflow-hidden ${BOX}`}>
+            {shot && (
+              // Image and spotlight move together, so the window slides from
+              // the login form down to the card button between those steps.
+              <div
+                className="absolute inset-x-0 top-0 transition-transform duration-300 ease-out"
+                style={{ transform: `translateY(-${shot.scroll}%)` }}
+              >
+                <img
+                  src={SCREENSHOT}
+                  alt="PayPal checkout window with a Log In form, and below it a Pay with Credit or Debit Card button"
+                  className="block w-full"
+                  onError={() => setImageMissing(true)}
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute rounded-lg ring-4 ring-[#db1a72] shadow-[0_0_0_9999px_rgba(0,0,0,0.28)] transition-all duration-300 ease-out"
+                  style={{
+                    left: `${shot.box.left}%`,
+                    top: `${shot.box.top}%`,
+                    width: `${shot.box.width}%`,
+                    height: `${shot.box.height}%`,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <p className={`mt-3 ${STEP_LABEL}`}>Step {index + 1} of {count}</p>
+          <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{shot ? step.title : ' '}</h3>
+          <p className={`mt-1 min-h-[4.5rem] ${BODY_TEXT}`}>{shot ? step.body : null}</p>
         </div>
 
-        <p className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-[#db1a72]">
-          Step {index + 1} of {STEPS.length}
-        </p>
-        <h3 className="mt-0.5 font-semibold text-gray-900 dark:text-white">{step.title}</h3>
-        <p className="mt-1 min-h-[4.5rem] text-sm leading-relaxed text-gray-600 dark:text-gray-300 [&_strong]:font-semibold [&_strong]:text-gray-900 dark:[&_strong]:text-white [&_a]:text-violet-600 dark:[&_a]:text-violet-400 [&_a]:underline [&_a]:break-all">
-          {step.body}
-        </p>
+        {!shot && (
+          <div className={`absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center ${BOX}`}>
+            <span className="mb-2 flex items-center text-[#db1a72]">{step.visual ?? <Globe size={28} />}</span>
+            <p className={STEP_LABEL}>Step {index + 1} of {count}</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+            <p className={BODY_TEXT}>{step.body}</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-auto flex items-center justify-between pt-3">
         <button
           type="button"
           onClick={() => go(index - 1)}
-          disabled={index === 0}
           aria-label="Previous step"
-          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <ChevronLeft size={18} />
         </button>
-        <div className="flex items-center gap-1.5">
-          {STEPS.map((s, n) => (
-            <button
-              key={s.title}
-              type="button"
-              onClick={() => go(n)}
-              aria-label={`Step ${n + 1}: ${s.title}`}
-              aria-current={n === index ? 'step' : undefined}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                n === index ? 'w-5 bg-[#db1a72]' : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
-              }`}
-            />
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            {STEPS.map((s, n) => (
+              <button
+                key={s.title}
+                type="button"
+                onClick={() => go(n)}
+                aria-label={`Step ${n + 1}: ${s.title}`}
+                aria-current={n === index ? 'step' : undefined}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  n === index ? 'w-5 bg-[#db1a72]' : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setPaused(p => !p)}
+            aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
+            className="rounded-md p-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            {paused ? <Play size={14} /> : <Pause size={14} />}
+          </button>
         </div>
         <button
           type="button"
           onClick={() => go(index + 1)}
-          disabled={index === last}
           aria-label="Next step"
-          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <ChevronRight size={18} />
         </button>
