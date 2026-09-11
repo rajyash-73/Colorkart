@@ -15,12 +15,12 @@ import { CONTACT_EMAIL } from '@/components/LegalPage';
 
 /** How long the move into each slide takes: the fade, and the screenshot
  *  window and spotlight gliding between the two PayPal steps. */
-const TRANSITION_MS = 500;
+const TRANSITION_MS = 1000;
 
 /** How long each slide then stays fully settled before the next begins. The
  *  two are separate so a slide is never cut off while still moving; together
- *  they give a new slide every second. */
-const SHOW_MS = 500;
+ *  they give a new slide every two seconds. */
+const SHOW_MS = 1000;
 
 /** The PayPal screenshot, cropped to the checkout form (no address bar). */
 const SCREENSHOT = '/paypal-checkout.png';
