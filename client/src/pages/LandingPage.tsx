@@ -8,6 +8,35 @@ import { useAuth } from "@/hooks/use-auth";
 import { PRO_PRICE_LABEL } from "@/hooks/use-pro";
 import { isLightColor } from "@/lib/colorUtils";
 
+/**
+ * Homepage FAQ. The FAQPage structured data and the visible section near the
+ * foot of the page are both built from this: Google requires FAQ markup to
+ * describe content the visitor can actually see, and keeping one source means
+ * the two cannot drift apart again.
+ */
+const HOMEPAGE_FAQS = [
+  {
+    q: 'What is the best free color palette generator?',
+    a: 'Coolors.in is a free color palette generator that lets you create harmonious color schemes instantly. Press spacebar to generate, lock colors you want to keep, choose from 5 color theory modes, and export as CSS, PNG or Tailwind config, with no sign-up required.',
+  },
+  {
+    q: 'Is Coolors free to use?',
+    a: 'Yes. Generating and exporting colour palettes is free at no cost, and free accounts can save up to 5 palettes. A one-time Coolors Pro purchase unlocks unlimited saves, the visualizer, image-to-palette, font pairing and an ad-free site.',
+  },
+  {
+    q: 'Can I use the palettes commercially?',
+    a: 'Yes, all palettes generated on Coolors.in are free to use for personal and commercial projects.',
+  },
+  {
+    q: 'What color formats can I export?',
+    a: 'Export in CSS custom properties, SCSS variables, Tailwind config, JSON, and PNG image formats.',
+  },
+  {
+    q: 'How do I generate a color palette?',
+    a: 'Visit coolors.in/generator and press the spacebar to instantly generate a new color palette. Lock any colors you like and keep pressing spacebar until you find your perfect combination.',
+  },
+];
+
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
 
 export default function LandingPage() {
@@ -226,8 +255,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Free Color Palette Generator | Coolors"
-        description="Generate beautiful color palettes instantly. Free color scheme generator for designers, developers & artists — explore trending palettes, check contrast, export CSS & Tailwind."
+        title="Free Color Palette Generator & Color Schemes | Coolors"
+        description="Generate color palettes instantly. Free color palette generator with 5 color theory modes, contrast checking and CSS, Tailwind and PNG export. No sign-up."
         keywords="color palette generator, color palettes, free color palette, color scheme generator, color schemes, color combinations, trending color palettes, CSS color palette, hex color picker, web design colors, UI color tool, color theory"
         canonicalPath="/"
         structuredData={[
@@ -279,13 +308,11 @@ export default function LandingPage() {
           {
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": [
-              { "@type": "Question", "name": "What is the best free color palette generator?", "acceptedAnswer": { "@type": "Answer", "text": "Coolors.in is a free color palette generator that lets you create harmonious color schemes instantly. Press spacebar to generate, lock colors you want to keep, choose from 5 color theory modes, and export as CSS, PNG or Tailwind config — no sign-up required." } },
-              { "@type": "Question", "name": "Is Coolors free to use?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Generating and exporting colour palettes is free at no cost, and free accounts can save up to 5 palettes. A one-time Coolors Pro purchase unlocks unlimited saves, the visualizer, image-to-palette, font pairing and an ad-free site." } },
-              { "@type": "Question", "name": "Can I use the palettes commercially?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, all palettes generated on Coolors.in are free to use for personal and commercial projects." } },
-              { "@type": "Question", "name": "What color formats can I export?", "acceptedAnswer": { "@type": "Answer", "text": "Export in CSS custom properties, SCSS variables, Tailwind config, JSON, and PNG image formats." } },
-              { "@type": "Question", "name": "How do I generate a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Visit coolors.in/generator and press the spacebar to instantly generate a new color palette. Lock any colors you like and keep pressing spacebar until you find your perfect combination." } }
-            ]
+            "mainEntity": HOMEPAGE_FAQS.map(f => ({
+              "@type": "Question",
+              "name": f.q,
+              "acceptedAnswer": { "@type": "Answer", "text": f.a },
+            }))
           }
         ]}
       />
@@ -450,6 +477,9 @@ export default function LandingPage() {
 
         {/* Apps & Tools Showcase */}
         <section className="mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Free color tools for designers and developers
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Color Palette Generator */}
             <a href="/generator" className="block bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 dark:border-gray-700 hover:border-violet-200 dark:hover:border-violet-700 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02]">
@@ -587,6 +617,16 @@ export default function LandingPage() {
 
         {/* Features Grid */}
         <section className="grid md:grid-cols-3 gap-8 mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            How the palette generator works
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 text-center max-w-3xl mx-auto mb-10 leading-relaxed">
+            Press the spacebar and the generator builds a new palette from five colour theory modes:
+            complementary, analogous, triadic, tetradic and monochromatic. Lock the colors you like and
+            generate again until the rest fit, or fine-tune any swatch by hue, saturation and lightness.
+            Export the result as CSS custom properties, SCSS variables, Tailwind config, JSON or PNG, and
+            check any pair against WCAG AA contrast before you ship it.
+          </p>
           <div className="text-center">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Palette className="w-8 h-8 text-blue-600" />
@@ -616,6 +656,27 @@ export default function LandingPage() {
               Export your palettes in any format you need for your design workflow.
             </p>
           </div>
+        </section>
+
+        {/* FAQ: rendered from HOMEPAGE_FAQS, the same source as the FAQPage
+            structured data, so the markup always matches what is on screen. */}
+        <section className="mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Color palette generator FAQ
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {HOMEPAGE_FAQS.map(({ q, a }) => (
+              <div key={q} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{q}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+            More questions? Read the{' '}
+            <a href="/faq" className="text-violet-600 dark:text-violet-400 hover:underline">full FAQ</a> or the{' '}
+            <a href="/generator-guide" className="text-violet-600 dark:text-violet-400 hover:underline">generator guide</a>.
+          </p>
         </section>
 
         {/* Final CTA */}
