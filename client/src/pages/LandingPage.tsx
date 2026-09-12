@@ -81,12 +81,36 @@ const HOMEPAGE_FAQS = [
     q: 'How do I generate a color palette?',
     a: 'Visit coolors.in/generator and press the spacebar to instantly generate a new color palette. Lock any colors you like and keep pressing spacebar until you find your perfect combination.',
   },
+  {
+    q: 'How do I choose colors that work together?',
+    a: 'Pick a color theory mode. Complementary gives high contrast, analogous keeps neighbouring hues calm, triadic and tetradic balance three or four hues around the wheel, and monochromatic varies a single hue by saturation and lightness.',
+  },
+  {
+    q: 'Can I create a color palette from an image?',
+    a: 'Yes. Image to Palette pulls the dominant colors out of any photo you upload, ready to lock, adjust and export. It is a Coolors Pro feature, included in the one-time purchase.',
+  },
+  {
+    q: 'How do I check if my colors are accessible?',
+    a: 'Use the free contrast checker at coolors.in/contrast-checker. It shows the contrast ratio between any two colors and whether that ratio passes WCAG 2.1 AA and AAA for normal and large text.',
+  },
+  {
+    q: 'Do I need an account to use Coolors?',
+    a: 'No. Generating, adjusting and exporting palettes needs no sign-up. An account is only for saving: a free account keeps up to 5 palettes, and Coolors Pro removes the limit.',
+  },
 ];
 
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
 
 /** How long each FAQ slide stays up before the next one. */
-const FAQ_SLIDE_MS = 1000;
+const FAQ_SLIDE_MS = 5000;
+
+/** Questions shown side by side on one slide. */
+const FAQS_PER_SLIDE = 3;
+
+const FAQ_SLIDES = Array.from(
+  { length: Math.ceil(HOMEPAGE_FAQS.length / FAQS_PER_SLIDE) },
+  (_, i) => HOMEPAGE_FAQS.slice(i * FAQS_PER_SLIDE, (i + 1) * FAQS_PER_SLIDE),
+);
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -109,7 +133,7 @@ function FaqSlideshow() {
   const [hovering, setHovering] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
 
-  const count = HOMEPAGE_FAQS.length;
+  const count = FAQ_SLIDES.length;
   const go = (n: number) => setIndex(((n % count) + count) % count);
   const playing = !paused && !hovering && !keyboardFocus;
 
@@ -137,17 +161,21 @@ function FaqSlideshow() {
           className="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {HOMEPAGE_FAQS.map(({ q, a }, n) => (
+          {FAQ_SLIDES.map((group, n) => (
             <div
-              key={q}
+              key={group[0].q}
               role="group"
               aria-roledescription="slide"
-              aria-label={`Question ${n + 1} of ${count}`}
+              aria-label={`Questions ${n * FAQS_PER_SLIDE + 1} to ${n * FAQS_PER_SLIDE + group.length} of ${HOMEPAGE_FAQS.length}`}
               className="w-full flex-shrink-0"
             >
-              <div className="mx-1 h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{q}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{a}</p>
+              <div className="mx-1 grid h-full gap-4 md:grid-cols-3">
+                {group.map(({ q, a }) => (
+                  <div key={q} className="h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{q}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{a}</p>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -158,18 +186,18 @@ function FaqSlideshow() {
         <button
           type="button"
           onClick={() => go(index - 1)}
-          aria-label="Previous question"
+          aria-label="Previous questions"
           className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-1.5">
-          {HOMEPAGE_FAQS.map(({ q }, n) => (
+          {FAQ_SLIDES.map((group, n) => (
             <button
-              key={q}
+              key={group[0].q}
               type="button"
               onClick={() => go(n)}
-              aria-label={`Question ${n + 1}: ${q}`}
+              aria-label={`Questions ${n * FAQS_PER_SLIDE + 1} to ${n * FAQS_PER_SLIDE + group.length}`}
               aria-current={n === index ? 'true' : undefined}
               className={`h-2 rounded-full transition-all duration-300 ${
                 n === index ? 'w-5 bg-violet-600' : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
@@ -188,7 +216,7 @@ function FaqSlideshow() {
         <button
           type="button"
           onClick={() => go(index + 1)}
-          aria-label="Next question"
+          aria-label="Next questions"
           className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <ChevronRight size={18} />
