@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from '@/components/SEOHead';
-import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Lock, Copy, Check, X } from "lucide-react";
+import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Lock, Copy, Check, X, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
@@ -84,6 +84,119 @@ const HOMEPAGE_FAQS = [
 ];
 
 const TRENDING = POPULAR_PALETTES.slice().sort((a, b) => b.likes - a.likes).slice(0, 6);
+
+/** How long each FAQ slide stays up before the next one. */
+const FAQ_SLIDE_MS = 1000;
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * The FAQ as a rotating slideshow.
+ *
+ * Every question stays in the DOM and the track is moved with a transform, so
+ * Google still reads all five and the FAQPage markup keeps matching the page.
+ * Rendering only the active slide would leave one question in the HTML and
+ * break that match.
+ *
+ * It stops while hovered, while focused from the keyboard, and on request, and
+ * starts stopped for visitors who ask for reduced motion: content that moves on
+ * its own needs a way to hold it still (WCAG 2.2.2).
+ */
+function FaqSlideshow() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(prefersReducedMotion);
+  const [hovering, setHovering] = useState(false);
+  const [keyboardFocus, setKeyboardFocus] = useState(false);
+
+  const count = HOMEPAGE_FAQS.length;
+  const go = (n: number) => setIndex(((n % count) + count) % count);
+  const playing = !paused && !hovering && !keyboardFocus;
+
+  useEffect(() => {
+    if (!playing) return;
+    const t = setTimeout(() => setIndex(i => (i + 1) % count), FAQ_SLIDE_MS);
+    return () => clearTimeout(t);
+  }, [playing, index, count]);
+
+  return (
+    <div
+      aria-roledescription="carousel"
+      aria-label="Frequently asked questions"
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      onFocus={e => { if ((e.target as HTMLElement).matches(':focus-visible')) setKeyboardFocus(true); }}
+      onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setKeyboardFocus(false); }}
+      onKeyDown={e => {
+        if (e.key === 'ArrowRight') go(index + 1);
+        if (e.key === 'ArrowLeft') go(index - 1);
+      }}
+    >
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
+          style={{ transform: `translateX(-${index * 100}%)` }}
+        >
+          {HOMEPAGE_FAQS.map(({ q, a }, n) => (
+            <div
+              key={q}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`Question ${n + 1} of ${count}`}
+              className="w-full flex-shrink-0"
+            >
+              <div className="mx-1 h-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{q}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => go(index - 1)}
+          aria-label="Previous question"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <ChevronLeft size={18} />
+        </button>
+        <div className="flex items-center gap-1.5">
+          {HOMEPAGE_FAQS.map(({ q }, n) => (
+            <button
+              key={q}
+              type="button"
+              onClick={() => go(n)}
+              aria-label={`Question ${n + 1}: ${q}`}
+              aria-current={n === index ? 'true' : undefined}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                n === index ? 'w-5 bg-violet-600' : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+              }`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setPaused(p => !p)}
+          aria-label={paused ? 'Play the FAQ slideshow' : 'Pause the FAQ slideshow'}
+          className="rounded-md p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          {paused ? <Play size={14} /> : <Pause size={14} />}
+        </button>
+        <button
+          type="button"
+          onClick={() => go(index + 1)}
+          aria-label="Next question"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          <ChevronRight size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -703,14 +816,7 @@ export default function LandingPage() {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">
             Color palette generator FAQ
           </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {HOMEPAGE_FAQS.map(({ q, a }) => (
-              <div key={q} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{q}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{a}</p>
-              </div>
-            ))}
-          </div>
+          <FaqSlideshow />
           <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
             More questions? Read the{' '}
             <a href="/faq" className="text-violet-600 dark:text-violet-400 hover:underline">full FAQ</a> or the{' '}
