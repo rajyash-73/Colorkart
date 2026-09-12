@@ -8,7 +8,7 @@ export default function ImagePaletteGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Image Color Palette Guide — Extract Colors from Any Photo"
+        title="Image Color Palette Guide — Extract from Photos"
         description="Learn how to extract and use color palettes from images. Step-by-step guide for designers, photographers and digital artists. Turn any photo into your design inspiration."
         keywords="image color palette guide, extract colors from photos, photo color palette tutorial, image to color scheme, colour picking from images, photo color extraction guide, image palette tutorial"
         canonicalPath="/image-palette-guide"

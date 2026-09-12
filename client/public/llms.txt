@@ -19,3 +19,10 @@
 - [Korean Personal Color Analysis](https://www.coolors.in/korean-color-analysis): Free online 퍼스널 컬러 test. Detect your Spring/Summer/Autumn/Winter season from a selfie, try every season color against your photo, compare gold vs silver undertones, and download a shareable result card.
 - [FAQ](https://www.coolors.in/faq): Common questions about generating, saving and exporting color palettes.
 - [About](https://www.coolors.in/about): Who built Coolors.in, the mission, and the full list of tools offered.
+
+## Pricing and policies
+- [Pricing](https://www.coolors.in/pricing): Free forever for generating, adjusting and exporting palettes, with no sign-up. A free account saves up to 5 palettes. Coolors.in Pro is a one-time ₹100 (≈ $1) payment, not a subscription, and unlocks the full Explore library, an ad-free site, the Palette Visualizer, Image to Palette, the font and color pairing simulator and unlimited saves.
+- [Contact](https://www.coolors.in/contact): Support and business enquiries at coolors.in@gmail.com.
+- [Terms and Conditions](https://www.coolors.in/terms): Terms covering accounts, Pro purchases, your palettes and acceptable use.
+- [Privacy Policy](https://www.coolors.in/privacy-policy): What is collected, why, who it is shared with, and how to access or delete your data.
+- [Refund Policy](https://www.coolors.in/refund-policy): Full refund on Pro within 2 days of purchase.

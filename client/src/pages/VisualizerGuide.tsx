@@ -8,7 +8,7 @@ export default function VisualizerGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Palette Visualizer Guide — Preview Colors in Real UI Designs"
+        title="Palette Visualizer Guide — Preview Your Colors"
         description="Learn how to use the Palette Visualizer to preview color schemes in real UI templates. Complete guide for designers and developers. See colors in dashboards, landing pages and more."
         keywords="palette visualizer guide, color scheme preview guide, UI color palette tutorial, visualizer tutorial, design color preview guide, color UI template guide"
         canonicalPath="/visualizer-guide"
