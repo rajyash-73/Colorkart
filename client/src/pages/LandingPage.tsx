@@ -31,13 +31,22 @@ const GENERATOR_STEPS = [
   },
   {
     n: '03',
-    Icon: SplitSquareHorizontal,
+    Icon: Monitor,
     tint: 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-300',
-    title: 'Check contrast',
-    body: 'Test any pair against WCAG AA and AAA in the contrast checker before the colours reach production.',
+    title: 'Visualize in real UI',
+    body: 'Drop the palette into dashboard, landing page, chat and calendar mockups to see how it behaves in a real layout.',
+    pro: true,
   },
   {
     n: '04',
+    Icon: Type,
+    tint: 'bg-pink-100 text-pink-600 dark:bg-pink-900/40 dark:text-pink-300',
+    title: 'Simulate font pairing',
+    body: 'Pair the colors with Google Fonts across a name card, website, article or style guide, then export the design.',
+    pro: true,
+  },
+  {
+    n: '05',
     Icon: Download,
     tint: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
     title: 'Export to your stack',
@@ -659,14 +668,14 @@ export default function LandingPage() {
             How the palette generator works
           </h2>
           <p className="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-10 leading-relaxed">
-            Four steps from a blank canvas to colors you can ship.
+            Five steps from a blank canvas to colors you can ship.
           </p>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {GENERATOR_STEPS.map(({ n, Icon, tint, title, body }) => (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {GENERATOR_STEPS.map(({ n, Icon, tint, title, body, pro }) => (
               <div
                 key={title}
-                className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 hover:border-violet-200 dark:hover:border-violet-700 transition-colors"
+                className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:border-violet-200 dark:hover:border-violet-700 transition-colors"
               >
                 <span aria-hidden="true" className="absolute right-5 top-4 text-3xl font-bold text-gray-100 dark:text-gray-700 select-none">
                   {n}
@@ -674,7 +683,14 @@ export default function LandingPage() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${tint}`}>
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+                  {pro && (
+                    <span className="rounded-md bg-[#db1a72]/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#db1a72]">
+                      Pro
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{body}</p>
               </div>
             ))}
