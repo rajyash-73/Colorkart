@@ -5,14 +5,14 @@ import { PRO_PRICE_LABEL, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 export default function RefundPolicy() {
   return (
     <LegalPage
-      title="Refund and Cancellation Policy | Coolors"
+      title="Refund and Cancellation Policy | Coolors.in"
       heading="Refund and Cancellation Policy"
-      description={`Coolors Pro comes with a ${REFUND_DAYS}-day full refund. Learn how to request a refund, how long it takes, and what happens to your account.`}
+      description={`Coolors.in Pro comes with a ${REFUND_DAYS}-day full refund. Learn how to request a refund, how long it takes, and what happens to your account.`}
       path="/refund-policy"
     >
       <p>
-        Coolors Pro is a one-time digital purchase of {PRO_PRICE_LABEL} that unlocks features on
-        coolors.in. This policy explains when you can get your money back and how.
+        Coolors.in Pro is a one-time digital purchase of {PRO_PRICE_LABEL} that unlocks features on
+        Coolors.in. This policy explains when you can get your money back and how.
       </p>
 
       <h2>{REFUND_DAYS}-day refund</h2>
@@ -30,7 +30,7 @@ export default function RefundPolicy() {
       <h2>How to request a refund</h2>
       <p>
         Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> with the email address on your
-        Coolors account and the Razorpay payment ID from your receipt (it starts with <strong>pay_</strong>).
+        Coolors.in account and the Razorpay payment ID from your receipt (it starts with <strong>pay_</strong>).
       </p>
 
       <h2>When you'll receive it</h2>

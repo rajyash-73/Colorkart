@@ -62,10 +62,10 @@ export default function Footer({ className }: FooterProps) {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-16 h-7">
-                <img src="/logo_circles.svg" alt="Coolors Logo" className="h-full" />
+                <img src="/logo_circles.svg" alt="Coolors.in Logo" className="h-full" />
               </div>
               <span className="font-bold text-lg bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                Coolors
+                Coolors.in
               </span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
@@ -119,7 +119,7 @@ export default function Footer({ className }: FooterProps) {
         </div>
 
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-500">
-          <span>© {currentYear} Coolors — All rights reserved.</span>
+          <span>© {currentYear} Coolors.in — All rights reserved.</span>
           <span className="mt-2 sm:mt-0 flex items-center gap-1">
             Made with <Heart size={13} className="text-red-500" /> for designers everywhere
           </span>

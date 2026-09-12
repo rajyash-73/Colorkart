@@ -18,8 +18,8 @@ export default function ImagePaletteGuide() {
           "@type": "Article",
           "headline": "Image Color Palette Guide",
           "description": "Learn how to extract and use color palettes from images for design projects.",
-          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
-          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "author": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
           "url": "https://coolors.in/image-palette-guide"
         }}
       />

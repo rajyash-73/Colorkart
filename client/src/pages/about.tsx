@@ -30,7 +30,7 @@ export default function About() {
           },
           "publisher": {
             "@type": "Organization",
-            "name": "Coolors",
+            "name": "Coolors.in",
             "url": "https://www.coolors.in"
           }
         }}
@@ -47,7 +47,7 @@ export default function About() {
             [&_strong]:font-semibold [&_strong]:text-gray-900 dark:[&_strong]:text-white
             [&_p_a]:text-violet-600 dark:[&_p_a]:text-violet-400 [&_p_a]:underline [&_p_a]:underline-offset-2"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">About Coolors</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">About Coolors.in</h1>
           <p className="mt-3 text-gray-500 dark:text-gray-400">
             A free color palette generator built for designers, developers and artists — designed to make
             beautiful color work effortless.
@@ -71,7 +71,7 @@ export default function About() {
 
           <h2>A note from the creator</h2>
           <p>
-            I'm Yash, and I built coolors.in to democratize color palette generation. Generate unlimited color
+            I'm Yash, and I built Coolors.in to democratize color palette generation. Generate unlimited color
             palettes, or browse the Explore library: curated palettes plus ones shared by the community.
           </p>
           <p>

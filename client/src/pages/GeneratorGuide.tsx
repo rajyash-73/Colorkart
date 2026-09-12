@@ -11,8 +11,8 @@ export default function GeneratorGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Color Palette Generator Guide | Coolors"
-        description="Learn how to use the Coolors color palette generator. Understand color theory modes, how to lock colors, export palettes and more. Complete guide for designers and developers."
+        title="Color Palette Generator Guide | Coolors.in"
+        description="Learn how to use the Coolors.in color palette generator. Understand color theory modes, how to lock colors, export palettes and more. Complete guide for designers and developers."
         keywords="color palette generator guide, how to use color palette generator, color theory modes explained, complementary analogous triadic palette, palette export guide, color scheme generator tutorial"
         canonicalPath="/generator-guide"
         ogType="article"
@@ -20,9 +20,9 @@ export default function GeneratorGuide() {
           "@context": "https://schema.org",
           "@type": "Article",
           "headline": "Color Palette Generator Guide",
-          "description": "Learn how to use the Coolors color palette generator with color theory modes, locking, exporting and more.",
-          "author": { "@type": "Organization", "name": "Coolors", "url": "https://www.coolors.in" },
-          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://www.coolors.in" },
+          "description": "Learn how to use the Coolors.in color palette generator with color theory modes, locking, exporting and more.",
+          "author": { "@type": "Organization", "name": "Coolors.in", "url": "https://www.coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors.in", "url": "https://www.coolors.in" },
           "url": "https://www.coolors.in/generator-guide"
         }}
       />
@@ -40,7 +40,7 @@ export default function GeneratorGuide() {
             </span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Everything you need to know about generating, customising and exporting color palettes with Coolors — from basic controls to advanced color theory.
+            Everything you need to know about generating, customising and exporting color palettes with Coolors.in — from basic controls to advanced color theory.
           </p>
           <a
             href="/generator"
@@ -56,7 +56,7 @@ export default function GeneratorGuide() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">How to Use the Color Palette Generator</h2>
             <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 leading-relaxed">
-              Generating a color palette with Coolors takes seconds. Press the <strong>spacebar</strong> or click <strong>Generate</strong> to
+              Generating a color palette with Coolors.in takes seconds. Press the <strong>spacebar</strong> or click <strong>Generate</strong> to
               instantly create a new five-color palette. If you find a color you love, click the <strong>lock icon</strong> to keep it in place
               while the rest of the palette regenerates around it. You can <strong>drag and drop</strong> swatches to reorder them, and{" "}
               <strong>click any color</strong> to fine-tune its hue, saturation and lightness with the built-in color picker. When your palette
@@ -144,7 +144,7 @@ export default function GeneratorGuide() {
                 },
                 {
                   q: "Can I save my color palettes for free?",
-                  a: "Yes. Create a free Coolors account to save up to 5 palettes to your library. Saved palettes sync across all devices and can be shared publicly with the community on the Explore page. A one-time Coolors Pro purchase lifts the limit.",
+                  a: "Yes. Create a free Coolors.in account to save up to 5 palettes to your library. Saved palettes sync across all devices and can be shared publicly with the community on the Explore page. A one-time Coolors.in Pro purchase lifts the limit.",
                 },
                 {
                   q: "How do I export a color palette?",

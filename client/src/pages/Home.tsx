@@ -158,8 +158,8 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
       <Helmet>
-        <title>Coolors - Free Color Palette Generator | Create Beautiful Color Schemes</title>
-        <meta name="description" content="Create and explore beautiful color combinations with Coolors, the free color palette generator. Design with confidence using our intuitive color tools." />
+        <title>Coolors.in - Free Color Palette Generator | Create Beautiful Color Schemes</title>
+        <meta name="description" content="Create and explore beautiful color combinations with Coolors.in, the free color palette generator. Design with confidence using our intuitive color tools." />
         <meta name="keywords" content="color palette generator, color scheme, color combinations, design tools" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="canonical" href="https://www.coolors.in/" />
@@ -168,7 +168,7 @@ export default function Home() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Coolors Color Palette Generator",
+            "name": "Coolors.in Color Palette Generator",
             "url": "https://www.coolors.in/",
             "description": "Create beautiful color combinations with our intuitive color generator",
             "applicationCategory": "DesignApplication",

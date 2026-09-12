@@ -7,7 +7,7 @@ export default function DesignersGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900 flex flex-col">
       <SEOHead
-        title="Designer's Guide to Color Theory | Coolors"
+        title="Designer's Guide to Color Theory | Coolors.in"
         description="Learn color theory from scratch. Understand monochromatic, analogous, complementary and triadic harmonies. Complete guide for designers."
         keywords="color theory guide, color harmonies, monochromatic palette, analogous colors, complementary colors, triadic color scheme, tetradic palette, designer color guide, colour theory guide, color wheel theory, web design color theory, color combinations explained"
         canonicalPath="/designers-guide"
@@ -17,8 +17,8 @@ export default function DesignersGuide() {
           "@type": "Article",
           "headline": "Designer's Guide to Color Theory",
           "description": "Learn color theory, harmonies and how to create beautiful color palettes for your design projects.",
-          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
-          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in", "logo": { "@type": "ImageObject", "url": "https://coolors.in/logo.svg" } },
+          "author": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in", "logo": { "@type": "ImageObject", "url": "https://coolors.in/logo.svg" } },
           "url": "https://coolors.in/designers-guide",
           "mainEntityOfPage": { "@type": "WebPage", "@id": "https://coolors.in/designers-guide" }
         }}
@@ -161,7 +161,7 @@ export default function DesignersGuide() {
             </div>
 
             <p className="text-gray-700 dark:text-gray-300">
-              At Coolors, you can experiment with all these rules using our easy palette generator. 
+              At Coolors.in, you can experiment with all these rules using our easy palette generator. 
               Not sure where to start? Just pick a base color and choose a rule — we'll handle the rest.
             </p>
 

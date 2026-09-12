@@ -404,7 +404,7 @@ function PaletteApp() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <SEOHead
-        title="Color Palette Generator — Fast & Free | Coolors"
+        title="Color Palette Generator — Fast & Free | Coolors.in"
         description="Press spacebar to generate color schemes fast. Lock colors you love, pick complementary, analogous or triadic modes, export CSS & Tailwind. Free, no sign-up."
         keywords="color palette generator, random color generator, colour palette generator, color scheme maker, complementary colors, analogous colors, triadic colors, CSS color variables, hex color generator, palette maker online, color theory tool, design color picker, color harmony generator"
         canonicalPath="/generator"
@@ -414,9 +414,9 @@ function PaletteApp() {
           "mainEntity": [
             { "@type": "Question", "name": "How do I generate a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Press the spacebar or click Generate to create a new random palette instantly. Lock any color you want to keep, then regenerate the rest." } },
             { "@type": "Question", "name": "What color theory modes are available?", "acceptedAnswer": { "@type": "Answer", "text": "Five modes: Complementary (opposite hues, high contrast), Analogous (adjacent hues, harmonious), Triadic (3 equidistant hues, vibrant), Tetradic (4 hues, rich), and Monochromatic (one hue at varying lightness)." } },
-            { "@type": "Question", "name": "Can I save my color palettes for free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create a free Coolors account to save up to 5 palettes, share them publicly with the community and access them from any device. A one-time Coolors Pro purchase makes saves unlimited." } },
+            { "@type": "Question", "name": "Can I save my color palettes for free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create a free Coolors.in account to save up to 5 palettes, share them publicly with the community and access them from any device. A one-time Coolors.in Pro purchase makes saves unlimited." } },
             { "@type": "Question", "name": "How do I export a color palette?", "acceptedAnswer": { "@type": "Answer", "text": "Click Export in the generator toolbar. Choose from PNG image, CSS custom properties, SCSS variables, Tailwind config or JSON format." } },
-            { "@type": "Question", "name": "Is the color palette generator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Generating, exporting and sharing colour palettes is free with no sign-up. A one-time Coolors Pro purchase unlocks the visualizer, image-to-palette, font pairing, unlimited saves and an ad-free site." } }
+            { "@type": "Question", "name": "Is the color palette generator free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Generating, exporting and sharing colour palettes is free with no sign-up. A one-time Coolors.in Pro purchase unlocks the visualizer, image-to-palette, font pairing, unlimited saves and an ad-free site." } }
           ]
         }}
       />

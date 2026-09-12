@@ -74,10 +74,10 @@ export default function Header({ mobileMenuOpen, toggleMobileMenu }: HeaderProps
         <div className="flex items-center space-x-1 sm:space-x-2 cursor-pointer" onClick={() => window.location.href = '/'}>
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="w-16 sm:w-20 md:w-24 h-6 sm:h-8">
-              <img src="/logo_circles.svg" alt="Coolors Logo" className="h-full" />
+              <img src="/logo_circles.svg" alt="Coolors.in Logo" className="h-full" />
             </div>
             <span className="font-bold text-md sm:text-lg md:text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Coolors
+              Coolors.in
             </span>
             {/* Only ever appears once entitlement has resolved, so a free
                 account cannot be shown the badge even momentarily. */}

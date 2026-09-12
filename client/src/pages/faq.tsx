@@ -8,15 +8,15 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
       <SEOHead
-        title="FAQ — Color Palette Generator | Coolors"
-        description="Find answers to common questions about Coolors color palette generator. Learn how to generate, save, export palettes and use color theory. Help for designers worldwide."
+        title="FAQ — Color Palette Generator | Coolors.in"
+        description="Find answers to common questions about Coolors.in color palette generator. Learn how to generate, save, export palettes and use color theory. Help for designers worldwide."
         keywords="color palette generator FAQ, color tool help, how to use color palette generator, palette generator guide, colour palette generator FAQ, color tool questions, color theory help"
         canonicalPath="/faq"
         structuredData={{
           "@context": "https://schema.org",
           "@type": "FAQPage",
           "mainEntity": [
-            { "@type": "Question", "name": "What is Coolors?", "acceptedAnswer": { "@type": "Answer", "text": "Coolors is a free online color palette generator that helps you create aesthetic color combinations for your design projects." } },
+            { "@type": "Question", "name": "What is Coolors.in?", "acceptedAnswer": { "@type": "Answer", "text": "Coolors.in is a free online color palette generator that helps you create aesthetic color combinations for your design projects." } },
             { "@type": "Question", "name": "Do I need to create an account?", "acceptedAnswer": { "@type": "Answer", "text": "No, you can use the tool right away without any sign-up or login." } },
             { "@type": "Question", "name": "Can I use the palettes for commercial use?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, all palettes are free to use for personal or commercial projects." } },
             { "@type": "Question", "name": "How do I generate a palette?", "acceptedAnswer": { "@type": "Answer", "text": "Press the spacebar or click the Generate button on the palette generator page to create a new random color palette." } },
@@ -42,9 +42,9 @@ export default function FAQPage() {
 
         <div className="space-y-6">
           <div className="border-b border-gray-200 dark:border-gray-700 pb-5">
-            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">1. What is Coolors?</h2>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">1. What is Coolors.in?</h2>
             <p className="text-gray-600 dark:text-gray-300">
-              Coolors is a free online color palette generator that helps you create aesthetic color combinations for your design projects.
+              Coolors.in is a free online color palette generator that helps you create aesthetic color combinations for your design projects.
             </p>
           </div>
           
@@ -70,7 +70,7 @@ export default function FAQPage() {
           </div>
           
           <div className="border-b border-gray-200 dark:border-gray-700 pb-5">
-            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">5. Does Coolors store my data?</h2>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">5. Does Coolors.in store my data?</h2>
             <p className="text-gray-600 dark:text-gray-300">
               No personal data is stored. We use anonymous tracking through cookies and analytics tools. Read our <span className="text-blue-600 hover:underline cursor-pointer" onClick={() => window.location.href = '/privacy-policy'}>Privacy Policy</span> for details.
             </p>

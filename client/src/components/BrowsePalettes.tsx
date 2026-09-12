@@ -203,7 +203,7 @@ export default function BrowsePalettes({ onSelectPalette, userId, subtitle }: Br
     openPopup(
       `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
       `&media=${encodeURIComponent(`${SHARE_ORIGIN}/api/palette-image?c=${colorsParam(palette)}&layout=tall`)}` +
-      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
+      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors.in`)}`,
     );
   };
 

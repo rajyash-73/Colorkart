@@ -17,9 +17,9 @@ export default function VisualizerGuide() {
           "@context": "https://schema.org",
           "@type": "Article",
           "headline": "Palette Visualizer Guide",
-          "description": "Learn how to preview color palettes in real UI templates using the Coolors Palette Visualizer.",
-          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
-          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "description": "Learn how to preview color palettes in real UI templates using the Coolors.in Palette Visualizer.",
+          "author": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
           "url": "https://coolors.in/visualizer-guide"
         }}
       />

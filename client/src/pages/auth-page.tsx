@@ -124,8 +124,8 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Sign In or Create Account | Coolors"
-        description="Sign in or create a free Coolors account to save color palettes, share with the community and export in multiple formats."
+        title="Sign In or Create Account | Coolors.in"
+        description="Sign in or create a free Coolors.in account to save color palettes, share with the community and export in multiple formats."
         canonicalPath="/auth"
         noIndex={true}
       />
@@ -134,9 +134,9 @@ export default function AuthPage() {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
             <ChevronLeft size={16} />
-            <span className="font-medium">Back to Coolors</span>
+            <span className="font-medium">Back to Coolors.in</span>
           </a>
-          <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Coolors</span>
+          <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Coolors.in</span>
         </div>
       </div>
 
@@ -145,7 +145,7 @@ export default function AuthPage() {
         <div className="hidden md:flex w-1/2 bg-gradient-to-br from-violet-600 via-blue-600 to-indigo-700 p-12 flex-col justify-center text-white">
           <div className="max-w-md">
             <h1 className="text-4xl font-bold mb-4">Your Colors, Your Story</h1>
-            <p className="text-violet-200 text-lg mb-8">Create, save, and share beautiful color palettes. Join thousands of designers using Coolors.</p>
+            <p className="text-violet-200 text-lg mb-8">Create, save, and share beautiful color palettes. Join thousands of designers using Coolors.in.</p>
             <div className="space-y-3">
               {['Save up to 5 palettes free', 'Share with the community', 'Export in CSS, SCSS, Tailwind'].map(f => (
                 <div key={f} className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function AuthPage() {
           <div className="w-full max-w-md">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{tab === 'login' ? 'Welcome back' : 'Create account'}</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{tab === 'login' ? 'Sign in to your Coolors account' : 'Start creating beautiful palettes'}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{tab === 'login' ? 'Sign in to your Coolors.in account' : 'Start creating beautiful palettes'}</p>
 
               {/* Google OAuth */}
               <button

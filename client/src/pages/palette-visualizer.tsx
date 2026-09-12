@@ -35,21 +35,21 @@ export default function PaletteVisualizer() {
       <Header mobileMenuOpen={mobileMenuOpen} toggleMobileMenu={() => setMobileMenuOpen(m => !m)} />
       <div className="flex-1 p-4 md:p-8 flex flex-col">
       <Helmet>
-        <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors</title>
+        <title>Palette Visualizer | See Your Colors in Real UI Templates - Coolors.in</title>
         <meta name="description" content="Visualize your color palette in real UI templates. See how your colors work together in dashboards, landing pages, and app interfaces." />
         <meta name="keywords" content="palette visualizer, color combinations, UI templates, color schemes in action" />
-        <link rel="canonical" href="https://Coolors/visualize" />
+        <link rel="canonical" href="https://Coolors.in/visualize" />
         {/* Dynamic structured data for the visualizer page */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Palette Visualizer | Coolors",
-            "url": "https://Coolors/visualize",
-            "description": "Visualize your color palette in real UI templates with Coolors's Palette Visualizer",
+            "name": "Palette Visualizer | Coolors.in",
+            "url": "https://Coolors.in/visualize",
+            "description": "Visualize your color palette in real UI templates with Coolors.in's Palette Visualizer",
             "isPartOf": {
               "@type": "WebApplication",
-              "name": "Coolors"
+              "name": "Coolors.in"
             }
           })}
         </script>

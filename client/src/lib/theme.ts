@@ -1,4 +1,4 @@
-// Maps an arbitrary Coolors palette onto the semantic tokens a mockup needs.
+// Maps an arbitrary Coolors.in palette onto the semantic tokens a mockup needs.
 // Palettes carry no role information — just an ordered list of hexes — so roles
 // are inferred from luminance and saturation, then the user can reassign them
 // by dragging the role swatches.

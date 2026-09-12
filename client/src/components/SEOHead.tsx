@@ -33,7 +33,7 @@ export default function SEOHead({
   noIndex = false,
 }: SEOHeadProps) {
   const canonicalUrl = `${BASE_URL}${canonicalPath}`;
-  const fullTitle = title.includes('Coolors') ? title : `${title} | Coolors`;
+  const fullTitle = title.includes('Coolors') ? title : `${title} | Coolors.in`;
   const robotsContent = noIndex
     ? 'noindex, follow'
     : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
@@ -46,7 +46,7 @@ export default function SEOHead({
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
       <meta name="robots" content={robotsContent} />
-      <meta name="author" content="Coolors" />
+      <meta name="author" content="Coolors.in" />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* ── hreflang ─────────────────────────────────────── */}
@@ -63,7 +63,7 @@ export default function SEOHead({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={title} />
-      <meta property="og:site_name" content="Coolors" />
+      <meta property="og:site_name" content="Coolors.in" />
       <meta property="og:locale" content="en_US" />
 
       {/* ── Twitter / X Card ─────────────────────────────── */}

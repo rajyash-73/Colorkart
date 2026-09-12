@@ -5,9 +5,9 @@ import LegalPage, { CONTACT_EMAIL } from '@/components/LegalPage';
 export default function Contact() {
   return (
     <LegalPage
-      title="Contact Us | Coolors"
+      title="Contact Us | Coolors.in"
       heading="Contact Us"
-      description={`Get in touch with Coolors for help with your account, Pro purchases, refunds or feedback. Email ${CONTACT_EMAIL}.`}
+      description={`Get in touch with Coolors.in for help with your account, Pro purchases, refunds or feedback. Email ${CONTACT_EMAIL}.`}
       path="/contact"
       showUpdated={false}
     >
@@ -29,7 +29,7 @@ export default function Contact() {
       <h2>Payments and Pro</h2>
       <p>
         Charged but Pro isn't active, charged twice, or want a refund? Email us with the email address on
-        your Coolors account and the Razorpay payment ID from your receipt (it starts with{' '}
+        your Coolors.in account and the Razorpay payment ID from your receipt (it starts with{' '}
         <strong>pay_</strong>). That lets us find your payment straight away.
       </p>
 
@@ -38,9 +38,9 @@ export default function Contact() {
         Bug reports, feature ideas, feedback and business enquiries are all welcome at the same address.
       </p>
 
-      <h2>Who runs Coolors</h2>
+      <h2>Who runs Coolors.in</h2>
       <p>
-        coolors.in is built and run by Yash, an independent developer based in India.
+        Coolors.in is built and run by Yash, an independent developer based in India.
       </p>
     </LegalPage>
   );

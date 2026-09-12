@@ -33,7 +33,7 @@ export default function ProUpgradeModal({ open, onClose, reason }: {
         <div className="flex items-start justify-between mb-1">
           <div className="flex items-center gap-2">
             <Sparkles size={18} className="text-violet-600" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Coolors Pro</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Coolors.in Pro</h2>
           </div>
           <button onClick={onClose} aria-label="Close"
             className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">

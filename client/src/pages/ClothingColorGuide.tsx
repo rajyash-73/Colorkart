@@ -8,7 +8,7 @@ export default function ClothingColorGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Clothing Color Guide | Coolors"
+        title="Clothing Color Guide | Coolors.in"
         description="Master clothing color combinations with our complete guide. Learn which colors work together, seasonal palettes, and how to build a cohesive wardrobe for every style."
         keywords="clothing color combinations, fashion color guide, outfit color matching, wardrobe color palette, what colors go with what clothing, colour combinations for clothes, fashion colour theory, style color guide, color matching outfits"
         canonicalPath="/korean-color-analysis-guide"
@@ -18,8 +18,8 @@ export default function ClothingColorGuide() {
           "@type": "Article",
           "headline": "Clothing Color Guide — How to Combine Colors in Fashion",
           "description": "Master clothing color combinations and build a cohesive wardrobe.",
-          "author": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
-          "publisher": { "@type": "Organization", "name": "Coolors", "url": "https://coolors.in" },
+          "author": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
+          "publisher": { "@type": "Organization", "name": "Coolors.in", "url": "https://coolors.in" },
           "url": "https://coolors.in/clothing-color-guide"
         }}
       />

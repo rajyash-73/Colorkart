@@ -88,9 +88,9 @@ export default function Pricing() {
 
   return (
     <LegalPage
-      title="Pricing: Free and Pro | Coolors"
+      title="Pricing: Free and Pro | Coolors.in"
       heading="Pricing"
-      description={`Coolors is free to use. Pro is a one-time ${PRO_PRICE_LABEL} payment that removes ads and unlocks the visualizer, image-to-palette, font pairing and unlimited saves.`}
+      description={`Coolors.in is free to use. Pro is a one-time ${PRO_PRICE_LABEL} payment that removes ads and unlocks the visualizer, image-to-palette, font pairing and unlimited saves.`}
       path="/pricing"
       showUpdated={false}
       wide
@@ -153,7 +153,7 @@ export default function Pricing() {
 
       <h2>Delivery</h2>
       <p>
-        Pro is a digital service, so there is nothing to ship. It is activated on your Coolors account the
+        Pro is a digital service, so there is nothing to ship. It is activated on your Coolors.in account the
         moment your payment succeeds, and works on every device you sign in to. If Pro isn't active within
         10 minutes of paying, email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> with your
         payment ID and we'll sort it out.
@@ -161,7 +161,7 @@ export default function Pricing() {
 
       <h2>What "lifetime" means</h2>
       <p>
-        Your Pro access lasts for as long as Coolors operates this service, with no renewal fees.
+        Your Pro access lasts for as long as Coolors.in operates this service, with no renewal fees.
       </p>
 
       <h2>Refunds</h2>

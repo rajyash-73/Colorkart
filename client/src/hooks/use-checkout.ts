@@ -83,7 +83,7 @@ export function useCheckout() {
         order_id: order.order_id,
         amount: order.amount,
         currency: order.currency,
-        name: 'Coolors',
+        name: 'Coolors.in',
         description: 'Pro, lifetime access',
         prefill: { email: user.email, name: user.name },
         theme: { color: '#7c3aed' },

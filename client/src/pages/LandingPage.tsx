@@ -66,8 +66,8 @@ const HOMEPAGE_FAQS = [
     a: 'Coolors.in is a free color palette generator that lets you create harmonious color schemes instantly. Press spacebar to generate, lock colors you want to keep, choose from 5 color theory modes, and export as CSS, PNG or Tailwind config, with no sign-up required.',
   },
   {
-    q: 'Is Coolors free to use?',
-    a: 'Yes. Generating and exporting colour palettes is free at no cost, and free accounts can save up to 5 palettes. A one-time Coolors Pro purchase unlocks unlimited saves, the visualizer, image-to-palette, font pairing and an ad-free site.',
+    q: 'Is Coolors.in free to use?',
+    a: 'Yes. Generating and exporting colour palettes is free at no cost, and free accounts can save up to 5 palettes. A one-time Coolors.in Pro purchase unlocks unlimited saves, the visualizer, image-to-palette, font pairing and an ad-free site.',
   },
   {
     q: 'Can I use the palettes commercially?',
@@ -87,15 +87,15 @@ const HOMEPAGE_FAQS = [
   },
   {
     q: 'Can I create a color palette from an image?',
-    a: 'Yes. Image to Palette pulls the dominant colors out of any photo you upload, ready to lock, adjust and export. It is a Coolors Pro feature, included in the one-time purchase.',
+    a: 'Yes. Image to Palette pulls the dominant colors out of any photo you upload, ready to lock, adjust and export. It is a Coolors.in Pro feature, included in the one-time purchase.',
   },
   {
     q: 'How do I check if my colors are accessible?',
     a: 'Use the free contrast checker at coolors.in/contrast-checker. It shows the contrast ratio between any two colors and whether that ratio passes WCAG 2.1 AA and AAA for normal and large text.',
   },
   {
-    q: 'Do I need an account to use Coolors?',
-    a: 'No. Generating, adjusting and exporting palettes needs no sign-up. An account is only for saving: a free account keeps up to 5 palettes, and Coolors Pro removes the limit.',
+    q: 'Do I need an account to use Coolors.in?',
+    a: 'No. Generating, adjusting and exporting palettes needs no sign-up. An account is only for saving: a free account keeps up to 5 palettes, and Coolors.in Pro removes the limit.',
   },
 ];
 
@@ -442,7 +442,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <SEOHead
-        title="Free Color Palette Generator & Color Schemes | Coolors"
+        title="Free Color Palette Generator & Color Schemes | Coolors.in"
         description="Generate color palettes instantly. Free color palette generator with 5 color theory modes, contrast checking and CSS, Tailwind and PNG export. No sign-up."
         keywords="color palette generator, color palettes, free color palette, color scheme generator, color schemes, color combinations, trending color palettes, CSS color palette, hex color picker, web design colors, UI color tool, color theory"
         canonicalPath="/"
@@ -450,7 +450,7 @@ export default function LandingPage() {
           {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Coolors",
+            "name": "Coolors.in",
             "url": "https://www.coolors.in",
             "description": "Coolors.in is a free color palette generator for designers, developers and artists. Generate harmonious color schemes instantly, lock colors you love, and export as CSS, PNG or Tailwind config.",
             "potentialAction": {
@@ -462,7 +462,7 @@ export default function LandingPage() {
           {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "Coolors",
+            "name": "Coolors.in",
             "url": "https://www.coolors.in",
             "logo": "https://www.coolors.in/logo_circles.svg",
             "contactPoint": { "@type": "ContactPoint", "email": "coolors.in@gmail.com", "contactType": "customer support" }
@@ -470,7 +470,7 @@ export default function LandingPage() {
           {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Coolors — Free Color Palette Generator",
+            "name": "Coolors.in — Free Color Palette Generator",
             "url": "https://www.coolors.in",
             "applicationCategory": "DesignApplication",
             "applicationSubCategory": "Color Palette Generator",

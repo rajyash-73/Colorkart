@@ -444,7 +444,7 @@ export default function KoreanColorAnalysis() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <SEOHead
-        title="Korean Color Analysis — Free Personal Color Test | Coolors"
+        title="Korean Color Analysis — Personal Color Test | Coolors.in"
         description="Find your Korean personal color season (퍼스널 컬러) online. Upload a selfie, try 48 colors against your photo, compare gold vs silver, and download your result card. Free."
         keywords="Korean color analysis, personal color analysis, 퍼스널 컬러, personal color test online free, color season analysis, skin tone color test, spring summer autumn winter color, warm cool undertone test"
         canonicalPath="/korean-color-analysis"

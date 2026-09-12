@@ -36,7 +36,7 @@ export default class ErrorBoundary extends React.Component<{ children: React.Rea
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     // Kept in the console so a report can carry the real cause rather than
     // "the page was blank".
-    console.error('Coolors crashed:', error, info.componentStack);
+    console.error('Coolors.in crashed:', error, info.componentStack);
   }
 
   render() {

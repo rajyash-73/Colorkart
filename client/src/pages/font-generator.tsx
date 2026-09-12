@@ -84,7 +84,7 @@ color: ${color};${italic ? '\nfont-style: italic;' : ''}${underline ? '\ntext-de
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEOHead
-        title="Font Generator — Google Fonts | Coolors"
+        title="Font Generator — Google Fonts | Coolors.in"
         description="Preview and customize 30+ Google Fonts instantly. Adjust size, weight, spacing and color. Export CSS and font stack for your project. Free."
         keywords="font generator online, Google Fonts preview, typography tool, font pairing tool, web font generator, CSS font import, Google Fonts CSS, font preview tool, font size preview, font weight preview, typography generator, font style maker, free font generator"
         canonicalPath="/font-generator"

@@ -22,8 +22,8 @@ export default function handler(req, res) {
   const named = c.split('-').map((h) => `${getColorName(h)} #${h.toUpperCase()}`).join(' · ');
   const target = `${ORIGIN}/explore?palette=${encodeURIComponent(id)}`;
   const image = `${ORIGIN}/api/palette-image?c=${encodeURIComponent(c)}`;
-  const title = `${name} — Color Palette | Coolors`;
-  const description = `${named} — explore and copy this free color palette on Coolors.`;
+  const title = `${name} — Color Palette | Coolors.in`;
+  const description = `${named} — explore and copy this free color palette on Coolors.in.`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@ export default function handler(req, res) {
 <meta name="description" content="${description}">
 <link rel="canonical" href="${target}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Coolors">
+<meta property="og:site_name" content="Coolors.in">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${target}">

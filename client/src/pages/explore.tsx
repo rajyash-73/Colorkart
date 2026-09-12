@@ -84,7 +84,7 @@ function PaletteCard({
     openPopup(
       `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(paletteUrl(palette.id))}` +
       `&media=${encodeURIComponent(`${SHARE_ORIGIN}/api/palette-image?c=${colorsParam(palette)}&layout=tall`)}` +
-      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors`)}`,
+      `&description=${encodeURIComponent(`${paletteCaption(palette)} — free color palette on Coolors.in`)}`,
     );
   };
 
@@ -335,7 +335,7 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SEOHead
-        title="Explore Trending Color Palettes | Coolors"
+        title="Explore Trending Color Palettes | Coolors.in"
         description="Browse trending color palettes for designers and artists — pastel, vintage, retro, neon, dark and more. Save favorites and apply any palette to the generator, free."
         keywords="trending color palettes, color palettes for designers, color palette ideas, explore color palettes, pastel color palette, vintage color palette, retro color palette, color scheme examples, color inspiration, popular color combinations"
         canonicalPath="/explore"
@@ -345,7 +345,7 @@ export default function ExplorePage() {
           "name": "Explore Color Palettes",
           "url": "https://www.coolors.in/explore",
           "description": "Browse curated color palettes for your next design project.",
-          "provider": { "@type": "Organization", "name": "Coolors", "url": "https://www.coolors.in" },
+          "provider": { "@type": "Organization", "name": "Coolors.in", "url": "https://www.coolors.in" },
           "numberOfItems": POPULAR_PALETTES.length,
           "itemListElement": POPULAR_PALETTES.slice(0, 10).map((p: { name: string }, i: number) => ({
             "@type": "ListItem",

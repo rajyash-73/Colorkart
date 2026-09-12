@@ -5,14 +5,14 @@ import MediavineNotice from '@/components/MediavineNotice';
 export default function PrivacyPolicy() {
   return (
     <LegalPage
-      title="Privacy Policy | Coolors"
+      title="Privacy Policy | Coolors.in"
       heading="Privacy Policy"
-      description="What coolors.in collects, why, who it is shared with, and how to access or delete your data."
+      description="What Coolors.in collects, why, who it is shared with, and how to access or delete your data."
       path="/privacy-policy"
     >
       <p>
-        This policy explains what coolors.in ("Coolors", "we") collects, why, and what you can do about it.
-        Coolors is built and run by Yash, an independent developer based in India.
+        This policy explains what Coolors.in ("we") collects, why, and what you can do about it.
+        Coolors.in is built and run by Yash, an independent developer based in India.
       </p>
 
       <h2>What we collect</h2>
@@ -48,7 +48,7 @@ export default function PrivacyPolicy() {
 
       <h2>Advertising</h2>
       <p>
-        Ads on Coolors are served by Mediavine, which with its partners may use cookies and device
+        Ads on Coolors.in are served by Mediavine, which with its partners may use cookies and device
         identifiers to show relevant ads and measure how they perform. Pro members are not shown ads. You
         can limit personalized advertising through your browser settings or industry opt-out tools.
       </p>
@@ -56,7 +56,7 @@ export default function PrivacyPolicy() {
 
       <h2>Who we share it with</h2>
       <p>
-        We don't sell your personal data. We share it only with the services that run Coolors: Supabase
+        We don't sell your personal data. We share it only with the services that run Coolors.in: Supabase
         (accounts and palette storage), Razorpay and PayPal (payments), Mediavine (advertising), Google
         (analytics and web fonts) and Vercel (hosting). Each processes data under its own privacy policy. We may also
         disclose information where the law requires it.
@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
 
       <h2>Children</h2>
       <p>
-        Coolors isn't directed at children under 13, and we don't knowingly collect their personal data.
+        Coolors.in isn't directed at children under 13, and we don't knowingly collect their personal data.
         If you believe a child has given us personal data, contact us and we'll delete it.
       </p>
 

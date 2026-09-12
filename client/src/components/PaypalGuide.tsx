@@ -85,7 +85,7 @@ const STEPS: Step[] = [
     visual: <CheckCircle size={28} />,
     body: (
       <>
-        You're taken back to Coolors and Pro is active straight away. Not active after 10 minutes? Email{' '}
+        You're taken back to Coolors.in and Pro is active straight away. Not active after 10 minutes? Email{' '}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </>
     ),

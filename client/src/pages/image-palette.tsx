@@ -211,7 +211,7 @@ export default function ImagePalette() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <SEOHead
-        title="Extract Palette from Image | Coolors"
+        title="Extract Palette from Image | Coolors.in"
         description="Upload any photo to extract dominant colors instantly. Get the perfect palette from any image. Download as CSS, PNG or use in the generator."
         keywords="color palette from image, extract colors from image, image color picker, photo color extractor, image to palette, dominant colors from image, colour palette from photo, image color palette generator, extract color code from image, photo colour picker, image color scheme"
         canonicalPath="/image-palette"
