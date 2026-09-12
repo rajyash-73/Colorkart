@@ -1,12 +1,49 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from '@/components/SEOHead';
-import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Copy, Check, X } from "lucide-react";
+import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Lock, Copy, Check, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { POPULAR_PALETTES } from "@/lib/palettesData";
 import { useAuth } from "@/hooks/use-auth";
 import { PRO_PRICE_LABEL } from "@/hooks/use-pro";
 import { isLightColor } from "@/lib/colorUtils";
+
+/**
+ * The homepage's "how it works" steps. One action per step with a verb-led
+ * heading, so the section reads as instructions rather than describing itself
+ * in the abstract. Between them they carry the vocabulary this page is judged
+ * on: the five colour theory modes, locking, WCAG contrast, export formats.
+ */
+const GENERATOR_STEPS = [
+  {
+    n: '01',
+    Icon: Sparkles,
+    tint: 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300',
+    title: 'Generate with color theory',
+    body: 'Press the spacebar for a new palette built on complementary, analogous, triadic, tetradic or monochromatic harmony.',
+  },
+  {
+    n: '02',
+    Icon: Lock,
+    tint: 'bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-300',
+    title: 'Lock and fine-tune',
+    body: 'Keep the colors that work, regenerate the rest, and adjust any swatch by hue, saturation and lightness.',
+  },
+  {
+    n: '03',
+    Icon: SplitSquareHorizontal,
+    tint: 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-300',
+    title: 'Check contrast',
+    body: 'Test any pair against WCAG AA and AAA in the contrast checker before the colours reach production.',
+  },
+  {
+    n: '04',
+    Icon: Download,
+    tint: 'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300',
+    title: 'Export to your stack',
+    body: 'Take the palette out as CSS custom properties, SCSS variables, Tailwind config, JSON or a PNG image.',
+  },
+];
 
 /**
  * Homepage FAQ. The FAQPage structured data and the visible section near the
@@ -615,46 +652,32 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section className="grid md:grid-cols-3 gap-8 mb-20">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+        {/* How it works. The heading and intro sit outside the grid; when they
+            were inside it they became grid cells and broke the row. */}
+        <section className="mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 text-center">
             How the palette generator works
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-center max-w-3xl mx-auto mb-10 leading-relaxed">
-            Press the spacebar and the generator builds a new palette from five colour theory modes:
-            complementary, analogous, triadic, tetradic and monochromatic. Lock the colors you like and
-            generate again until the rest fit, or fine-tune any swatch by hue, saturation and lightness.
-            Export the result as CSS custom properties, SCSS variables, Tailwind config, JSON or PNG, and
-            check any pair against WCAG AA contrast before you ship it.
+          <p className="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-10 leading-relaxed">
+            Four steps from a blank canvas to colors you can ship.
           </p>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Palette className="w-8 h-8 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Smart Generation</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Our advanced algorithms create harmonious color combinations that work perfectly together.
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900 dark:to-emerald-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Monitor className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Live Preview</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              See your colors in action with our real-time visualization tools and UI mockups.
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-violet-100 dark:from-purple-900 dark:to-violet-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Download className="w-8 h-8 text-purple-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Easy Export</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Export your palettes in any format you need for your design workflow.
-            </p>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {GENERATOR_STEPS.map(({ n, Icon, tint, title, body }) => (
+              <div
+                key={title}
+                className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 hover:border-violet-200 dark:hover:border-violet-700 transition-colors"
+              >
+                <span aria-hidden="true" className="absolute right-5 top-4 text-3xl font-bold text-gray-100 dark:text-gray-700 select-none">
+                  {n}
+                </span>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${tint}`}>
+                  <Icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{body}</p>
+              </div>
+            ))}
           </div>
         </section>
 
