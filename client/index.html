@@ -36,7 +36,9 @@
     <link data-rh="true" rel="alternate" hreflang="x-default" href="https://www.coolors.in/" />
     <link data-rh="true" rel="alternate" hreflang="en" href="https://www.coolors.in/" />
 
-    <!-- Google Analytics -->
+    <!-- Google tag: Analytics and Google Ads share one gtag.js load, so the Ads
+         ID is a second config rather than a second copy of the loader. Its
+         conversion events fire per page from client/src/lib/googleAds.ts. -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB40PTGVD4"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -44,6 +46,7 @@
       gtag('js', new Date());
 
       gtag('config', 'G-XB40PTGVD4');
+      gtag('config', 'AW-972436066');
     </script>
 
     <!-- Mediavine / grow.me are injected at runtime by AdGate so they can be

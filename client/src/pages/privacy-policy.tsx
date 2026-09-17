@@ -20,7 +20,10 @@ export default function PrivacyPolicy() {
         <strong>When you use the tools.</strong> You don't need an account to generate palettes. We and our
         partners collect standard usage data, such as pages visited, device and browser type, and
         approximate location from your IP address, using cookies and similar technologies, including
-        Google Analytics.
+        Google Analytics and Google Ads. Google Ads measures whether a visit from one of our ads goes on to
+        reach our home or pricing page, and may add your browser to audiences we use to show you our ads on
+        other sites. You can turn off personalized Google ads in
+        your <a href="https://adssettings.google.com">Google Ad Settings</a>.
       </p>
       <p>
         <strong>When you create an account.</strong> Your email address and name, from the sign-up form or
@@ -58,7 +61,7 @@ export default function PrivacyPolicy() {
       <p>
         We don't sell your personal data. We share it only with the services that run Coolors.in: Supabase
         (accounts and palette storage), Razorpay and PayPal (payments), Mediavine (advertising), Google
-        (analytics and web fonts) and Vercel (hosting). Each processes data under its own privacy policy. We may also
+        (analytics, ad measurement and audiences, and web fonts) and Vercel (hosting). Each processes data under its own privacy policy. We may also
         disclose information where the law requires it.
       </p>
 

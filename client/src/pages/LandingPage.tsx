@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef, useCallback } from "react";
 import SEOHead from '@/components/SEOHead';
+import { trackPageViewConversion } from '@/lib/googleAds';
 import { ArrowRight, Palette, Smartphone, Monitor, Download, Users, SplitSquareHorizontal, Layers, Pipette, Compass, Type, Heart, BookMarked, Sparkles, Lock, Copy, Check, X, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -233,6 +234,8 @@ export default function LandingPage() {
 
   // Get Pro leads to the Pricing page; checkout opens from there.
   const goToPricing = () => { window.location.href = '/pricing'; };
+
+  useEffect(() => { trackPageViewConversion(); }, []);
 
   useEffect(() => {
     if (user) return;

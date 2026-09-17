@@ -5,6 +5,7 @@ import PaypalGuide from '@/components/PaypalGuide';
 import { usePro, PRO_PRICE_LABEL, PRO_INTENT_KEY, FREE_SAVE_LIMIT } from '@/hooks/use-pro';
 import { useAuth } from '@/hooks/use-auth';
 import { useCheckout } from '@/hooks/use-checkout';
+import { trackPageViewConversion } from '@/lib/googleAds';
 
 // "₹100 (≈ $1)" split so the rupee figure can be large and the dollar small,
 // while still coming from the one constant checkout is priced against.
@@ -74,6 +75,8 @@ export default function Pricing() {
   // Get Pro here opens the payment gateway directly: this page already lays
   // out what Pro includes, so there is no confirmation step in between.
   const { startCheckout, busy } = useCheckout();
+
+  useEffect(() => { trackPageViewConversion(); }, []);
 
   // Back from sign-in with a purchase pending: open checkout straight away,
   // since that is what they clicked before being sent to sign in.

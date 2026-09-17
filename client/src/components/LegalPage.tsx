@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 export const CONTACT_EMAIL = 'coolors.in@gmail.com';
 
 /** Shown as "Last updated" on the policy pages. Bump it when their text changes. */
-export const LEGAL_UPDATED = 'September 11, 2026';
+export const LEGAL_UPDATED = 'September 17, 2026';
 
 /** Days after purchase in which Pro can be refunded on request. Quoted by the
  *  Refund Policy and Pricing, so the two can never disagree. */
